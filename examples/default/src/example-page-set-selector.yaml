@@ -1,0 +1,9 @@
+includes:
+- common/header
+data:
+  title: "Example: Page set selector"
+dataSelectors:
+- id: selected
+  class: PageSetSelector
+  model:
+    pageSetId: page-set1

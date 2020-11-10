@@ -1,0 +1,5 @@
+data:
+  title: Page 0
+  content: |
+    This page has been rejected since the processed date (2020-10-31) is in the past,
+    please have a look at DateProcessor and DateFilter in page-set1.yaml

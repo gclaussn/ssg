@@ -1,0 +1,64 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+  <id>distribution</id>
+
+  <formats>
+    <format>zip</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>lib</outputDirectory>
+    </dependencySet>
+  </dependencySets>
+
+  <fileSets>
+    <fileSet>
+      <outputDirectory>conf</outputDirectory>
+      <directory>${project.basedir}/src/main/distribution/conf</directory>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>lib/ext</outputDirectory>
+      <directory>${project.basedir}/src/main/distribution/lib/ext</directory>
+    </fileSet>
+
+    <fileSet>
+      <outputDirectory>licenses</outputDirectory>
+      <directory>${project.basedir}/target/generated-resources/licenses</directory>
+    </fileSet>
+
+    <fileSet>
+      <outputDirectory>templates/default</outputDirectory>
+      <directory>${project.basedir}/../examples/default</directory>
+      <excludes>
+        <exclude>out/**</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+
+  <files>
+    <file>
+      <source>${project.basedir}/src/main/distribution/bin/ssg</source>
+      <outputDirectory>bin</outputDirectory>
+    </file>
+    <file>
+      <source>${project.basedir}/src/main/distribution/bin/ssg.cmd</source>
+      <outputDirectory>bin</outputDirectory>
+      <lineEnding>windows</lineEnding>
+    </file>
+
+    <file>
+      <source>${project.basedir}/../LICENSE</source>
+      <outputDirectory></outputDirectory>
+    </file>
+    <file>
+      <source>${project.basedir}/../NOTICE</source>
+      <outputDirectory></outputDirectory>
+    </file>
+    <file>
+      <source>${project.basedir}/target/generated-sources/license/THIRD-PARTY.txt</source>
+      <outputDirectory></outputDirectory>
+    </file>
+  </files>
+</assembly>

@@ -1,0 +1,6 @@
+data:
+  title: Page 1
+  content: |
+    # h1 Heading
+    ## h2 Heading
+    ### h3 Heading

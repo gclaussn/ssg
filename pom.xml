@@ -1,0 +1,183 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.gclaussn</groupId>
+  <artifactId>ssg</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>gclaussn</id>
+      <name>Gabor Claußnitzer</name>
+      <url>https://github.com/gclaussn</url>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/gclaussn/ssg</url>
+    <connection>scm:git:git://github.com/gclaussn/ssg.git</connection>
+    <developerConnection>scm:git:git@github.com:gclaussn/ssg.git</developerConnection>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/gclaussn/ssg/issues</url>
+  </issueManagement>
+
+  <modules>
+    <module>cli</module>
+    <module>impl</module>
+    <module>server</module>
+    <module>server-app</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Versions -->
+    <jackson.version>2.10.3</jackson.version>
+    <jade4j.version>1.3.1</jade4j.version>
+    <jcommander.version>1.78</jcommander.version>
+    <junit.version>4.13.1</junit.version>
+    <logback.version>1.2.3</logback.version>
+    <mockito.version>3.4.6</mockito.version>
+    <resteasy.version>4.5.3.Final</resteasy.version>
+    <undertow.version>2.0.23.Final</undertow.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.github.gclaussn</groupId>
+        <artifactId>ssg-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.gclaussn</groupId>
+        <artifactId>ssg-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.gclaussn</groupId>
+        <artifactId>ssg-server-app</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.4</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-yaml</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        <artifactId>jackson-jaxrs-json-provider</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>de.neuland-bfi</groupId>
+        <artifactId>jade4j</artifactId>
+        <version>${jade4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-undertow</artifactId>
+        <version>${resteasy.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.undertow</groupId>
+        <artifactId>undertow-websockets-jsr</artifactId>
+        <version>${undertow.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.beust</groupId>
+        <artifactId>jcommander</artifactId>
+        <version>${jcommander.version}</version>
+      </dependency>
+
+      <!-- Test -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <release>14</release>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.0</version>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <phase>integration-test</phase>
+            <configuration>
+              <excludes>
+                <exclude>**/*Test.java</exclude>
+              </excludes>
+              <includes>
+                <include>**/*IT.java</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

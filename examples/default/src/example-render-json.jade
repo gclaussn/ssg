@@ -1,0 +1,30 @@
+html(lang=en)
+  head
+    title= title
+
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1, user-scalable=no")
+
+    link(rel="icon", href="data:,")
+
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css")
+
+  body
+    include /common/header.jade
+
+    div(class="pt-md-5 pb-md-4 text-center")
+      h1(class="display-6")= title
+      div
+        p Page data node is rendered as JSON
+        pre \!{_fn.renderJson(numbers)}
+      div !{_fn.renderJson(numbers)}
+      div(id="numbers", class="mt-4")
+
+    script(type="text/javascript", src="https://code.jquery.com/jquery-3.5.1.min.js")
+    script.
+      const numbers = !{_fn.renderJson(numbers)};
+
+      numbers.forEach(number => {
+        const odd = number % 2 == 1;
+        $("#numbers").append(`<p>${odd ? "Odd" : "Even"}: ${number}</p>`);
+      });

@@ -1,0 +1,88 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.github.gclaussn</groupId>
+    <artifactId>ssg</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>ssg-server</artifactId>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.gclaussn</groupId>
+      <artifactId>ssg-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.gclaussn</groupId>
+      <artifactId>ssg-server-app</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.jaxrs</groupId>
+      <artifactId>jackson-jaxrs-json-provider</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-undertow</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-websockets-jsr</artifactId>
+    </dependency>
+
+    <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <version>1.7.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <resourceBundles>
+            <resourceBundle>${project.groupId}:${project.artifactId}-app:${project.version}</resourceBundle>
+          </resourceBundles>
+          <outputDirectory>${project.build.outputDirectory}/app</outputDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

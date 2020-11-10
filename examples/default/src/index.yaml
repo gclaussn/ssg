@@ -1,0 +1,4 @@
+includes:
+- common/header
+data:
+  title: Example site

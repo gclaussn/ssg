@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.github.gclaussn</groupId>
+    <artifactId>ssg</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>ssg-cli</artifactId>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.gclaussn</groupId>
+      <artifactId>ssg-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.gclaussn</groupId>
+      <artifactId>ssg-server</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.beust</groupId>
+      <artifactId>jcommander</artifactId>
+    </dependency>
+
+    <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>2.0.0</version>
+        <configuration>
+          <excludedGroups>${project.groupId}</excludedGroups>
+        </configuration>
+        <executions>
+          <execution>
+            <id>generate-third-party-txt</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>download-licenses</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
+          <archiverConfig>
+            <directoryMode>0750</directoryMode>
+            <defaultDirectoryMode>0750</defaultDirectoryMode>
+            <fileMode>0750</fileMode>
+          </archiverConfig>
+          <finalName>ssg</finalName>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-distribution</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${project.basedir}/src/main/assembly/distribution.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

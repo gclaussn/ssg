@@ -1,0 +1,6 @@
+pages:
+- index
+- example-render-json
+- example-page-set-selector
+pageSets:
+- page-set1

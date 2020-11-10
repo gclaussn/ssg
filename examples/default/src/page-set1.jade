@@ -1,0 +1,25 @@
+html(lang=en)
+  head
+    title= title
+
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1, user-scalable=no")
+
+    link(rel="icon", href="data:,")
+
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css")
+
+  body
+    include /common/header.jade
+
+    div(class="pt-md-5 pb-md-4 text-center")
+      h1(class="display-6")= title
+      div
+        p YAML string is rendered as Markdown
+        pre \!{_fn.renderMarkdown(content)}
+      div !{_fn.renderMarkdown(content)}
+
+      div(class="pt-md-5")
+        p Data processed by DataProcessor
+        pre \!{_fn.renderJson(date)}
+      div !{_fn.renderJson(date)}

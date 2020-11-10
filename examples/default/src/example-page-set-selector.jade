@@ -1,0 +1,26 @@
+html(lang=en)
+  head
+    title= title
+
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1, user-scalable=no")
+
+    link(rel="icon", href="data:,")
+
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css")
+
+  body
+    include /common/header.jade
+
+    div(class="pt-md-5 text-center")
+      h1(class="display-6")= title
+      div
+        p Selected pages are part of the page data
+        pre \!{_fn.renderJson(selected)}
+      div(class="p-3") !{_fn.renderJson(selected)}
+      
+      div(class="pt-md-5")
+        p Selected pages:
+        each page in selected
+          div
+            a(href= page._meta.url) #{page.title}

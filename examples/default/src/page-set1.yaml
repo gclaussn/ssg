@@ -1,0 +1,14 @@
+includes:
+- common/header
+processors:
+- id: date
+  class: DateProcessor
+  model:
+    dateFormat: yyyy-MM-dd
+    dateFormatLocale: en
+    timeZoneId: UTC
+filters:
+- id: date
+  class: DateFilter
+  model:
+    source: date

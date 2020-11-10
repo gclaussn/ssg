@@ -1,0 +1,4 @@
+site.yaml
+src/index.yaml
+public/index.css
+node_modules/test/styles.css

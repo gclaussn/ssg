@@ -1,0 +1,7 @@
+This software is published under the Apache License 2.0 (see LICENSE).
+
+A distribution of this software contains third-party libraries.
+License terms and copyright of those third-party libraries can be reviewed in THIRD-PARTY.txt
+The licenses/ directory provides unmodified copies of the official license files.
+None of those third-party libraries are modified or changed - they are solely distributed as is.
+Each library (whether provided in source or object form) is licensed to you by its copyright holders under the original open source license.

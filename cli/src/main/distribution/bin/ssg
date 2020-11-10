@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+if [ -z "$SSG_HOME" ]; then
+  echo "SSG_HOME variable must be set" && exit 1
+fi
+
+if [[ "$(uname)" == "MINGW"* ]]; then
+  CLASSPATH_SEPERATOR=";"
+else
+  CLASSPATH_SEPERATOR=":"
+fi
+
+exec "java" \
+  "-Dlogback.configurationFile=${SSG_HOME}/conf/logback.xml" \
+  ${JAVA_OPTS} \
+  -classpath "${SSG_HOME}/lib/*${CLASSPATH_SEPERATOR}${SSG_HOME}/lib/ext/*" \
+  --add-opens java.base/java.time.format=ALL-UNNAMED \
+  --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+  "com.github.gclaussn.ssg.cli.Cli" \
+  "$@"
