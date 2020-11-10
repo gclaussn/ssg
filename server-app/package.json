@@ -1,6 +1,6 @@
 {
   "name": "ssg-server-app",
-  "version": "0.1.0-SNAPSHOT",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
