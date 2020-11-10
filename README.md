@@ -25,7 +25,7 @@ and many more!
 
 ## Quickstart
 1. Ensure that Java 14 is installed (`java -version`)
-2. [Download](/gclaussn/ssg/releases/download/latest/ssg.zip) latest release
+2. [Download](https://github.com/gclaussn/ssg/releases/latest/download/ssg.zip) latest release
 3. Unpackage ZIP file
 4. Add `SSG_HOME` environment variable, and point it to your SSG folder
 5. Extend `PATH` variable
@@ -149,7 +149,7 @@ in `site.yaml` includes can be specified based the glob pattern syntax:
     nodeModules:
       includes:
       - "**/@fortawesome/fontawesome-free/css/all.min.css"
-      - "**/@fortawesome/fontawesome-free/webfonts/*"	
+      - "**/@fortawesome/fontawesome-free/webfonts/*"
 
 ### Generate and output site
 
