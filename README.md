@@ -36,7 +36,7 @@ Windows:
 
 Unix:
 
-    export PATH=${PATH}:${SSH_HOME}/bin
+    export PATH=${PATH}:${SSG_HOME}/bin
 
 6. To verify the installation run:
 
@@ -51,7 +51,7 @@ Unix:
 
 ## Docker
 
-    docker pull gclaussn/ssg:latest
+    docker pull gclaussn/ssg
     docker run --rm -v $(pwd):/site gclaussn/ssg init
     docker run --rm -v $(pwd):/site -p 8080:8080 gclaussn/ssg server -h 0.0.0.0
 
@@ -65,7 +65,7 @@ The [default site](./examples/default) is a good starting point.
 ### Site structure
 
     <site>
-		├── site.yaml     # Site model, that lists pages and page sets to load
+    ├── site.yaml     # Site model, that lists pages and page sets to load
     ├── src/          # YAML and JADE source files
     ├── public/       # Public assets like scripts, style sheets and images
     ├── node_modules/ # Node modules, used within the site
@@ -142,14 +142,14 @@ YAML layout:
 SSG supports `node_modules` folder, installed by [npm](https://www.npmjs.com/) using a `package.json`.
 Resources can be referenced via `/node_modules/` - for example:
 
-		link(rel="stylesheet", href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css")
+    link(rel="stylesheet", href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css")
 
 in `site.yaml` includes can be specified based the glob pattern syntax:
 
-		nodeModules:
-			includes:
-			- "**/@fortawesome/fontawesome-free/css/all.min.css"
-			- "**/@fortawesome/fontawesome-free/webfonts/*"	
+    nodeModules:
+      includes:
+      - "**/@fortawesome/fontawesome-free/css/all.min.css"
+      - "**/@fortawesome/fontawesome-free/webfonts/*"	
 
 ### Generate and output site
 

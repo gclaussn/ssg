@@ -1,14 +1,15 @@
 #!/bin/bash
 
+set -e
+
 if [ ! -z $1 ]; then
-  npm version $1
+  npm --prefix server-app/ version $1
   mvn versions:set -DnewVersion=$1 versions:commit
 fi
 
-npm run --prefix server-app/ install
-npm run --prefix server-app/ build
+npm run-script --prefix server-app/ build
 
-mvn clean package
+mvn clean install
 
 docker build -t gclaussn/ssg -f Dockerfile cli/target
 
