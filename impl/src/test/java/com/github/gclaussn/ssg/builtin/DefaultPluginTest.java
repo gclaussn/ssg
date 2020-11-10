@@ -2,7 +2,7 @@ package com.github.gclaussn.ssg.builtin;
 
 import static com.github.gclaussn.ssg.test.CustomMatcher.isDirectory;
 import static com.github.gclaussn.ssg.test.CustomMatcher.isFile;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Files;
