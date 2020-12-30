@@ -1,18 +1,19 @@
 package com.github.gclaussn.ssg.plugin;
 
-import java.util.List;
 import java.util.Map;
-
-import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
+import java.util.Set;
 
 public interface SitePluginManager {
 
-  static SitePluginManager of(Site site, List<SitePlugin> plugins) {
-    return SitePluginManagerImpl.of(site, plugins);
-  }
+  void execute(SitePluginGoal pluginGoal);
 
-  int execute(String pluginGoal);
+  void execute(SitePluginGoal pluginGoal, Map<String, Object> properties);
 
-  int execute(String pluginGoal, Map<String, Object> properties);
+  void execute(String pluginGoal);
+
+  void execute(String pluginGoal, Map<String, Object> properties);
+
+  Set<SitePluginDesc> getPlugins();
+
+  SitePluginGoalDesc getPluginGoal(String pluginGoal);
 }

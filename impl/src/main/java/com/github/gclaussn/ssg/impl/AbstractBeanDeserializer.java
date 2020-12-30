@@ -1,5 +1,7 @@
 package com.github.gclaussn.ssg.impl;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.util.Set;
 
@@ -49,7 +51,7 @@ abstract class AbstractBeanDeserializer<T, I> extends JsonDeserializer<T> {
 
     JsonNode modelNode = jsonNode.get(FIELD_MODEL);
     if (modelNode != null && !modelNode.isObject()) {
-      throw new RuntimeException(String.format("Field '%s' must be an object, if provided", FIELD_MODEL));
+      throw new RuntimeException(format("Field '%s' must be an object, if provided", FIELD_MODEL));
     }
 
     I implementation;
@@ -77,16 +79,16 @@ abstract class AbstractBeanDeserializer<T, I> extends JsonDeserializer<T> {
     try {
       return implClass.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
-      throw new RuntimeException("Implementation could not be instantiated", e);
+      throw new RuntimeException(format("Class '%s' could not be instantiated", implClass), e);
     }
   }
 
   private RuntimeException fieldNotProvided(String fieldName) {
-    return new RuntimeException(String.format("Field '%s' field must be provided", fieldName));
+    return new RuntimeException(format("Field '%s' field must be provided", fieldName));
   }
 
   private RuntimeException fieldNotTextual(String fieldName) {
-    return new RuntimeException(String.format("Field '%s' field must be textual", fieldName));
+    return new RuntimeException(format("Field '%s' field must be textual", fieldName));
   }
 
   protected String getId(JsonNode jsonNode) {
@@ -105,7 +107,7 @@ abstract class AbstractBeanDeserializer<T, I> extends JsonDeserializer<T> {
   protected Class<? extends I> getImplClass(String implClassName) {
     Class<? extends I> type = typeLookup.lookup(implClassName);
     if (type == null) {
-      throw new RuntimeException(String.format("Implementation class '%s' not found", implClassName));
+      throw new RuntimeException(format("Class '%s' not found", implClassName));
     }
 
     return type;

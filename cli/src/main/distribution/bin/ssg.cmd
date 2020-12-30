@@ -10,5 +10,6 @@ if "%SSG_HOME%" == "" (
   %JAVA_OPTS% ^
   -classpath "%SSG_HOME%\lib\*;%SSG_HOME%\lib\ext\*" ^
   --add-opens java.base/java.time.format=ALL-UNNAMED ^
+  --add-opens java.base/sun.nio.ch=ALL-UNNAMED ^
   "com.github.gclaussn.ssg.cli.Cli" ^
   %*

@@ -2,17 +2,20 @@
 
 set -e
 
-if [ ! -z $1 ]; then
-  npm --prefix server-app/ version $1
-  mvn versions:set -DnewVersion=$1 versions:commit
+VERSION=$1
+
+if [ ! -z ${VERSION} ]; then
+  npm --prefix server-app/ version ${VERSION}
+  mvn versions:set -DnewVersion=${VERSION} versions:commit
 fi
 
 npm run-script --prefix server-app/ build
 
 mvn clean install
 
-docker build -t gclaussn/ssg -f Dockerfile cli/target
+docker build -t ssg -f Dockerfile cli/target
 
-if [ ! -z $1 ]; then
-  docker tag gclaussn/ssg gclaussn/ssg:$1
+if [ ! -z ${VERSION} ]; then
+  docker tag ssg gclaussn/ssg:${VERSION}
+  docker tag gclaussn/ssg:${VERSION} gclaussn/ssg:latest
 fi

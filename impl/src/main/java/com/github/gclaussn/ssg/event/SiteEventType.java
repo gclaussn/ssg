@@ -22,5 +22,5 @@ public enum SiteEventType {
   FILTER_PAGE,
   SELECT_DATA,
   GENERATE_PAGE_SET,
-  GENERATE_PAGE;
+  GENERATE_PAGE
 }

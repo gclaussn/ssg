@@ -25,12 +25,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.gclaussn.ssg.Page;
 import com.github.gclaussn.ssg.PageFilterBean;
 import com.github.gclaussn.ssg.PageInclude;
@@ -47,7 +41,6 @@ import com.github.gclaussn.ssg.conf.SiteConf;
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataBuilder;
 import com.github.gclaussn.ssg.event.SiteEvent;
-import com.github.gclaussn.ssg.impl.event.SiteEventFactory;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
 class SiteImpl implements Site {
@@ -70,11 +63,7 @@ class SiteImpl implements Site {
   private final Path sourcePath;
   private final Path outputPath;
 
-  /** YAML object mapper, used to read source models. */
-  private final ObjectMapper objectMapper;
-
   private final SiteGenerator generator;
-  private final SitePluginManager pluginManager;
 
   SiteImpl(Path sitePath, SiteConfImpl conf) {
     this.conf = conf;
@@ -92,25 +81,8 @@ class SiteImpl implements Site {
     pageIncludes = createMap(PageIncludeImpl.class);
     pageSets = createMap(PageSetImpl.class);
 
-    // configure YAML object mapper
-    SimpleModule module = new SimpleModule();
-    module.addDeserializer(PageData.class, new PageDataDeserializer());
-    module.addDeserializer(PageDataSelectorBeanImpl.class, new PageDataSelectorDeserializer(conf));
-    module.addDeserializer(PageFilterBeanImpl.class, new PageFilterDeserializer(conf));
-    module.addDeserializer(PageProcessorBeanImpl.class, new PageProcessorDeserializer(conf));
-
-    objectMapper = new ObjectMapper(new YAMLFactory());
-    objectMapper.configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true);
-    objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-    objectMapper.registerModule(module);
-    objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
-    objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-
     // initialize generator
     generator = new SiteGeneratorImpl(this);
-
-    // initialize plugin manager
-    pluginManager = SitePluginManager.of(this, conf.plugins);
   }
 
   @Override
@@ -211,11 +183,7 @@ class SiteImpl implements Site {
 
   @Override
   public void close() {
-    try {
-      conf.plugins.forEach(plugin -> plugin.preDestroy(this));
-    } catch (Exception e) {
-      // ignore any exception
-    }
+    conf.pluginManager.preDestroy(this);
 
     reset();
   }
@@ -252,16 +220,6 @@ class SiteImpl implements Site {
       // load site model
       return new SiteOutputServer(this, readSiteModel(path.resolve(MODEL_NAME)));
     }
-  }
-
-  @Override
-  public int execute(String pluginGoal) {
-    return getPluginManager().execute(pluginGoal);
-  }
-
-  @Override
-  public int execute(String pluginGoal, Map<String, Object> properties) {
-    return getPluginManager().execute(pluginGoal, properties);
   }
 
   /**
@@ -377,7 +335,7 @@ class SiteImpl implements Site {
 
   @Override
   public SitePluginManager getPluginManager() {
-    return pluginManager;
+    return conf.pluginManager;
   }
 
   @Override
@@ -731,7 +689,7 @@ class SiteImpl implements Site {
 
     PageIncludeModel model;
     try {
-      model = objectMapper.readValue(filePath.toFile(), PageIncludeModel.class);
+      model = conf.objectMapper.readValue(filePath.toFile(), PageIncludeModel.class);
       model.filePath = filePath;
     } catch (IOException e) {
       throw errorFactory.modelNotRead(e, new SourceImpl(SourceType.PAGE_INCLUDE, pageIncludeId)).toException();
@@ -749,7 +707,7 @@ class SiteImpl implements Site {
 
     PageModel model;
     try {
-      model = objectMapper.readValue(filePath.toFile(), PageModel.class);
+      model = conf.objectMapper.readValue(filePath.toFile(), PageModel.class);
       model.filePath = filePath;
     } catch (IOException e) {
       throw errorFactory.modelNotRead(e, new SourceImpl(SourceType.PAGE, pageId)).toException();
@@ -767,7 +725,7 @@ class SiteImpl implements Site {
 
     PageSetModel model;
     try {
-      model = objectMapper.readValue(filePath.toFile(), PageSetModel.class);
+      model = conf.objectMapper.readValue(filePath.toFile(), PageSetModel.class);
       model.filePath = filePath;
     } catch (IOException e) {
       throw errorFactory.modelNotRead(e, new SourceImpl(SourceType.PAGE_SET, pageSetId)).toException();
@@ -778,7 +736,7 @@ class SiteImpl implements Site {
 
   protected SiteModel readSiteModel(Path filePath) {
     try {
-      return objectMapper.readValue(filePath.toFile(), SiteModel.class);
+      return conf.objectMapper.readValue(filePath.toFile(), SiteModel.class);
     } catch (IOException e) {
       throw errorFactory.modelNotRead(e, new SourceImpl(SourceType.SITE, null)).toException();
     }

@@ -25,10 +25,6 @@ export default class PageSetTableView extends React.Component {
   render() {
     const { pageSets } = this.state;
 
-    if (pageSets === null) {
-      return null;
-    }
-
     return (
       <div>
         <div className="p075">
@@ -36,23 +32,31 @@ export default class PageSetTableView extends React.Component {
           <p>&nbsp;</p>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <td className="border-top-0">
-                <b>ID</b>
-              </td>
-              <td className="border-top-0 text-center">
-                <b>Skipped</b>
-              </td>
-            </tr>
-          </thead>
-
-          <tbody>
-            {pageSets.map(pageSet => this._renderPageSet(pageSet))}
-          </tbody>
-        </table>
+        {pageSets !== null ? this._renderTable() : null}
       </div>
+    )
+  }
+
+  _renderTable() {
+    const { pageSets } = this.state;
+
+    return (
+      <table className="table">
+        <thead>
+          <tr>
+            <td className="border-top-0">
+              <b>ID</b>
+            </td>
+            <td className="border-top-0 text-center">
+              <b>Skipped</b>
+            </td>
+          </tr>
+        </thead>
+
+        <tbody>
+          {pageSets.map(pageSet => this._renderPageSet(pageSet))}
+        </tbody>
+      </table>
     )
   }
 

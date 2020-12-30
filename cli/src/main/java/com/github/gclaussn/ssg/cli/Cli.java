@@ -5,19 +5,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.MissingCommandException;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.internal.DefaultConsole;
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.cli.cmd.CopyOutput;
-import com.github.gclaussn.ssg.cli.cmd.Execute;
+import com.github.gclaussn.ssg.SiteBuilder;
+import com.github.gclaussn.ssg.cli.cmd.Cp;
+import com.github.gclaussn.ssg.cli.cmd.Desc;
+import com.github.gclaussn.ssg.cli.cmd.Exec;
 import com.github.gclaussn.ssg.cli.cmd.Generate;
 import com.github.gclaussn.ssg.cli.cmd.Init;
-import com.github.gclaussn.ssg.cli.cmd.ListOutput;
+import com.github.gclaussn.ssg.cli.cmd.Ls;
+import com.github.gclaussn.ssg.cli.cmd.Plugins;
 import com.github.gclaussn.ssg.cli.cmd.Server;
 import com.github.gclaussn.ssg.plugin.SitePluginException;
 
@@ -30,12 +30,12 @@ public class Cli {
     System.exit(new Cli().run(args));
   }
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(Cli.class);
+  private static final String PROGRAM_NAME = "ssg";
 
   private final Main main;
 
   /** List of available commands. */
-  private final List<AbstractCmd> commands;
+  private final List<AbstractCommand> commands;
 
   private final JCommander jc;
 
@@ -44,14 +44,16 @@ public class Cli {
   }
 
   protected Cli(PrintStream ps) {
-    main = new Main();
+    main = new Main(ps);
 
     commands = new LinkedList<>();
-    commands.add(new CopyOutput());
-    commands.add(new Execute());
+    commands.add(new Cp());
+    commands.add(new Desc());
+    commands.add(new Exec());
     commands.add(new Generate());
     commands.add(new Init());
-    commands.add(new ListOutput());
+    commands.add(new Ls());
+    commands.add(new Plugins());
     commands.add(new Server());
 
     JCommander.Builder builder = JCommander.newBuilder().console(new DefaultConsole(ps)).addObject(main);
@@ -61,12 +63,21 @@ public class Cli {
     jc = builder.build();
   }
 
-  protected Optional<AbstractCmd> findCommand(String commandName) {
+  protected Site buildSite(AbstractCommand command) {
+    SiteBuilder builder = Site.builder();
+
+    // call preBuild hook
+    command.preBuild(builder, main);
+
+    return builder.setPropertyMap(main.getProperties()).build(main.getSitePath());
+  }
+
+  protected Optional<AbstractCommand> findCommand(String commandName) {
     if (commandName == null) {
       return Optional.empty();
     }
 
-    AbstractCmd command = (AbstractCmd) jc.findCommandByAlias(commandName).getObjects().get(0);
+    AbstractCommand command = (AbstractCommand) jc.findCommandByAlias(commandName).getObjects().get(0);
     return Optional.of(command);
   }
 
@@ -81,27 +92,42 @@ public class Cli {
       main.help = true;
     }
 
-    Optional<AbstractCmd> command = findCommand(jc.getParsedCommand());
+    Optional<AbstractCommand> command = findCommand(jc.getParsedCommand());
     if (!command.isPresent()) {
-      jc.setProgramName(CliConstants.PROGRAM_NAME);
+      jc.setProgramName(PROGRAM_NAME);
       jc.usage();
-      return CliConstants.SC_ERROR;
+      return 0;
     }
 
     return run(command.get());
   }
 
-  protected int run(AbstractCmd command) {
+  protected void log(SitePluginException e) {
+    if (main.isVerbose()) {
+      e.printStackTrace();
+    } else if (e.getCause() != null) {
+      jc.getConsole().println(e.getCause().getMessage());
+    } else {
+      jc.getConsole().println(e.getMessage());
+    }
+  }
+
+  protected int run(AbstractCommand command) {
     if (main.isHelp() || command.isHelp()) {
       jc.getUsageFormatter().usage(jc.getParsedCommand());
-      return CliConstants.SC_SUCCESS;
+      return 1;
     }
 
-    try (Site site = command.build(main)) {
-      return command.run(site, jc);
+    try (Site site = buildSite(command)) {
+      command.run(site);
     } catch (SitePluginException e) {
-      LOGGER.error("Command failed", e);
-      return CliConstants.SC_ERROR;
+      log(e);
+      return e.getStatusCode();
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      return 1;
     }
+
+    return 0;
   }
 }

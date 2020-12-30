@@ -3,6 +3,16 @@ import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
 
 class AppNav extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.links = [
+      {label: "Pages", to: "/pages", icon: "fas fa-file-code"},
+      {label: "Page sets", to: "/page-sets", icon: "far fa-copy"},
+      {label: "Plugins", to: "/plugins", icon: "fas fa-plug"}
+    ];
+  }
+
   _shouldHide(path) {
     return path.startsWith("/pages/");
   }
@@ -22,20 +32,22 @@ class AppNav extends React.Component {
               <li className="nav-item d-sm-none d-md-inline">
                 <h6 className="text-white"><i>Static Site Generator</i></h6>
               </li>
-              <li className="nav-item w-100">
-                <Link className="nav-link" to="/pages">
-                  <i className="fas fa-file-code mr-1" style={{width: "14px"}}></i> <span>Pages</span>
-                </Link>
-              </li>
-              <li className="nav-item w-100">
-                <Link className="nav-link" to="/page-sets">
-                  <i className="far fa-copy mr-1" style={{width: "14px"}}></i> <span>Page sets</span>
-                </Link>
-              </li>
+
+              {this.links.map((link, index) => this._renderLink(link, index))}
             </ul>
           </div>
         </div>
       </div>
+    )
+  }
+
+  _renderLink(link, index) {
+    return (
+      <li key={index} className="nav-item w-100">
+        <Link className="nav-link" to={link.to}>
+          <i className={link.icon + " mr-1"} style={{width: "14px"}}></i> <span>{link.label}</span>
+        </Link>
+      </li>
     )
   }
 }

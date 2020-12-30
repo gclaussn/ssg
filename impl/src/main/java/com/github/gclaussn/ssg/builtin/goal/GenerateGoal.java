@@ -1,26 +1,27 @@
 package com.github.gclaussn.ssg.builtin.goal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Collections;
+import java.util.List;
 
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.plugin.SitePluginException;
 import com.github.gclaussn.ssg.plugin.SitePluginGoal;
 
 public class GenerateGoal implements SitePluginGoal {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GenerateGoal.class);
-
   @Override
-  public int execute(Site site) {
-    LOGGER.info("Generate site {}", site.getPath());
+  public void execute(Site site) {
+    List<SiteError> errors;
 
-    if (!site.isLoaded() && !site.load().isEmpty()) {
-      return SC_ERROR;
-    }
-    if (!site.generate().isEmpty()) {
-      return SC_ERROR;
+    errors = !site.isLoaded() ? site.load() : Collections.emptyList();
+    if (!errors.isEmpty()) {
+      throw new SitePluginException("Failed to load site");
     }
 
-    return SC_SUCCESS;
+    errors = site.generate();
+    if (!errors.isEmpty()) {
+      throw new SitePluginException("Failed to generate site");
+    }
   }
 }

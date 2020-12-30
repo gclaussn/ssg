@@ -69,11 +69,8 @@ class SiteGeneratorImpl implements SiteGenerator {
     PageDataBuilder builder = PageData.builder();
 
     for (Object extension : extensions) {
-      String typeName = normalizeTypeName(extension.getClass().getName());
-      builder.put(typeName, extension);
-
-      String simpleTypeName = normalizeTypeName(extension.getClass().getSimpleName());
-      builder.put(simpleTypeName, extension);
+      String typeName = extension.getClass().getName();
+      builder.put(typeName.replace('.', '/'), extension);
     }
 
     return builder.build();
@@ -299,34 +296,6 @@ class SiteGeneratorImpl implements SiteGenerator {
 
       if (c == '-' || c == '_') {
         toUpper = true;
-      } else if (toUpper) {
-        sb.append(Character.toUpperCase(c));
-        toUpper = false;
-      } else {
-        sb.append(c);
-      }
-    }
-
-    return sb.toString();
-  }
-
-  protected String normalizeTypeName(String typeName) {
-    StringBuilder sb = new StringBuilder(typeName.length());
-
-    boolean toLower = true;
-    boolean toUpper = false;
-    for (int i = 0; i < typeName.length(); i++) {
-      char c = typeName.charAt(i);
-
-      if (c == '_') {
-        toUpper = true;
-        toLower = false;
-      } else if (c == '.') {
-        sb.append('/');
-        toLower = true;
-      } else if (toLower) {
-        sb.append(Character.toLowerCase(c));
-        toLower = false;
       } else if (toUpper) {
         sb.append(Character.toUpperCase(c));
         toUpper = false;

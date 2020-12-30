@@ -10,18 +10,15 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.plugin.SitePluginGoal;
 
 class InitFromFile extends SimpleFileVisitor<Path> implements SitePluginGoal {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(InitFromFile.class);
+  protected SiteConsole console;
 
   private final String template;
-
   private final List<Path> resources;
 
   InitFromFile(String template) {
@@ -31,11 +28,10 @@ class InitFromFile extends SimpleFileVisitor<Path> implements SitePluginGoal {
   }
 
   @Override
-  public int execute(Site site) {
+  public void execute(Site site) {
     Path templatePath = Paths.get(template);
 
-    LOGGER.info("Listing resources under {}", template);
-
+    console.log("Listing resources under %s", template);
     try {
       Files.walkFileTree(templatePath, this);
     } catch (IOException e) {
@@ -47,7 +43,7 @@ class InitFromFile extends SimpleFileVisitor<Path> implements SitePluginGoal {
 
       Path target = site.getPath().resolve(relativePath);
 
-      LOGGER.info("Copying resource: {}", relativePath);
+      console.log("Copying resource: %s", relativePath);
       try {
         Files.createDirectories(target.getParent());
         Files.copy(resource, target);
@@ -57,8 +53,6 @@ class InitFromFile extends SimpleFileVisitor<Path> implements SitePluginGoal {
     }
 
     resources.clear();
-
-    return SC_SUCCESS;
   }
 
   @Override

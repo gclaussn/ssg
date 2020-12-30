@@ -6,5 +6,5 @@ public enum SiteErrorType {
   MODEL,
   IO,
   TEMPLATE,
-  UNKNOWN;
+  UNKNOWN
 }

@@ -21,6 +21,7 @@ export default class PageSetView extends React.Component {
 
   render() {
     const { pageSet } = this.props;
+    const { pages } = this.state;
 
     return (
       <div>
@@ -29,18 +30,8 @@ export default class PageSetView extends React.Component {
           <p>&nbsp;</p>
         </div>
 
-        {this._renderPages()}
+        {pages !== null ? <PageTable pages={pages} /> : null}
       </div>
     )
-  }
-
-  _renderPages() {
-    const { pages } = this.state;
-
-    if (pages === null) {
-      return null;
-    }
-
-    return <PageTable pages={pages} />
   }
 }

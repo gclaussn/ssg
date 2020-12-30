@@ -8,18 +8,16 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.plugin.SitePluginGoal;
 
 class InitFromClasspath implements SitePluginGoal {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(InitFromClasspath.class);
+  protected SiteConsole console;
 
   private final String template;
-
   private final ClassLoader classLoader;
 
   InitFromClasspath(String template) {
@@ -29,10 +27,10 @@ class InitFromClasspath implements SitePluginGoal {
   }
 
   @Override
-  public int execute(Site site) {
+  public void execute(Site site) {
     String base = template.substring(InitGoal.CLASSPATH_LOCATOR.length());
 
-    LOGGER.info("Listing resources under {}", template);
+    console.log("Listing resources under %s", template);
     for (String fileName : listFileNames(base)) {
       String resourceName = new StringBuilder()
           .append(base)
@@ -42,7 +40,7 @@ class InitFromClasspath implements SitePluginGoal {
 
       Path target = site.getPath().resolve(fileName);
 
-      LOGGER.info("Copying resource: {}", fileName);
+      console.log("Copying resource: %s", fileName);
       try (InputStream in = getResource(resourceName)) {
         Files.createDirectories(target.getParent());
         Files.copy(in, target);
@@ -50,8 +48,6 @@ class InitFromClasspath implements SitePluginGoal {
         throw new RuntimeException(String.format("Site resource '%s' could not be copied", resourceName), e);
       }
     }
-
-    return SC_SUCCESS;
   }
 
   protected InputStream getResource(String resourceName) {

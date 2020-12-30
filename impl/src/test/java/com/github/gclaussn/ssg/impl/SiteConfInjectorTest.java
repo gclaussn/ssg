@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.github.gclaussn.ssg.conf.SiteProperty;
@@ -14,30 +15,28 @@ import com.github.gclaussn.ssg.conf.SiteProperty;
 public class SiteConfInjectorTest {
 
   private SiteConfInjector injector;
+  
+  private SiteConfImpl conf;
+  private Map<String, String> env;
 
-  @Test
-  public void testGetEnvironmentVariableName() {
-    injector = new SiteConfInjector(Collections.emptyMap());
+  @Before
+  public void setUp() {
+    conf = new SiteConfImpl();
+    env = new HashMap<>();
 
-    assertThat(injector.getEnvironmentVariableName("test.prop"), equalTo("TEST_PROP"));
+    injector = new SiteConfInjector(conf, env);
   }
 
   @Test
   public void testReplaceVariable() {
-    Map<String, String> env = new HashMap<>();
     env.put("SSG_HOME", "/opt/ssg");
-
-    injector = new SiteConfInjector(Collections.emptyMap(), env);
 
     assertThat(injector.replaceVariables("${SSG_HOME}"), equalTo(env.get("SSG_HOME")));
   }
 
   @Test
   public void shouldInject() {
-    Map<String, String> env = new HashMap<>();
     env.put("SSG_HOME", "/opt/ssg");
-
-    injector = new SiteConfInjector(Collections.emptyMap(), env);
 
     InjectionTarget target = injector.inject(new InjectionTarget(), Collections.emptyMap());
     assertThat(target.template, equalTo("/opt/ssg/templates/default"));

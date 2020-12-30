@@ -22,4 +22,6 @@ public interface SiteError {
    * @see SiteException#getError()
    */
   SiteException toException();
+
+  String toMessage(boolean verbose);
 }

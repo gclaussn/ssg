@@ -3,9 +3,11 @@ package com.github.gclaussn.ssg;
 import java.nio.file.Path;
 import java.util.Map;
 
+import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.plugin.SitePluginGoal;
 
 /**
  * Builder for {@link Site} and {@link EventDrivenSite} instances.
@@ -33,11 +35,20 @@ public interface SiteBuilder {
    */
   SiteBuilder addExtension(Object extension);
 
-  SiteBuilder addPageDataSelectorType(Class<? extends PageDataSelector> pageDataSelectorType);
+  SiteBuilder addPageDataSelector(Class<? extends PageDataSelector> pageDataSelectorType);
 
-  SiteBuilder addPageFilterType(Class<? extends PageFilter> pageFilterType);
+  SiteBuilder addPageFilter(Class<? extends PageFilter> pageFilterType);
 
-  SiteBuilder addPageProcessorType(Class<? extends PageProcessor> pageProcessorType);
+  SiteBuilder addPageProcessor(Class<? extends PageProcessor> pageProcessorType);
+
+  /**
+   * Registers a {@link SitePluginGoal}.
+   * 
+   * @param pluginGoalType A plugin goal type.
+   * 
+   * @return The builder.
+   */
+  SiteBuilder addPluginGoal(Class<? extends SitePluginGoal> pluginGoalType);
 
   /**
    * Builds the site.
@@ -47,6 +58,15 @@ public interface SiteBuilder {
    * @return The newly created {@link Site} instance.
    */
   Site build(Path sitePath);
+
+  /**
+   * Sets the console to be used, e.g. by {@link SitePluginGoal}s.
+   * 
+   * @param console A console.
+   * 
+   * @return The builder.
+   */
+  SiteBuilder setConsole(SiteConsole console);
 
   SiteBuilder setProperty(String name, Object value);
 

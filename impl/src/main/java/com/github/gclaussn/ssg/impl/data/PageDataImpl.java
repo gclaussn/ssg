@@ -59,7 +59,7 @@ class PageDataImpl implements PageData {
 
   @Override
   public Map<String, Object> getRootMap() {
-    return root;
+    return new HashMap<>(root);
   }
 
   @Override

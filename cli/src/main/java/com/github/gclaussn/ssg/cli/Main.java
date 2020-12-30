@@ -1,5 +1,6 @@
 package com.github.gclaussn.ssg.cli;
 
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -22,6 +23,16 @@ public class Main {
 
   @Parameter(names = {"--verbose"}, description = "Show stacktraces")
   protected boolean verbose;
+
+  private final PrintStream ps;
+
+  public Main(PrintStream ps) {
+    this.ps = ps;
+  }
+
+  public PrintStream getPrintStream() {
+    return ps;
+  }
 
   public Map<String, Object> getProperties() {
     return new HashMap<>(properties);

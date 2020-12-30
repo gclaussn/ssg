@@ -1,15 +1,15 @@
 package com.github.gclaussn.ssg.cli.cmd;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameters;
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.cli.AbstractCmd;
+import com.github.gclaussn.ssg.builtin.goal.GenerateGoal;
+import com.github.gclaussn.ssg.cli.AbstractCommand;
 
 @Parameters(commandNames = "generate", commandDescription = "Generate a site")
-public class Generate extends AbstractCmd {
+public class Generate extends AbstractCommand {
 
   @Override
-  public int run(Site site, JCommander jc) {
-    return site.execute("default:generate");
+  public void run(Site site) {
+    site.getPluginManager().execute(new GenerateGoal());
   }
 }

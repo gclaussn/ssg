@@ -15,6 +15,9 @@ import PageSetController from "page-set/PageSetController";
 import PageSetTableView from "page-set/PageSetTableView";
 import PageSetView from "page-set/PageSetView";
 
+import SitePluginView from "plugin/SitePluginView";
+import SitePluginGoalView from "plugin/SitePluginGoalView";
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -44,10 +47,12 @@ class App extends React.Component {
         <Switch>
           <Route exact path="/pages" component={PageTableView} />
           <Route exact path="/page-sets" component={PageSetTableView} />
+          <Route exact path="/plugins" component={SitePluginView} />
 
           <Route path="/pages/:pageId+/data" render={this._renderPageDataView} />
           <Route path="/pages/:pageId+" render={this._renderPageView} />
           <Route path="/page-sets/:pageSetId+" render={this._renderPageSetView} />
+          <Route path="/plugin-goals/:typeName+" component={SitePluginGoalView} />
           <Route component={PageTableView} />
         </Switch>
       </div>

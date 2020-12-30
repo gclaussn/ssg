@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -24,16 +25,22 @@ public class DefaultPluginTest {
 
   private Path sitePath;
 
+  private Map<String, Object> properties;
+
   @Before
   public void setUp() {
     sitePath = temporaryFolder.getRoot().toPath();
+
+    properties = new HashMap<>();
   }
 
   @Test
   public void shouldInitFromClasspath() {
     Site site = Site.builder().build(sitePath);
 
-    site.execute("init", Collections.singletonMap("ssg.init.template", "classpath:sites/init/default"));
+    properties.put("ssg.init.template", "classpath:sites/init/default");
+
+    site.getPluginManager().execute("init", properties);
     assertThat(sitePath.resolve(Site.MODEL_NAME), isFile());
     assertThat(site.getSourcePath(), isDirectory());
     assertThat(site.getSourcePath().resolve("index.yaml"), isFile());
@@ -45,7 +52,9 @@ public class DefaultPluginTest {
   public void shouldInitFromFile() {
     Site site = Site.builder().build(sitePath);
 
-    site.execute("init", Collections.singletonMap("ssg.init.template", "./src/test/resources/sites/init/default"));
+    properties.put("ssg.init.template", "./src/test/resources/sites/init/default");
+
+    site.getPluginManager().execute("init", properties);
     assertThat(sitePath.resolve(Site.MODEL_NAME), isFile());
     assertThat(site.getSourcePath(), isDirectory());
     assertThat(site.getSourcePath().resolve("index.yaml"), isFile());
@@ -57,14 +66,18 @@ public class DefaultPluginTest {
   public void shouldCopyOutput() throws IOException {
     Site site = Site.builder().build(sitePath);
 
-    site.execute("init", Collections.singletonMap("ssg.init.template", "classpath:sites/init/default"));
+    properties.put("ssg.init.template", "classpath:sites/init/default");
+
+    site.getPluginManager().execute("init", properties);
 
     site.load();
     site.generate();
 
     Path target = Files.createDirectories(site.getPath().resolve("target"));
 
-    site.execute("copy-output", Collections.singletonMap("ssg.cp.target", target.toAbsolutePath().toString()));
+    properties.put("ssg.cp.target", target.toAbsolutePath().toString());
+
+    site.getPluginManager().execute("cp", properties);
     assertThat(target.resolve("index.html"), isFile());
     assertThat(target.resolve("index.css"), isFile());
     assertThat(target.resolve("node_modules"), isDirectory());

@@ -7,5 +7,5 @@ public enum PageDataNodeType {
   MAP,
   NULL,
   OTHER,
-  STRING;
+  STRING
 }
