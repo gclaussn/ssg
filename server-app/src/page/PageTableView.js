@@ -23,10 +23,6 @@ export default class PageTableView extends React.Component {
   render() {
     const { pages } = this.state;
 
-    if (pages === null) {
-      return null;
-    }
-
     return (
       <div>
         <div className="p075">
@@ -35,7 +31,7 @@ export default class PageTableView extends React.Component {
           </div>
         </div>
 
-        <PageTable pages={pages} />
+        {pages !== null ? <PageTable pages={pages} /> : null}
       </div>
     )
   }

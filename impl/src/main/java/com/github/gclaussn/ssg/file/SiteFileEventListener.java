@@ -1,7 +1,7 @@
 package com.github.gclaussn.ssg.file;
 
 /**
- * Callback interface to be notified of events that are produced by a {@link SiteFileWatcher}.
+ * Callback interface to be notified of file - e.g. produced by a file watcher.
  */
 public interface SiteFileEventListener {
 

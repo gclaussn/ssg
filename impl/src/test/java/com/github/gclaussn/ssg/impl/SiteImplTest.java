@@ -31,10 +31,10 @@ public class SiteImplTest {
 
   @Before
   public void setUp() {
-    Path sitePath = Paths.get("./src/test/resources")
-        .resolve(SiteImplTest.class.getPackage().getName().replace('.', '/'));
+    String packageName = SiteImplTest.class.getPackage().getName().replace('.', '/');
+    Path sitePath = Paths.get("./src/test/resources").resolve(packageName);
 
-    site = new SiteImpl(sitePath, new SiteConfImpl());
+    site = new SiteImpl(sitePath, new SiteConfImpl().complete());
   }
 
   @Test
@@ -100,6 +100,11 @@ public class SiteImplTest {
     assertThat(site.getPublicPath(), equalTo(site.getPath().resolve(Site.PUBLIC)));
     assertThat(site.getSourcePath(), equalTo(site.getPath().resolve(Site.SOURCE)));
     assertThat(site.getOutputPath(), equalTo(site.getPath().resolve(Site.OUTPUT)));
+  }
+
+  @Test
+  public void testGetPluginManager() {
+    assertThat(site.getPluginManager(), notNullValue());
   }
 
   @Test

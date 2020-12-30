@@ -50,4 +50,24 @@ class SiteErrorImpl implements SiteError {
   public SiteException toException() {
     return new SiteException(this);
   }
+
+  @Override
+  public String toMessage(boolean verbose) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Site error occurred");
+
+    if (location != null) {
+      sb.append(" in ");
+      sb.append(location);
+    }
+
+    if (!verbose) {
+      sb.append(":\n");
+      sb.append(message);
+      sb.append(":\n");
+      sb.append(cause.getMessage());
+    }
+
+    return sb.toString();
+  }
 }

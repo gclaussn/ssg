@@ -42,12 +42,15 @@ Unix:
 
     ssg --help
 
-7. Initialize default site and start development server:
+7. Initialize default site:
 
     ssg init
+
+8. Start development server:
+
     ssg server
 
-8. Open [application](http://localhost:8080/app) in browser
+9. Open [application](http://localhost:8080/app) in browser
 
 ## Docker
 
@@ -144,7 +147,7 @@ Resources can be referenced via `/node_modules/` - for example:
 
     link(rel="stylesheet", href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css")
 
-in `site.yaml` includes can be specified based the glob pattern syntax:
+in `site.yaml` includes can be specified based on the glob pattern syntax:
 
     nodeModules:
       includes:

@@ -34,7 +34,7 @@ class SiteErrorFactory {
     resourceBundle = ResourceBundle.getBundle(this.getClass().getName());
   }
 
-  public SiteError beanExecutionFailed(Exception e, String beanId, Source source) {
+  protected SiteError beanExecutionFailed(Exception e, String beanId, Source source) {
     SiteErrorImpl error = new SiteErrorImpl(e);
     error.message = format(getModelName(source), source.getId(), beanId);
     error.source = source;
@@ -43,7 +43,7 @@ class SiteErrorFactory {
     return error;
   }
 
-  public SiteError beanNotInitialized(Exception e, String beanId, Source source) {
+  protected SiteError beanNotInitialized(Exception e, String beanId, Source source) {
     SiteErrorImpl error = new SiteErrorImpl(e);
     error.message = format(beanId);
     error.source = source;
@@ -52,7 +52,7 @@ class SiteErrorFactory {
     return error;
   }
 
-  public SiteError modelNotRead(IOException e, Source source) {
+  protected SiteError modelNotRead(IOException e, Source source) {
     Path modelPath = getModelPath(source);
 
     SiteErrorLocationImpl location = new SiteErrorLocationImpl(modelPath);
@@ -79,7 +79,7 @@ class SiteErrorFactory {
     return error;
   }
 
-  public SiteError outputDirectoryNotCreated(IOException e) {
+  protected SiteError outputDirectoryNotCreated(IOException e) {
     SiteErrorImpl error = new SiteErrorImpl(e);
     error.message = format(site.getOutputPath());
     error.type = SiteErrorType.IO;
@@ -87,7 +87,7 @@ class SiteErrorFactory {
     return error;
   }
 
-  public SiteError outputDirectoryNotDeleted(IOException e) {
+  protected SiteError outputDirectoryNotDeleted(IOException e) {
     SiteErrorImpl error = new SiteErrorImpl(e);
     error.message = format(site.getOutputPath());
     error.type = SiteErrorType.IO;
@@ -95,7 +95,7 @@ class SiteErrorFactory {
     return error;
   }
 
-  public SiteError pageNotGenerated(IOException e, Page page) {
+  protected SiteError pageNotGenerated(IOException e, Page page) {
     SiteErrorImpl error = new SiteErrorImpl(e);
     error.message = format(page.getId());
     error.source = page;
@@ -104,7 +104,7 @@ class SiteErrorFactory {
     return error;
   }
 
-  public SiteError pageNotGenerated(JadeException e, Page page) {
+  protected SiteError pageNotGenerated(JadeException e, Page page) {
     SiteErrorLocationImpl location = new SiteErrorLocationImpl(Paths.get(e.getFilename()));
     location.line = e.getLineNumber();
 
@@ -117,7 +117,7 @@ class SiteErrorFactory {
     return error;
   }
 
-  public SiteError pageOutputDirectoryNotCreated(IOException e, Page page) {
+  protected SiteError pageOutputDirectoryNotCreated(IOException e, Page page) {
     SiteErrorImpl error = new SiteErrorImpl(e);
     error.message = format(page.getId());
     error.source = page;
@@ -126,7 +126,7 @@ class SiteErrorFactory {
     return error;
   }
 
-  public SiteError pageSetNotTraversed(IOException e, Source source) {
+  protected SiteError pageSetNotTraversed(IOException e, Source source) {
     SiteErrorImpl error = new SiteErrorImpl(e);
     error.message = format(source.getId());
     error.source = source;
@@ -135,7 +135,7 @@ class SiteErrorFactory {
     return error;
   }
 
-  public SiteError siteFileServeFailed(IOException e) {
+  protected SiteError siteFileServeFailed(IOException e) {
     SiteErrorImpl error = new SiteErrorImpl(e);
     error.message = format();
     error.type = SiteErrorType.IO;

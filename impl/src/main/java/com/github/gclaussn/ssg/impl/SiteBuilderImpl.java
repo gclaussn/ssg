@@ -1,7 +1,6 @@
 package com.github.gclaussn.ssg.impl;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -9,8 +8,10 @@ import com.github.gclaussn.ssg.PageFilter;
 import com.github.gclaussn.ssg.PageProcessor;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SiteBuilder;
+import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.plugin.SitePluginGoal;
 
 public class SiteBuilderImpl implements SiteBuilder {
 
@@ -37,7 +38,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   }
 
   @Override
-  public SiteBuilder addPageDataSelectorType(Class<? extends PageDataSelector> pageDataSelectorType) {
+  public SiteBuilder addPageDataSelector(Class<? extends PageDataSelector> pageDataSelectorType) {
     Objects.requireNonNull(pageDataSelectorType, "page data selector type is null");
 
     conf.pageDataSelectorTypes.add(pageDataSelectorType);
@@ -45,7 +46,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   }
 
   @Override
-  public SiteBuilder addPageFilterType(Class<? extends PageFilter> pageFilterType) {
+  public SiteBuilder addPageFilter(Class<? extends PageFilter> pageFilterType) {
     Objects.requireNonNull(pageFilterType, "page filter type is null");
 
     conf.pageFilterTypes.add(pageFilterType);
@@ -53,7 +54,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   }
 
   @Override
-  public SiteBuilder addPageProcessorType(Class<? extends PageProcessor> pageProcessorType) {
+  public SiteBuilder addPageProcessor(Class<? extends PageProcessor> pageProcessorType) {
     Objects.requireNonNull(pageProcessorType, "page processor type is null");
 
     conf.pageProcessorTypes.add(pageProcessorType);
@@ -61,23 +62,39 @@ public class SiteBuilderImpl implements SiteBuilder {
   }
 
   @Override
+  public SiteBuilder addPluginGoal(Class<? extends SitePluginGoal> pluginGoalType) {
+    Objects.requireNonNull(pluginGoalType, "plugin goal type is null");
+
+    conf.pluginManager.addPluginGoal(pluginGoalType);
+    return this;
+  }
+
+  @Override
   public Site build(Path sitePath) {
     Objects.requireNonNull(sitePath, "site path is null");
 
-    // call preBuild hook of loaded plugins
-    conf.plugins.forEach(plugin -> plugin.preBuild(this));
+    // load plugins
+    conf.pluginManager.preBuild(this);
 
-    SiteConfImpl built = conf;
+    // complete configuration
+    SiteConfImpl built = conf.complete();
 
-    // wrap in unmodifiable collections
-    built.eventListeners = Collections.unmodifiableList(conf.eventListeners);
-    built.pageDataSelectorTypes = Collections.unmodifiableSet(conf.pageDataSelectorTypes);
-    built.pageFilterTypes = Collections.unmodifiableSet(conf.pageFilterTypes);
-    built.pageProcessorTypes = Collections.unmodifiableSet(conf.pageProcessorTypes);
+    Site site = new EventDrivenSiteImpl(sitePath, built);
+
+    // call postBuild hook
+    conf.pluginManager.postBuild(site);
 
     conf = new SiteConfImpl();
 
-    return new EventDrivenSiteImpl(sitePath, built);
+    return site;
+  }
+
+  @Override
+  public SiteBuilder setConsole(SiteConsole console) {
+    Objects.requireNonNull(console, "console is null");
+
+    conf.console = console;
+    return this;
   }
 
   @Override

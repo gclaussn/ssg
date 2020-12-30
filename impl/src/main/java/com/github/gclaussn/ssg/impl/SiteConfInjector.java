@@ -1,36 +1,50 @@
 package com.github.gclaussn.ssg.impl;
 
 import java.lang.reflect.Field;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrLookup;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
+import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.conf.SiteProperty;
+import com.github.gclaussn.ssg.conf.SitePropertyDesc;
+import com.github.gclaussn.ssg.conf.SitePropertyType;
 
 class SiteConfInjector extends StrLookup<String> {
 
-  private final Map<String, Object> properties;
+  private final SiteConfImpl conf;
+
   private final Map<String, String> env;
 
   private final StrSubstitutor variableReplacer;
 
-  SiteConfInjector(Map<String, Object> properties) {
-    this(properties, System.getenv());
+  SiteConfInjector(SiteConfImpl conf) {
+    this(conf, System.getenv());
   }
 
-  protected SiteConfInjector(Map<String, Object> properties, Map<String, String> env) {
-    this.properties = properties;
+  protected SiteConfInjector(SiteConfImpl conf, Map<String, String> env) {
+    this.conf = conf;
     this.env = env;
 
     variableReplacer = new StrSubstitutor(this);
   }
 
+  protected String buildErrorMessageRequired(Object instance, Field field, SitePropertyDesc desc) {
+    return new StringBuilder()
+        .append(instance.getClass())
+        .append('#')
+        .append(field.getName())
+        .append(": Property '")
+        .append(desc.getName())
+        .append("' is required, but no value has been provided")
+        .toString();
+  }
+
   @SuppressWarnings({"rawtypes", "unchecked"})
-  protected Object convert(Object value, Class<?> targetType) {
-    if (value.getClass() == String.class) {
+  protected Object convert(Object value, Class<?> targetType, SitePropertyDesc desc) {
+    if (value != null && value.getClass() == String.class) {
       // replace environment variables e.g. ${SSG_HOME}
       value = replaceVariables((String) value);
     }
@@ -45,28 +59,31 @@ class SiteConfInjector extends StrLookup<String> {
 
     String valueAsString = (String) value;
 
-    if (targetType == Boolean.class) {
-      return Boolean.valueOf(valueAsString);
-    } else if (targetType == Double.class) {
-      return Double.valueOf(valueAsString);
-    } else if (targetType == Integer.class) {
-      return Integer.valueOf(valueAsString);
-    } else if (targetType == Long.class) {
-      return Long.valueOf(valueAsString);
-    } else if (targetType.isEnum()) {
-      return Enum.valueOf((Class<Enum>) targetType, valueAsString);
-    } else {
-      return valueAsString;
+    switch (desc.getType()) {
+      case BOOLEAN:
+        return Boolean.valueOf(valueAsString);
+      case DOUBLE:
+        return Double.valueOf(valueAsString);
+      case ENUM:
+        return Enum.valueOf((Class<Enum>) targetType, valueAsString);
+      case INTEGER:
+        return Integer.valueOf(valueAsString);
+      case LONG:
+        return Long.valueOf(valueAsString);
+      case STRING:
+        return valueAsString.isEmpty() ? null : valueAsString;
+      default:
+        return value;
     }
-  }
-
-  protected String getEnvironmentVariableName(String name) {
-    return name.toUpperCase(Locale.ENGLISH).replace('.', '_');
   }
 
   protected <T> T inject(T instance, Map<String, Object> additionalProperties) {
     for (Field field : instance.getClass().getDeclaredFields()) {
-      inject(instance, additionalProperties, field);
+      if (field.getType() == SiteConsole.class) {
+        injectConsole(instance, field, additionalProperties);
+      } else {
+        inject(instance, additionalProperties, field);
+      }
     }
 
     return instance;
@@ -80,19 +97,23 @@ class SiteConfInjector extends StrLookup<String> {
 
     String name = property.name();
     if (StringUtils.isBlank(name)) {
-      String message = String.format("%s.%s: SiteProperty#name is blank", instance.getClass(), field.getName());
+      String message = String.format("%s#%s: Property name is blank", instance.getClass(), field.getName());
       throw new RuntimeException(message);
     }
+
+    SitePropertyDescImpl desc = new SitePropertyDescImpl();
+    desc.name = property.name();
+    desc.type = SitePropertyType.of(field.getType());
 
     Object value = additionalProperties.get(name);
     if (value == null) {
       // use configuration properties
-      value = properties.get(name);
+      value = conf.properties.get(name);
     }
 
     if (value == null) {
       // use environment variable
-      value = System.getenv(getEnvironmentVariableName(name));
+      value = System.getenv(desc.getVariableName());
     }
 
     if (value == null) {
@@ -101,11 +122,29 @@ class SiteConfInjector extends StrLookup<String> {
     }
 
     // convert value to the type of the target field
-    Object converted = convert(value, field.getType());
+    Object converted = convert(value, field.getType(), desc);
+
+    if (value == null && property.required()) {
+      String message = buildErrorMessageRequired(instance, field, desc);
+      throw new RuntimeException(message);
+    }
 
     try {
       field.setAccessible(true);
       field.set(instance, converted);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    } catch (IllegalArgumentException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void injectConsole(Object instance, Field field, Map<String, Object> additionalProperties) {
+    Object console = additionalProperties.get(SiteConsole.PROPERTY_NAME);
+
+    try {
+      field.setAccessible(true);
+      field.set(instance, console != null ? console : conf.getConsole());
     } catch (IllegalAccessException e) {
       throw new RuntimeException(e);
     } catch (IllegalArgumentException e) {

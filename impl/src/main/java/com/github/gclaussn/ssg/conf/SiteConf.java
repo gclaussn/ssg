@@ -20,6 +20,31 @@ import com.github.gclaussn.ssg.event.SiteEventListener;
 public interface SiteConf {
 
   /**
+   * Describes the given type and its site properties.
+   * 
+   * @param type A type.
+   * 
+   * @return The type description.
+   */
+  TypeDesc describe(Class<?> type);
+
+  /**
+   * Describes the type with the given name and its site properties.
+   * 
+   * @param typeName The name of a specific type.
+   * 
+   * @return The type description.
+   */
+  TypeDesc describe(String typeName);
+
+  /**
+   * Provides a console to output messages to {@code stdout} or other print streams.
+   * 
+   * @return The site's console.
+   */
+  SiteConsole getConsole();
+
+  /**
    * Provides all registered event listeners.
    * 
    * @return An unmodifiable list, containing the registered event listeners.
@@ -34,7 +59,7 @@ public interface SiteConf {
 
   Set<Class<? extends PageProcessor>> getPageProcessorTypes();
 
-  Object getProperty(String name);
+  Object getProperty(String propertyName);
 
   <T> T inject(T instance);
 

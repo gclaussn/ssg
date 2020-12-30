@@ -1,5 +1,12 @@
 package com.github.gclaussn.ssg.impl;
 
+import static com.github.gclaussn.ssg.event.SiteEventType.CREATE_JADE;
+import static com.github.gclaussn.ssg.event.SiteEventType.CREATE_YAML;
+import static com.github.gclaussn.ssg.event.SiteEventType.DELETE_JADE;
+import static com.github.gclaussn.ssg.event.SiteEventType.DELETE_YAML;
+import static com.github.gclaussn.ssg.event.SiteEventType.MODIFY_JADE;
+import static com.github.gclaussn.ssg.event.SiteEventType.MODIFY_YAML;
+
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -17,9 +24,11 @@ import com.github.gclaussn.ssg.SiteException;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.event.SiteEvent;
+import com.github.gclaussn.ssg.event.SiteEventType;
 import com.github.gclaussn.ssg.file.SiteFileEvent;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.file.SiteFileEventType;
+import com.github.gclaussn.ssg.file.SiteFileType;
 
 class EventDrivenSiteImpl extends SiteImpl implements EventDrivenSite, SiteFileEventListener {
 
@@ -90,6 +99,19 @@ class EventDrivenSiteImpl extends SiteImpl implements EventDrivenSite, SiteFileE
    */
   protected boolean isPageInclude(String id) {
     return pages.values().stream().anyMatch(page -> page.model.includes.contains(id));
+  }
+
+  protected SiteEventType mapEventType(SiteFileEvent fileEvent) {
+    switch (fileEvent.getType()) {
+      case CREATE:
+        return fileEvent.getFileType() == SiteFileType.YAML ? CREATE_YAML : CREATE_JADE;
+      case MODIFY:
+        return fileEvent.getFileType() == SiteFileType.YAML ? MODIFY_YAML : MODIFY_JADE;
+      case DELETE:
+        return fileEvent.getFileType() == SiteFileType.YAML ? DELETE_YAML : DELETE_JADE;
+      default:
+        throw new IllegalArgumentException(String.format("Unsupported file event type %s", fileEvent.getFileType()));
+    }
   }
 
   protected void modify(Source source) {
@@ -216,7 +238,11 @@ class EventDrivenSiteImpl extends SiteImpl implements EventDrivenSite, SiteFileE
       return;
     }
 
-    SiteEvent origin = eventFactory.fileEvent(event, source);
+    SiteEventImpl origin = new SiteEventImpl();
+    origin.reference = event.getPath().toString();
+    origin.source = source;
+    origin.timestamp = event.getTimestamp();
+    origin.type = mapEventType(event);
 
     publishEvent(origin);
 

@@ -3,15 +3,17 @@ package com.github.gclaussn.ssg.cli.cmd;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.cli.AbstractCmd;
-import com.github.gclaussn.ssg.server.goal.StartGoal;
+import com.github.gclaussn.ssg.SiteBuilder;
+import com.github.gclaussn.ssg.cli.AbstractCommand;
+import com.github.gclaussn.ssg.cli.Main;
+import com.github.gclaussn.ssg.server.StartGoal;
+import com.github.gclaussn.ssg.server.domain.event.SiteEventLogger;
 
 @Parameters(commandNames = "server", commandDescription = "Run a developer server")
-public class Server extends AbstractCmd {
+public class Server extends AbstractCommand {
 
   @Parameter(names = {"--host", "-h"}, description = "Host name")
   protected String host;
@@ -19,11 +21,16 @@ public class Server extends AbstractCmd {
   protected Integer port;
 
   @Override
-  public int run(Site site, JCommander jc) {
+  public void preBuild(SiteBuilder builder, Main main) {
+    builder.addEventListener(new SiteEventLogger(main.isVerbose()));
+  }
+
+  @Override
+  public void run(Site site) {
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put(StartGoal.HOST, host);
     properties.put(StartGoal.PORT, port);
 
-    return site.execute("server:start", properties);
+    site.getPluginManager().execute(new StartGoal(), properties);
   }
 }

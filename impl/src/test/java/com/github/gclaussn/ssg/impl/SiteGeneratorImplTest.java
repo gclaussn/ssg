@@ -35,17 +35,11 @@ public class SiteGeneratorImplTest {
   @Test
   public void testCompileExtensions() {
     PageData compiled = generator.compileExtensions(Collections.singleton(new SiteGeneratorImplTest()));
-    assertThat(compiled.has("com/github/gclaussn/ssg/impl/siteGeneratorImplTest"), is(true));
+    assertThat(compiled.has("com/github/gclaussn/ssg/impl/SiteGeneratorImplTest"), is(true));
 
     PageDataNode node;
 
-    node = compiled.get("com/github/gclaussn/ssg/impl/siteGeneratorImplTest");
-    assertThat(node, notNullValue());
-    assertThat(node.getType(), is(PageDataNodeType.OTHER));
-    assertThat(node.isNull(), is(false));
-
-    // simple name
-    node = compiled.get("siteGeneratorImplTest");
+    node = compiled.get("com/github/gclaussn/ssg/impl/SiteGeneratorImplTest");
     assertThat(node, notNullValue());
     assertThat(node.getType(), is(PageDataNodeType.OTHER));
     assertThat(node.isNull(), is(false));
@@ -57,14 +51,5 @@ public class SiteGeneratorImplTest {
     assertThat(generator.normalizeId("page-a"), equalTo("pageA"));
     assertThat(generator.normalizeId("page_b"), equalTo("pageB"));
     assertThat(generator.normalizeId("page-set1/sub/x_y_z"), equalTo("pageSet1/sub/xYZ"));
-  }
-
-  @Test
-  public void testNormalizeTypeName() {
-    assertThat(generator.normalizeTypeName(""), equalTo(""));
-    assertThat(generator.normalizeTypeName("org.example.Type"), equalTo("org/example/type"));
-    assertThat(generator.normalizeTypeName("org.example_test.Type"), equalTo("org/exampleTest/type"));
-    assertThat(generator.normalizeTypeName("Type"), equalTo("type"));
-    assertThat(generator.normalizeTypeName("_Type"), equalTo("Type"));
   }
 }

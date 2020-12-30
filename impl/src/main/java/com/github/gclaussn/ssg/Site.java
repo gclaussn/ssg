@@ -4,7 +4,6 @@ import static com.github.gclaussn.ssg.file.SiteFileType.YAML;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -74,10 +73,6 @@ public interface Site extends AutoCloseable {
    */
   @Override
   void close();
-
-  int execute(String pluginGoal);
-
-  int execute(String pluginGoal, Map<String, Object> properties);
 
   /**
    * Generates the output of all known pages.

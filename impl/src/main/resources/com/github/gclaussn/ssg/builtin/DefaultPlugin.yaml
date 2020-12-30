@@ -1,0 +1,3 @@
+name: Default site plugin
+documentation:
+  Provides builtin PageProcessor, PageFilter and PageDataSelector implementations as well as default goals to execute.

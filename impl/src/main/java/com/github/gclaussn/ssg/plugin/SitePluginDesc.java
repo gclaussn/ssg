@@ -1,6 +1,18 @@
 package com.github.gclaussn.ssg.plugin;
 
-public interface SitePluginDesc {
+import java.util.Set;
 
-  String getShortName();
+import com.github.gclaussn.ssg.conf.SitePropertyDesc;
+
+public interface SitePluginDesc extends Comparable<SitePluginDesc> {
+
+  String getDocumentation();
+
+  Set<String> getGoals();
+
+  String getName();
+
+  Set<SitePropertyDesc> getProperties();
+
+  String getTypeName();
 }

@@ -2,14 +2,9 @@ package com.github.gclaussn.ssg.impl.plugin;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-
-import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.conf.SiteConf;
 
 public class SitePluginManagerImplTest {
 
@@ -17,19 +12,12 @@ public class SitePluginManagerImplTest {
 
   @Before
   public void setUp() {
-    Site site = Mockito.mock(Site.class);
-    when(site.getConf()).thenReturn(Mockito.mock(SiteConf.class));
-
-    manager = new SitePluginManagerImpl(site);
+    manager = new SitePluginManagerImpl();
   }
 
   @Test
-  public void testExtractPluginGoalName() {
-    assertThat(manager.extractPluginGoalName("test:goal"), equalTo("goal"));
-  }
-
-  @Test
-  public void testExtractPluginName() {
-    assertThat(manager.extractPluginName("test:goal"), equalTo("test"));
+  public void testBuildPluginGoalId() {
+    assertThat(manager.buildPluginGoalId("TestGoal"), equalTo("test"));
+    assertThat(manager.buildPluginGoalId("TestSomethingGoal"), equalTo("test-something"));
   }
 }
