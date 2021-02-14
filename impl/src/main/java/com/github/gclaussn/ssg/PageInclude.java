@@ -13,6 +13,15 @@ import com.github.gclaussn.ssg.data.PageData;
 public interface PageInclude extends Source {
 
   /**
+   * Checks if the page include depends on the given source.
+   * 
+   * @param source Another page include.
+   * 
+   * @return {@code true}, if the page include does depend on the source. Otherwise {@code false}.
+   */
+  boolean dependsOn(Source source);
+
+  /**
    * Returns the data, specified within the page include's YAML file.
    * 
    * @return The page include data.

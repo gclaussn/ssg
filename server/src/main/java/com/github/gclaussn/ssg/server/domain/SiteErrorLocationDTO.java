@@ -2,7 +2,7 @@ package com.github.gclaussn.ssg.server.domain;
 
 import java.nio.file.Path;
 
-import com.github.gclaussn.ssg.SiteErrorLocation;
+import com.github.gclaussn.ssg.error.SiteErrorLocation;
 
 public class SiteErrorLocationDTO {
 

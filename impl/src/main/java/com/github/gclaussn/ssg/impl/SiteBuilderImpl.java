@@ -79,7 +79,7 @@ public class SiteBuilderImpl implements SiteBuilder {
     // complete configuration
     SiteConfImpl built = conf.complete();
 
-    Site site = new EventDrivenSiteImpl(sitePath, built);
+    Site site = new SiteImpl(sitePath, built);
 
     // call postBuild hook
     conf.pluginManager.postBuild(site);

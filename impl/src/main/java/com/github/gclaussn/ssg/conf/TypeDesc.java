@@ -6,7 +6,7 @@ import com.github.gclaussn.ssg.plugin.SitePlugin;
 import com.github.gclaussn.ssg.plugin.SitePluginGoal;
 
 /**
- * Description of a site type.<br />
+ * Description of a site type.<br>
  * Types are:
  * <ul>
  *   <li>{@link SitePlugin}</li>

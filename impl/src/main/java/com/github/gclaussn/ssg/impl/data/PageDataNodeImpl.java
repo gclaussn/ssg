@@ -60,7 +60,7 @@ class PageDataNodeImpl implements PageDataNode {
   }
 
   /**
-   * Ensures that the node has the expected type.<br />
+   * Ensures that the node has the expected type.<br>
    * If the node is of a different type, an {@link IllegalStateException} is thrown.
    * 
    * @param expected The expected node type.

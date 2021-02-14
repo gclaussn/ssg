@@ -8,9 +8,20 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.github.gclaussn.ssg.conf.SiteConf;
+import com.github.gclaussn.ssg.error.SiteError;
+import com.github.gclaussn.ssg.error.SiteException;
+import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.impl.SiteBuilderImpl;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
+/**
+ * Static site representation, which loades pages and page sets that are defined in its
+ * {@code site.yaml} file.<br>
+ * <br>
+ * A {@link Site} can also be driven by file events (create, modify, delete).<br>
+ * It can be used in combination with a {@link SiteFileEventListener} - a watcher (thread) that is
+ * watching for file events on the {@code site.yaml} and recursively on the source directory.
+ */
 public interface Site extends AutoCloseable {
 
   /** Name of the site model (YAML) file. */
@@ -35,7 +46,7 @@ public interface Site extends AutoCloseable {
   }
 
   /**
-   * Creates a new site from the given path, using a default configuration.<br />
+   * Creates a new site from the given path, using a default configuration.<br>
    * Please note: {@link #load()} must be called to load the site initially.
    * 
    * @param sitePath Path to a directory with a {@code site.yaml} file.
@@ -49,7 +60,7 @@ public interface Site extends AutoCloseable {
   }
 
   /**
-   * Analyzes, which pages use the page include with the given ID.<br />
+   * Analyzes, which pages use the page include with the given ID.<br>
    * If the page include does not exist, an {@link SiteException} is thrown.
    * 
    * @param pageIncludeId The ID of a specific {@link PageInclude}.
@@ -59,7 +70,7 @@ public interface Site extends AutoCloseable {
   List<Page> analyzePageIncludeUsage(String pageIncludeId);
 
   /**
-   * Analyzes, which pages use the page set with the given ID via data selectors.<br />
+   * Analyzes, which pages use the page set with the given ID via data selectors.<br>
    * If the page set does not exist, an {@link SiteException} is thrown.
    * 
    * @param pageSetId The ID of a specific {@link PageSet}.
@@ -106,9 +117,11 @@ public interface Site extends AutoCloseable {
 
   Page getPage(String pageId);
 
+  Set<Page> getPages();
+
   PageInclude getPageInclude(String pageIncludeId);
 
-  Set<Page> getPages();
+  Set<PageInclude> getPageIncludes();
 
   PageSet getPageSet(String pageSetId);
 
@@ -131,7 +144,7 @@ public interface Site extends AutoCloseable {
   Path getPublicPath();
 
   /**
-   * Identifies the source, using the given ID.<br />
+   * Identifies the source, using the given ID.<br>
    * If there is no such source, the type will be {@link SourceType#UNKNOWN}.
    * 
    * @param id The ID of the source to identify.
@@ -183,7 +196,7 @@ public interface Site extends AutoCloseable {
   boolean isLoaded();
 
   /**
-   * Loads the site, based on its {@code site.yaml} file.<br />
+   * Loads the site, based on its {@code site.yaml} file.<br>
    * This method can also be called to reload the site at any given time.
    * 
    * @return A list with {@link SiteError}s that occurred during loading.

@@ -13,27 +13,22 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import com.github.gclaussn.ssg.EventDrivenSite;
-import com.github.gclaussn.ssg.EventStore;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.event.SiteEvent;
+import com.github.gclaussn.ssg.event.SiteEventStore;
 import com.github.gclaussn.ssg.server.AbstractResource;
 
 @Path("/site-events")
 @Produces(MediaType.APPLICATION_JSON)
 public class SiteEventResource extends AbstractResource {
 
-  private EventStore eventStore;
+  private SiteEventStore eventStore;
 
   @Override
   protected void init(Site site) {
     super.init(site);
 
-    try {
-      eventStore = ((EventDrivenSite) site).getEventStore();
-    } catch (ClassCastException e) {
-      eventStore = null;
-    }
+    eventStore = site.getConf().getEventStore();
   }
 
   @GET

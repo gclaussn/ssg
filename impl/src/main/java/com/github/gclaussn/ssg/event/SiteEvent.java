@@ -1,12 +1,16 @@
 package com.github.gclaussn.ssg.event;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 
-import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.Source;
+import com.github.gclaussn.ssg.error.SiteError;
+import com.github.gclaussn.ssg.impl.event.SiteEventBuilderImpl;
 
 public interface SiteEvent {
+
+  static SiteEventBuilder builder() {
+    return new SiteEventBuilderImpl();
+  }
 
   Optional<SiteError> getError();
 
@@ -17,8 +21,4 @@ public interface SiteEvent {
   long getTimestamp();
 
   SiteEventType getType();
-
-  SiteEvent publish(Consumer<SiteEvent> consumer);
-
-  SiteEvent with(SiteError error);
 }

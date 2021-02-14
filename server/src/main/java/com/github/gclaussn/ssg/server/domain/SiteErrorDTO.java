@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import com.github.gclaussn.ssg.SiteError;
-import com.github.gclaussn.ssg.SiteErrorType;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;
+import com.github.gclaussn.ssg.error.SiteError;
+import com.github.gclaussn.ssg.error.SiteErrorType;
 
 public class SiteErrorDTO {
 

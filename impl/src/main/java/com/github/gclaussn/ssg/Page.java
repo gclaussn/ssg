@@ -7,6 +7,8 @@ import java.util.Set;
 
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataSelectorBean;
+import com.github.gclaussn.ssg.error.SiteError;
+import com.github.gclaussn.ssg.error.SiteException;
 
 /**
  * A page within a static site that can be generated.
@@ -14,7 +16,16 @@ import com.github.gclaussn.ssg.data.PageDataSelectorBean;
 public interface Page extends Source {
 
   /**
-   * Generates the page.<br />
+   * Checks if the page depends on the given source.
+   * 
+   * @param source A specific source - e.g. a page set.
+   * 
+   * @return {@code true}, if the page does depend on the source. Otherwise {@code false}.
+   */
+  boolean dependsOn(Source source);
+
+  /**
+   * Generates the page.<br>
    * If the page is skipped or rejected, it cannot be generated - in this case an
    * {@link SiteException} is thrown.
    * 
@@ -64,11 +75,18 @@ public interface Page extends Source {
   Path getOutputPath();
 
   /**
+   * Provides all includes, that are used by the page and that are loaded.
+   * 
+   * @return A set, containing all used and successfully loaded {@link PageInclude}s.
+   */
+  Set<PageInclude> getPageIncludes();
+
+  /**
    * Provides all includes, that are used by the page.
    * 
    * @return A set, containing all used {@link PageInclude}s.
    */
-  Set<PageInclude> getPageIncludes();
+  Set<String> getPageIncludeIds();
 
   /**
    * Returns the set, the page is related to.
@@ -115,6 +133,13 @@ public interface Page extends Source {
    * @return The absolute page URL.
    */
   String getUrl();
+
+  /**
+   * Determines if the page is generated or if it is ignored during generation.
+   * 
+   * @return {@code true}, if the page is generated. Otherwise {@code false}.
+   */
+  boolean isGenerated();
 
   /**
    * Determines if the page is rejected by a {@link PageFilter}. A rejected page cannot be generated.

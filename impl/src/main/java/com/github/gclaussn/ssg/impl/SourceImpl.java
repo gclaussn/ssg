@@ -3,12 +3,12 @@ package com.github.gclaussn.ssg.impl;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;
 
-class SourceImpl implements Source {
+public class SourceImpl implements Source {
 
-  protected final String id;
-  protected final SourceType type;
+  private final String id;
+  private final SourceType type;
 
-  SourceImpl(SourceType type, String id) {
+  public SourceImpl(SourceType type, String id) {
     this.type = type;
     this.id = id;
   }
@@ -26,7 +26,7 @@ class SourceImpl implements Source {
     }
 
     Source source = (Source) obj;
-    return id.equals(source.getId());
+    return type == source.getType() && id.equals(source.getId());
   }
 
   @Override

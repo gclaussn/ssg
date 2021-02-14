@@ -9,9 +9,9 @@ import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.gclaussn.ssg.EventDrivenSite;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.conf.SiteProperty;
+import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.plugin.SitePluginGoal;
 import com.github.gclaussn.ssg.server.domain.SiteResource;
 import com.github.gclaussn.ssg.server.domain.event.SiteEventEncoder;
@@ -137,10 +137,12 @@ public class StartGoal implements SitePluginGoal {
     // start server
     server.start(Undertow.builder().addHttpListener(port, host));
 
-    LOGGER.info("Serving site: http://{}:{} and application: http://{}:{}/app", host, port, host, port);
+    LOGGER.info("Serving site: http://{}:{}", host, port);
+    LOGGER.info("Serving app:  http://{}:{}/app", host, port);
+    LOGGER.info("Serving api:  http://{}:{}/api", host, port);
 
     // start file watcher
-    siteFileWatcher.start((EventDrivenSite) site);
+    siteFileWatcher.start((SiteFileEventListener) site);
 
     // add shutdown hook that notifies the waiting main thread
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {

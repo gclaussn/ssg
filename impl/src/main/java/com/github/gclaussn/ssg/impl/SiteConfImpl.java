@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.gclaussn.ssg.PageFilter;
 import com.github.gclaussn.ssg.PageProcessor;
@@ -29,9 +28,12 @@ import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.conf.SiteProperty;
 import com.github.gclaussn.ssg.conf.SitePropertyType;
 import com.github.gclaussn.ssg.conf.TypeDesc;
-import com.github.gclaussn.ssg.data.PageData;
+import com.github.gclaussn.ssg.conf.TypeLookup;
 import com.github.gclaussn.ssg.data.PageDataSelector;
+import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.event.SiteEventStore;
+import com.github.gclaussn.ssg.impl.event.SiteEventStoreImpl;
 import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
 
 class SiteConfImpl implements SiteConf {
@@ -44,6 +46,9 @@ class SiteConfImpl implements SiteConf {
   protected SiteConsole console;
 
   protected List<SiteEventListener> eventListeners;
+
+  protected SiteEventStoreImpl eventStore;
+
   /** Generator extensions. */
   protected Set<Object> extensions;
 
@@ -59,6 +64,8 @@ class SiteConfImpl implements SiteConf {
     pluginManager = new SitePluginManagerImpl();
 
     eventListeners = new LinkedList<>();
+    eventStore = new SiteEventStoreImpl();
+
     extensions = new HashSet<>();
     pageDataSelectorTypes = new HashSet<>();
     pageFilterTypes = new HashSet<>();
@@ -79,6 +86,8 @@ class SiteConfImpl implements SiteConf {
       console = new SiteConsoleImpl();
     }
 
+    eventListeners.add(0, eventStore);
+
     // wrap in unmodifiable collections
     eventListeners = Collections.unmodifiableList(eventListeners);
     extensions = Collections.unmodifiableSet(extensions);
@@ -88,16 +97,9 @@ class SiteConfImpl implements SiteConf {
     properties = Collections.unmodifiableMap(properties);
 
     // configure YAML object mapper
-    SimpleModule module = new SimpleModule();
-    module.addDeserializer(PageData.class, new PageDataDeserializer());
-    module.addDeserializer(PageDataSelectorBeanImpl.class, new PageDataSelectorDeserializer(this));
-    module.addDeserializer(PageFilterBeanImpl.class, new PageFilterDeserializer(this));
-    module.addDeserializer(PageProcessorBeanImpl.class, new PageProcessorDeserializer(this));
-
     objectMapper = new ObjectMapper(new YAMLFactory());
     objectMapper.configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true);
     objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-    objectMapper.registerModule(module);
     objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
@@ -163,18 +165,23 @@ class SiteConfImpl implements SiteConf {
   }
 
   @Override
-  public Set<Class<? extends PageDataSelector>> getPageDataSelectorTypes() {
-    return pageDataSelectorTypes;
+  public SiteEventStore getEventStore() {
+    return eventStore;
   }
 
   @Override
-  public Set<Class<? extends PageFilter>> getPageFilterTypes() {
-    return pageFilterTypes;
+  public TypeLookup<PageDataSelector> getPageDataSelectorTypes() {
+    return new TypeLookupImpl<>(pageDataSelectorTypes);
   }
 
   @Override
-  public Set<Class<? extends PageProcessor>> getPageProcessorTypes() {
-    return pageProcessorTypes;
+  public TypeLookup<PageFilter> getPageFilterTypes() {
+    return new TypeLookupImpl<>(pageFilterTypes);
+  }
+
+  @Override
+  public TypeLookup<PageProcessor> getPageProcessorTypes() {
+    return new TypeLookupImpl<>(pageProcessorTypes);
   }
 
   @Override
@@ -192,6 +199,11 @@ class SiteConfImpl implements SiteConf {
   @Override
   public <T> T inject(T instance, Map<String, Object> additionalProperties) {
     return injector.inject(instance, additionalProperties);
+  }
+
+  @Override
+  public void publish(SiteEvent event) {
+    eventListeners.forEach(l -> l.onEvent(event));
   }
 
   protected TypeDescModel readTypeDescModel(String typeName) {

@@ -17,9 +17,9 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.SiteError;
-import com.github.gclaussn.ssg.SiteErrorType;
 import com.github.gclaussn.ssg.SourceType;
+import com.github.gclaussn.ssg.error.SiteError;
+import com.github.gclaussn.ssg.error.SiteErrorType;
 
 public class SitesTest {
 

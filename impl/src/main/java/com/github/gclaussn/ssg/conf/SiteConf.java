@@ -2,17 +2,18 @@ package com.github.gclaussn.ssg.conf;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.github.gclaussn.ssg.PageFilter;
 import com.github.gclaussn.ssg.PageProcessor;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SiteBuilder;
 import com.github.gclaussn.ssg.data.PageDataSelector;
+import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.event.SiteEventStore;
 
 /**
- * Configuration, used to load and generate the {@link Site}.<br />
+ * Configuration, used to load and generate the {@link Site}.<br>
  * 
  * @see SiteBuilder
  * @see Site#getConf()
@@ -53,15 +54,24 @@ public interface SiteConf {
    */
   List<SiteEventListener> getEventListeners();
 
-  Set<Class<? extends PageDataSelector>> getPageDataSelectorTypes();
+  /**
+   * Provides the underlying {@link SiteEvent} store.
+   * 
+   * @return The event store.
+   */
+  SiteEventStore getEventStore();
 
-  Set<Class<? extends PageFilter>> getPageFilterTypes();
+  TypeLookup<PageDataSelector> getPageDataSelectorTypes();
 
-  Set<Class<? extends PageProcessor>> getPageProcessorTypes();
+  TypeLookup<PageFilter> getPageFilterTypes();
+
+  TypeLookup<PageProcessor> getPageProcessorTypes();
 
   Object getProperty(String propertyName);
 
   <T> T inject(T instance);
 
   <T> T inject(T instance, Map<String, Object> additionalProperties);
+
+  void publish(SiteEvent event);
 }

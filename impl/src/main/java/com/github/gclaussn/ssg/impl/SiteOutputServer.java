@@ -5,10 +5,13 @@ import static com.github.gclaussn.ssg.file.SiteFileType.HTML;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SiteOutput;
+import com.github.gclaussn.ssg.error.SiteError;
+import com.github.gclaussn.ssg.model.NodeModules;
 
 class SiteOutputServer {
 
@@ -16,15 +19,9 @@ class SiteOutputServer {
   protected static final String NODE_MODULES = String.format("%s/", Site.NODE_MODULES);
 
   private final SiteImpl site;
-  private final SiteModel siteModel;
 
   SiteOutputServer(SiteImpl site) {
-    this(site, site.model);
-  }
-
-  SiteOutputServer(SiteImpl site, SiteModel siteModel) {
     this.site = site;
-    this.siteModel = siteModel;
   }
 
   protected SiteOutput map(Path basePath, Path filePath) {
@@ -78,7 +75,7 @@ class SiteOutputServer {
 
       return Stream.of(outputFiles, publicFiles, nodeModulesFiles).reduce(Stream::concat).get();
     } catch (IOException e) {
-      throw site.errorFactory.siteFileServeFailed(e).toException();
+      throw SiteError.builder(site).errorSiteFileServeFailed(e).toException();
     }
   }
 
@@ -122,8 +119,10 @@ class SiteOutputServer {
     }
     
     Stream<Path> stream = Files.walk(path).filter(Files::isRegularFile);
-    if (siteModel.nodeModules != null) {
-      stream = stream.filter(new NodeModulesMatcher(siteModel.nodeModules));
+
+    Optional<NodeModules> nodeModules = site.repository.getNodeModules();
+    if (nodeModules.isPresent()) {
+      stream = stream.filter(nodeModules.get().getMatcher());
     }
 
     return stream.map(filePath -> map(site.getPath(), filePath));

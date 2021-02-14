@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.github.gclaussn.ssg.data.PageData;
+import com.github.gclaussn.ssg.error.SiteError;
+import com.github.gclaussn.ssg.error.SiteException;
 
 /**
  * A page set, provides default data and a template for contained pages that are part of the page
@@ -14,7 +16,7 @@ import com.github.gclaussn.ssg.data.PageData;
 public interface PageSet extends Source {
 
   /**
-   * Generates all pages of the page set.<br />
+   * Generates all pages of the page set.<br>
    * If the page set is skipped, it's pages cannot be generated - in this case an
    * {@link SiteException} is thrown.
    * 

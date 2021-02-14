@@ -6,9 +6,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -19,14 +21,16 @@ import org.apache.commons.io.FileUtils;
 import com.github.gclaussn.ssg.Page;
 import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageSet;
-import com.github.gclaussn.ssg.SiteError;
-import com.github.gclaussn.ssg.SiteException;
 import com.github.gclaussn.ssg.SiteGenerator;
 import com.github.gclaussn.ssg.SiteGeneratorFn;
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataBuilder;
 import com.github.gclaussn.ssg.data.PageDataSelectorBean;
+import com.github.gclaussn.ssg.error.SiteError;
+import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.event.SiteEvent;
+import com.github.gclaussn.ssg.event.SiteEventBuilder;
+import com.github.gclaussn.ssg.event.SiteEventType;
 import com.github.gclaussn.ssg.impl.markdown.MarkdownFilter;
 
 import de.neuland.jade4j.Jade4J.Mode;
@@ -65,6 +69,15 @@ class SiteGeneratorImpl implements SiteGenerator {
     configuration.getFilters().put("md", markdownFilter);
   }
 
+  protected Map<String, Object> buildMetadata(Page page) {
+    Map<String, Object> meta = new HashMap<>();
+    meta.put("id", page.getId());
+    meta.put("subId", page.getSubId().orElse(null));
+    meta.put("url", page.getUrl());
+
+    return meta;
+  }
+
   protected PageData compileExtensions(Set<Object> extensions) {
     PageDataBuilder builder = PageData.builder();
 
@@ -83,6 +96,8 @@ class SiteGeneratorImpl implements SiteGenerator {
 
   protected PageData compilePageData(Page page) {
     PageDataBuilder builder = PageData.builder();
+
+    builder.put(PageData.META, buildMetadata(page));
 
     // put data from page includes
     for (PageInclude pageInclude : resolvePageIncludes(page)) {
@@ -106,7 +121,7 @@ class SiteGeneratorImpl implements SiteGenerator {
     try {
       FileUtils.forceMkdir(site.getOutputPath().toFile());
     } catch (IOException e) {
-      throw site.errorFactory.outputDirectoryNotCreated(e).toException();
+      throw SiteError.builder(site).errorOutputDirectoryNotCreated(e).toException();
     }
   }
 
@@ -118,7 +133,7 @@ class SiteGeneratorImpl implements SiteGenerator {
     try {
       FileUtils.deleteDirectory(site.getOutputPath().toFile());
     } catch (IOException e) {
-      throw site.errorFactory.outputDirectoryNotDeleted(e).toException();
+      throw SiteError.builder(site).errorOutputDirectoryNotDeleted(e).toException();
     }
   }
 
@@ -126,32 +141,34 @@ class SiteGeneratorImpl implements SiteGenerator {
     return !page.isSkipped() && !page.isRejected();
   }
 
+  private boolean filterPageNoSet(Page page) {
+    return page.getPageSet().isEmpty();
+  }
+
   @Override
   public List<SiteError> generate() {
-    SiteEvent event = site.eventFactory.generateSite();
+    SiteEventBuilder eventBuilder = SiteEvent.builder().type(SiteEventType.GENERATE_SITE);
 
     try {
       deleteOutputDirectory();
       createOutputDirectory();
     } catch (SiteException e) {
-      event = event.with(e.getError());
+      eventBuilder.error(e.getError());
       return Collections.singletonList(e.getError());
     } finally {
-      event.publish(site::publishEvent);
+      publish(eventBuilder.build());
     }
 
     List<SiteError> errors = new LinkedList<>();
 
-    if (site.model == null) {
+    if (!site.isLoaded()) {
       return errors;
     }
 
     // generate pages, that are not part of a page set
-    site.model.pages.stream()
-        // filter pages, which has been loaded successfully
-        .filter(site::hasPage)
-        // get page
-        .map(site::getPage)
+    site.getPages().stream()
+        // filter pages, that has no page set
+        .filter(this::filterPageNoSet)
         // filter pages, that are neither skipped nor rejected
         .filter(this::filterPage)
         // generate page
@@ -164,9 +181,7 @@ class SiteGeneratorImpl implements SiteGenerator {
         .forEach(errors::add);
 
     // generate page sets
-    site.model.pageSets.stream()
-        // filter page sets, which has been loaded successfully
-        .filter(site::hasPageSet)
+    site.getPageSets().stream()
         // generate page set
         .map(this::generatePageSet)
         // collect errors
@@ -190,7 +205,7 @@ class SiteGeneratorImpl implements SiteGenerator {
   }
 
   protected Optional<SiteError> generatePage(Page page) {
-    SiteEvent event = site.eventFactory.generatePage(page);
+    SiteEventBuilder eventBuilder = SiteEvent.builder().type(SiteEventType.GENERATE_PAGE).source(page);
 
     Path path = page.getOutputPath();
 
@@ -198,8 +213,8 @@ class SiteGeneratorImpl implements SiteGenerator {
     try {
       Files.createDirectories(path.getParent());
     } catch (IOException e) {
-      SiteError error = site.errorFactory.pageOutputDirectoryNotCreated(e, page);
-      event.with(error).publish(site::publishEvent);
+      SiteError error = SiteError.builder(site).source(page).errorPageOutputDirectoryNotCreated(e);
+      eventBuilder.error(error).buildAndPublish(this::publish);
       return Optional.of(error);
     }
 
@@ -216,16 +231,17 @@ class SiteGeneratorImpl implements SiteGenerator {
       JadeTemplate template = configuration.getTemplate(page.getTemplateName());
       configuration.renderTemplate(template, data.getRootMap(), writer);
     } catch (JadeException e) {
-      SiteError error = site.errorFactory.pageNotGenerated(e, page);
-      event.with(error).publish(site::publishEvent);
+      SiteError error = SiteError.builder(site).source(page).errorPageNotGenerated(e);
+      eventBuilder.error(error);
       return Optional.of(error);
     } catch (IOException e) {
-      SiteError error = site.errorFactory.pageNotGenerated(e, page);
-      event.with(error).publish(site::publishEvent);
+      SiteError error = SiteError.builder(site).source(page).errorPageNotGenerated(e);
+      eventBuilder.error(error);
       return Optional.of(error);
+    } finally {
+      publish(eventBuilder.build());
     }
 
-    event.publish(site::publishEvent);
     return Optional.empty();
   }
 
@@ -245,7 +261,7 @@ class SiteGeneratorImpl implements SiteGenerator {
       return Collections.emptyList();
     }
 
-    site.eventFactory.generatePageSet(pageSet).publish(site::publishEvent);
+    SiteEvent.builder().type(SiteEventType.GENERATE_PAGE_SET).source(pageSet).buildAndPublish(this::publish);
 
     List<SiteError> errors = pageSet.getPages().stream()
         // filter pages, that are neither skipped nor rejected
@@ -305,5 +321,9 @@ class SiteGeneratorImpl implements SiteGenerator {
     }
 
     return sb.toString();
+  }
+
+  protected void publish(SiteEvent event) {
+    site.getConf().publish(event);
   }
 }
