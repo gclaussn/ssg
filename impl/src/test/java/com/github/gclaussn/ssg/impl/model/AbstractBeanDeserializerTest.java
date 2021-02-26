@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,9 +19,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.builtin.selector.PageSetSelector;
-import com.github.gclaussn.ssg.conf.SiteConf;
 import com.github.gclaussn.ssg.data.PageDataSelector;
-import com.github.gclaussn.ssg.impl.TypeLookupImpl;
+import com.github.gclaussn.ssg.impl.conf.SiteConfImpl;
 
 public class AbstractBeanDeserializerTest {
 
@@ -32,10 +30,8 @@ public class AbstractBeanDeserializerTest {
 
   @Before
   public void setUp() {
-    Set<Class<? extends PageDataSelector>> types = Collections.singleton(PageSetSelector.class);
-
-    SiteConf siteConf = Mockito.mock(SiteConf.class);
-    when(siteConf.getPageDataSelectorTypes()).thenReturn(new TypeLookupImpl<>(types));
+    SiteConfImpl siteConf = new SiteConfImpl();
+    siteConf.getPageDataSelectorTypes().add(PageSetSelector.class);
 
     Site site = Mockito.mock(Site.class);
     when(site.getConf()).thenReturn(siteConf);

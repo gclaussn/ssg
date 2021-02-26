@@ -57,12 +57,12 @@ class SiteGeneratorImpl implements SiteGenerator {
     configuration.setCaching(false);
     configuration.setMode(Mode.XHTML);
     configuration.setPrettyPrint(true);
-    configuration.setTemplateLoader(new FileTemplateLoader(site));
+    configuration.setTemplateLoader(new JadeTemplateLoader(site));
 
     fn = new SiteGeneratorFnImpl(site, markdownFilter);
     configuration.getSharedVariables().put(SiteGenerator.FUNCTIONS, fn);
 
-    PageData extensions = compileExtensions(site.conf.extensions);
+    PageData extensions = compileExtensions(site.conf.getExtensions());
     configuration.getSharedVariables().put(SiteGenerator.EXTENSIONS, extensions.getRootMap());
 
     configuration.getFilters().put("markdown", markdownFilter);
@@ -97,6 +97,9 @@ class SiteGeneratorImpl implements SiteGenerator {
   protected PageData compilePageData(Page page) {
     PageDataBuilder builder = PageData.builder();
 
+    // put page data
+    builder.putRoot(page.getData());
+
     builder.put(PageData.META, buildMetadata(page));
 
     // put data from page includes
@@ -108,11 +111,8 @@ class SiteGeneratorImpl implements SiteGenerator {
     // put data from selectors
     for (PageDataSelectorBean dataSelector : page.getDataSelectors()) {
       String id = normalizeId(dataSelector.getId());
-      builder.put(id, dataSelector.select(page));
+      builder.putIfAbsent(id, dataSelector.select(page));
     }
-
-    // put page data
-    builder.putRoot(page.getData());
 
     return builder.build();
   }

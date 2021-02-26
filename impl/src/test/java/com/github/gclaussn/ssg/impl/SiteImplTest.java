@@ -21,7 +21,7 @@ public class SiteImplTest {
     String packageName = SiteImplTest.class.getPackage().getName().replace('.', '/');
     Path sitePath = Paths.get("./src/test/resources").resolve(packageName);
 
-    site = new SiteImpl(sitePath, new SiteConfImpl().complete());
+    site = new SiteImpl(new SiteBuilderImpl(), sitePath);
   }
 
   @Test

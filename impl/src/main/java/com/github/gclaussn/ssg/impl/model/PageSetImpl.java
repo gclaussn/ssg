@@ -1,6 +1,7 @@
 package com.github.gclaussn.ssg.impl.model;
 
 import java.nio.file.Path;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -11,6 +12,7 @@ import com.github.gclaussn.ssg.PageSet;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.data.PageData;
+import com.github.gclaussn.ssg.data.PageDataSelectorBean;
 import com.github.gclaussn.ssg.error.SiteError;
 
 class PageSetImpl extends AbstractSource implements PageSet {
@@ -64,6 +66,11 @@ class PageSetImpl extends AbstractSource implements PageSet {
   @Override
   public PageData getData() {
     return data;
+  }
+
+  @Override
+  public List<PageDataSelectorBean> getDataSelectors() {
+    return new LinkedList<>(dataSelectors);
   }
 
   @Override

@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.github.gclaussn.ssg.data.PageData;
+import com.github.gclaussn.ssg.data.PageDataSelectorBean;
 import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.error.SiteException;
 
@@ -39,6 +40,13 @@ public interface PageSet extends Source {
    * @return The page set data.
    */
   PageData getData();
+
+  /**
+   * Provides the specified data selectors.
+   * 
+   * @return A list of {@link PageDataSelectorBean}s.
+   */
+  List<PageDataSelectorBean> getDataSelectors();
 
   /**
    * Returns the path to the page set's model (YAML) file.

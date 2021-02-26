@@ -41,7 +41,8 @@ public interface Page extends Source {
   PageData getData();
 
   /**
-   * Provides the specified data selectors, which are executed when the page is generated.
+   * Provides the specified data selectors, which are executed when the page is generated.<br>
+   * If the page is part of a page set, the page set's data selectors are also applied.
    * 
    * @return A list of {@link PageDataSelectorBean}s.
    * 

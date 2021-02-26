@@ -2,11 +2,12 @@ package com.github.gclaussn.ssg.impl.model;
 
 import com.github.gclaussn.ssg.PageProcessor;
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.impl.conf.TypeLookupImpl;
 
 class PageProcessorDeserializer extends AbstractBeanDeserializer<PageProcessorBeanImpl, PageProcessor> {
 
   PageProcessorDeserializer(Site site) {
-    super(site, site.getConf().getPageProcessorTypes());
+    super(site, new TypeLookupImpl<>(site.getConf().getPageProcessorTypes()));
   }
 
   @Override

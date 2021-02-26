@@ -28,7 +28,7 @@ public class SiteEventResource extends AbstractResource {
   protected void init(Site site) {
     super.init(site);
 
-    eventStore = site.getConf().getEventStore();
+    eventStore = site.getEventStore();
   }
 
   @GET

@@ -1,4 +1,4 @@
-package com.github.gclaussn.ssg.impl;
+package com.github.gclaussn.ssg.impl.conf;
 
 import java.lang.reflect.Field;
 import java.util.Map;

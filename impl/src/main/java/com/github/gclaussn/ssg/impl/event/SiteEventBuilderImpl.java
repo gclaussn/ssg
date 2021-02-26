@@ -9,11 +9,11 @@ import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventBuilder;
 import com.github.gclaussn.ssg.event.SiteEventType;
-import com.github.gclaussn.ssg.impl.SourceImpl;
+import com.github.gclaussn.ssg.impl.model.SourceImpl;
 
 public class SiteEventBuilderImpl implements SiteEventBuilder {
 
-  private final SiteEventImpl event;
+  private SiteEventImpl event;
 
   public SiteEventBuilderImpl() {
     event = new SiteEventImpl();

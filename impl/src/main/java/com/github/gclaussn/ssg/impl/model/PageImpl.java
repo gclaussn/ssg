@@ -65,7 +65,14 @@ class PageImpl extends AbstractSource implements Page {
 
   @Override
   public List<PageDataSelectorBean> getDataSelectors() {
-    return new LinkedList<>(dataSelectors);
+    List<PageDataSelectorBean> list = new LinkedList<>(dataSelectors);
+
+    if (setId != null) {
+      // add data selectors of page set
+      list.addAll(site.getPageSet(setId).getDataSelectors());
+    }
+
+    return list;
   }
 
   @Override

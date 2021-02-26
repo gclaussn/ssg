@@ -20,13 +20,18 @@ public class PageDataBuilderImpl implements PageDataBuilder {
   public PageData build() {
     PageData built = data;
 
-    data = new PageDataImpl();
+    data = null;
 
     return built;
   }
 
   @Override
   public PageDataBuilder put(String location, Object data) {
+    put(location, data, false);
+    return this;
+  }
+
+  protected void put(String location, Object data, boolean ifAbsent) {
     int index = location.lastIndexOf('/');
 
     Map<String, Object> map;
@@ -38,8 +43,16 @@ public class PageDataBuilderImpl implements PageDataBuilder {
 
     String key = location.substring(index + 1, location.length());
 
-    map.put(key, data);
+    if (ifAbsent) {
+      map.putIfAbsent(key, data);
+    } else {
+      map.put(key, data);
+    }
+  }
 
+  @Override
+  public PageDataBuilder putIfAbsent(String location, Object data) {
+    put(location, data, true);
     return this;
   }
 

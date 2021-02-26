@@ -25,16 +25,12 @@ class SiteOutputServer {
   }
 
   protected SiteOutput map(Path basePath, Path filePath) {
-    String relativePath = basePath.relativize(filePath).toString();
-
-    String name;
+    String name = basePath.relativize(filePath).toString();
 
     // ensure unix file separator
-    int index = relativePath.indexOf('\\');
+    int index = name.indexOf('\\');
     if (index >= 0) {
-      name = relativePath.replace('\\', '/');
-    } else {
-      name = relativePath;
+      name = name.replace('\\', '/');
     }
     
     String path = new StringBuilder(name.length() + 1)

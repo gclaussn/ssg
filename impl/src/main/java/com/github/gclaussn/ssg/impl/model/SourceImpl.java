@@ -1,4 +1,4 @@
-package com.github.gclaussn.ssg.impl;
+package com.github.gclaussn.ssg.impl.model;
 
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;

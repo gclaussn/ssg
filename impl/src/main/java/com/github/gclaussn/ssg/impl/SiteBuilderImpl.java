@@ -11,21 +11,30 @@ import com.github.gclaussn.ssg.SiteBuilder;
 import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.impl.conf.SiteConfImpl;
+import com.github.gclaussn.ssg.impl.event.SiteEventStoreImpl;
+import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
 import com.github.gclaussn.ssg.plugin.SitePluginGoal;
 
 public class SiteBuilderImpl implements SiteBuilder {
 
-  private SiteConfImpl conf;
+  protected SiteConfImpl conf;
+
+  protected SiteEventStoreImpl eventStore;
+
+  protected SitePluginManagerImpl pluginManager;
 
   public SiteBuilderImpl() {
     conf = new SiteConfImpl();
+    eventStore = new SiteEventStoreImpl();
+    pluginManager = new SitePluginManagerImpl();
   }
 
   @Override
   public SiteBuilder addEventListener(SiteEventListener eventListener) {
     Objects.requireNonNull(eventListener, "event listener is null");
 
-    conf.eventListeners.add(eventListener);
+    conf.getEventListeners().add(eventListener);
     return this;
   }
 
@@ -33,7 +42,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   public SiteBuilder addExtension(Object extension) {
     Objects.requireNonNull(extension, "extension is null");
 
-    conf.extensions.add(extension);
+    conf.getExtensions().add(extension);
     return this;
   }
 
@@ -41,7 +50,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   public SiteBuilder addPageDataSelector(Class<? extends PageDataSelector> pageDataSelectorType) {
     Objects.requireNonNull(pageDataSelectorType, "page data selector type is null");
 
-    conf.pageDataSelectorTypes.add(pageDataSelectorType);
+    conf.getPageDataSelectorTypes().add(pageDataSelectorType);
     return this;
   }
 
@@ -49,7 +58,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   public SiteBuilder addPageFilter(Class<? extends PageFilter> pageFilterType) {
     Objects.requireNonNull(pageFilterType, "page filter type is null");
 
-    conf.pageFilterTypes.add(pageFilterType);
+    conf.getPageFilterTypes().add(pageFilterType);
     return this;
   }
 
@@ -57,7 +66,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   public SiteBuilder addPageProcessor(Class<? extends PageProcessor> pageProcessorType) {
     Objects.requireNonNull(pageProcessorType, "page processor type is null");
 
-    conf.pageProcessorTypes.add(pageProcessorType);
+    conf.getPageProcessorTypes().add(pageProcessorType);
     return this;
   }
 
@@ -65,7 +74,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   public SiteBuilder addPluginGoal(Class<? extends SitePluginGoal> pluginGoalType) {
     Objects.requireNonNull(pluginGoalType, "plugin goal type is null");
 
-    conf.pluginManager.addPluginGoal(pluginGoalType);
+    pluginManager.addPluginGoal(pluginGoalType);
     return this;
   }
 
@@ -73,18 +82,18 @@ public class SiteBuilderImpl implements SiteBuilder {
   public Site build(Path sitePath) {
     Objects.requireNonNull(sitePath, "site path is null");
 
+    conf.getEventListeners().add(eventStore);
+
     // load plugins
-    conf.pluginManager.preBuild(this);
+    pluginManager.preBuild(this);
 
-    // complete configuration
-    SiteConfImpl built = conf.complete();
-
-    Site site = new SiteImpl(sitePath, built);
+    Site site = new SiteImpl(this, sitePath);
 
     // call postBuild hook
-    conf.pluginManager.postBuild(site);
+    pluginManager.postBuild(site);
 
-    conf = new SiteConfImpl();
+    conf = null;
+    pluginManager = null;
 
     return site;
   }
@@ -93,7 +102,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   public SiteBuilder setConsole(SiteConsole console) {
     Objects.requireNonNull(console, "console is null");
 
-    conf.console = console;
+    conf.setConsole(console);
     return this;
   }
 
@@ -101,7 +110,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   public SiteBuilder setProperty(String name, Object value) {
     Objects.requireNonNull(name, "name is null");
 
-    conf.properties.put(name, value);
+    conf.getProperties().put(name, value);
     return this;
   }
 
@@ -109,7 +118,7 @@ public class SiteBuilderImpl implements SiteBuilder {
   public SiteBuilder setPropertyMap(Map<String, Object> properties) {
     Objects.requireNonNull(properties, "properties are null");
 
-    conf.properties.putAll(properties);
+    conf.getProperties().putAll(properties);
     return this;
   }
 }

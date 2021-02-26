@@ -5,15 +5,12 @@ public enum SiteEventType {
   // Site events
   LOAD_SITE,
   GENERATE_SITE,
-  
+
   // Site file events
-  CREATE_YAML,
-  CREATE_JADE,
-  MODIFY_YAML,
-  MODIFY_JADE,
-  DELETE_YAML,
-  DELETE_JADE,
-  
+  CREATE_FILE,
+  MODIFY_FILE,
+  DELETE_FILE,
+
   // Source related events
   LOAD_PAGE,
   LOAD_PAGE_INCLUDE,

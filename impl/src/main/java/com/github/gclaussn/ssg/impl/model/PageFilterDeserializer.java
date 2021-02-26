@@ -2,11 +2,12 @@ package com.github.gclaussn.ssg.impl.model;
 
 import com.github.gclaussn.ssg.PageFilter;
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.impl.conf.TypeLookupImpl;
 
 class PageFilterDeserializer extends AbstractBeanDeserializer<PageFilterBeanImpl, PageFilter> {
 
   PageFilterDeserializer(Site site) {
-    super(site, site.getConf().getPageFilterTypes());
+    super(site, new TypeLookupImpl<>(site.getConf().getPageFilterTypes()));
   }
 
   @Override

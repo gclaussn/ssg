@@ -12,11 +12,11 @@ import de.neuland.jade4j.template.TemplateLoader;
 /**
  * Custom file based template loader that does not validate the source path premature.
  */
-class FileTemplateLoader implements TemplateLoader {
+class JadeTemplateLoader implements TemplateLoader {
 
   private final Site site;
 
-  FileTemplateLoader(Site site) {
+  JadeTemplateLoader(Site site) {
     this.site = site;
   }
 

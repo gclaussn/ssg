@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 import com.github.gclaussn.ssg.conf.SiteConf;
 import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.error.SiteException;
+import com.github.gclaussn.ssg.event.SiteEvent;
+import com.github.gclaussn.ssg.event.SiteEventStore;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.impl.SiteBuilderImpl;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
@@ -100,6 +102,13 @@ public interface Site extends AutoCloseable {
    * @return The site's configuration.
    */
   SiteConf getConf();
+
+  /**
+   * Provides the underlying {@link SiteEvent} store.
+   * 
+   * @return The event store.
+   */
+  SiteEventStore getEventStore();
 
   /**
    * Returns the generator, which is used to generate pages.

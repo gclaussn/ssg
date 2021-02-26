@@ -37,12 +37,9 @@ public class SiteEventLogger implements SiteEventListener {
       includedEventTypes.add(SiteEventType.LOAD_SITE);
 
       // when running a file watcher
-      includedEventTypes.add(SiteEventType.CREATE_JADE);
-      includedEventTypes.add(SiteEventType.CREATE_YAML);
-      includedEventTypes.add(SiteEventType.MODIFY_JADE);
-      includedEventTypes.add(SiteEventType.MODIFY_YAML);
-      includedEventTypes.add(SiteEventType.DELETE_JADE);
-      includedEventTypes.add(SiteEventType.DELETE_YAML);
+      includedEventTypes.add(SiteEventType.CREATE_FILE);
+      includedEventTypes.add(SiteEventType.MODIFY_FILE);
+      includedEventTypes.add(SiteEventType.DELETE_FILE);
     }
   }
 

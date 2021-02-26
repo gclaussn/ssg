@@ -1,11 +1,8 @@
 package com.github.gclaussn.ssg.impl;
 
-import static com.github.gclaussn.ssg.event.SiteEventType.CREATE_JADE;
-import static com.github.gclaussn.ssg.event.SiteEventType.CREATE_YAML;
-import static com.github.gclaussn.ssg.event.SiteEventType.DELETE_JADE;
-import static com.github.gclaussn.ssg.event.SiteEventType.DELETE_YAML;
-import static com.github.gclaussn.ssg.event.SiteEventType.MODIFY_JADE;
-import static com.github.gclaussn.ssg.event.SiteEventType.MODIFY_YAML;
+import static com.github.gclaussn.ssg.event.SiteEventType.CREATE_FILE;
+import static com.github.gclaussn.ssg.event.SiteEventType.DELETE_FILE;
+import static com.github.gclaussn.ssg.event.SiteEventType.MODIFY_FILE;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -30,19 +27,25 @@ import com.github.gclaussn.ssg.conf.SiteConf;
 import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.event.SiteEvent;
+import com.github.gclaussn.ssg.event.SiteEventStore;
 import com.github.gclaussn.ssg.event.SiteEventType;
 import com.github.gclaussn.ssg.file.SiteFileEvent;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.file.SiteFileEventType;
-import com.github.gclaussn.ssg.file.SiteFileType;
+import com.github.gclaussn.ssg.impl.conf.SiteConfImpl;
+import com.github.gclaussn.ssg.impl.event.SiteEventStoreImpl;
 import com.github.gclaussn.ssg.impl.model.SiteModelRepository;
+import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
 class SiteImpl implements Site, SiteFileEventListener {
 
   protected final SiteConfImpl conf;
+  protected final SiteEventStoreImpl eventStore;
+  protected final SitePluginManagerImpl pluginManager;
 
   protected final SiteModelRepository repository;
+  protected final SiteGenerator generator;
 
   /** Base path of the site. */
   private final Path path;
@@ -51,22 +54,21 @@ class SiteImpl implements Site, SiteFileEventListener {
   private final Path sourcePath;
   private final Path outputPath;
 
-  private final SiteGenerator generator;
-
-  SiteImpl(Path sitePath, SiteConfImpl conf) {
-    this.conf = conf;
+  SiteImpl(SiteBuilderImpl builder, Path sitePath) {
+    this.conf = builder.conf;
+    this.eventStore = builder.eventStore;
+    this.pluginManager = builder.pluginManager;
 
     // initialize repository
     repository = new SiteModelRepository(this);
+    // initialize generator
+    generator = new SiteGeneratorImpl(this);
 
     path = sitePath;
 
     publicPath = sitePath.resolve(PUBLIC);
     sourcePath = sitePath.resolve(SOURCE);
     outputPath = sitePath.resolve(OUTPUT);
-
-    // initialize generator
-    generator = new SiteGeneratorImpl(this);
   }
 
   @Override
@@ -108,7 +110,7 @@ class SiteImpl implements Site, SiteFileEventListener {
 
   @Override
   public void close() {
-    conf.pluginManager.preDestroy(this);
+    pluginManager.preDestroy(this);
 
     repository.close();
   }
@@ -121,6 +123,11 @@ class SiteImpl implements Site, SiteFileEventListener {
   @Override
   public SiteConf getConf() {
     return conf;
+  }
+
+  @Override
+  public SiteEventStore getEventStore() {
+    return eventStore;
   }
 
   @Override
@@ -182,7 +189,7 @@ class SiteImpl implements Site, SiteFileEventListener {
 
   @Override
   public SitePluginManager getPluginManager() {
-    return conf.pluginManager;
+    return pluginManager;
   }
 
   @Override
@@ -223,7 +230,7 @@ class SiteImpl implements Site, SiteFileEventListener {
   @Override
   public List<SiteError> load() {
     // clear stored events
-    conf.eventStore.clear();
+    eventStore.clear();
 
     return repository.load();
   }
@@ -231,11 +238,11 @@ class SiteImpl implements Site, SiteFileEventListener {
   protected SiteEventType mapEventType(SiteFileEvent fileEvent) {
     switch (fileEvent.getType()) {
       case CREATE:
-        return fileEvent.getFileType() == SiteFileType.YAML ? CREATE_YAML : CREATE_JADE;
+        return CREATE_FILE;
       case MODIFY:
-        return fileEvent.getFileType() == SiteFileType.YAML ? MODIFY_YAML : MODIFY_JADE;
+        return MODIFY_FILE;
       case DELETE:
-        return fileEvent.getFileType() == SiteFileType.YAML ? DELETE_YAML : DELETE_JADE;
+        return DELETE_FILE;
       default:
         throw new IllegalArgumentException(String.format("Unsupported file event type %s", fileEvent.getFileType()));
     }
@@ -340,6 +347,7 @@ class SiteImpl implements Site, SiteFileEventListener {
     switch (event.getFileType()) {
       case YAML:
       case JADE:
+      case MD:
         // are supported
         break;
       default:
@@ -347,7 +355,7 @@ class SiteImpl implements Site, SiteFileEventListener {
         return;
     }
 
-    conf.eventStore.onEvent(event);
+    eventStore.onEvent(event);
 
     // try to determine, what source (site, page, page include, page set) is affected
     Source source = repository.getSource(event.getPath());

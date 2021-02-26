@@ -7,6 +7,7 @@ public enum SiteFileType implements SiteFileExtension {
 
   HTML,
   JADE,
+  MD,
   YAML,
   UNKNOWN;
 

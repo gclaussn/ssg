@@ -33,7 +33,7 @@ public class SiteGeneratorImplTest {
 
     Path sitePath = testResources.resolve(packageName.replace('.', '/'));
 
-    SiteImpl site = new SiteImpl(sitePath, new SiteConfImpl());
+    SiteImpl site = new SiteImpl(new SiteBuilderImpl(), sitePath);
 
     generator = new SiteGeneratorImpl(site);
   }

@@ -1,4 +1,4 @@
-package com.github.gclaussn.ssg.impl;
+package com.github.gclaussn.ssg.impl.conf;
 
 import static com.github.gclaussn.ssg.file.SiteFileType.YAML;
 
@@ -28,73 +28,36 @@ import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.conf.SiteProperty;
 import com.github.gclaussn.ssg.conf.SitePropertyType;
 import com.github.gclaussn.ssg.conf.TypeDesc;
-import com.github.gclaussn.ssg.conf.TypeLookup;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
-import com.github.gclaussn.ssg.event.SiteEventStore;
-import com.github.gclaussn.ssg.impl.event.SiteEventStoreImpl;
-import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
 
-class SiteConfImpl implements SiteConf {
+public class SiteConfImpl implements SiteConf {
 
-  protected final SitePluginManagerImpl pluginManager;
+  protected final SiteConfInjector injector;
+
+  protected final List<SiteEventListener> eventListeners;
+  /** Generator extensions. */
+  protected final Set<Object> extensions;
+  protected final Set<Class<? extends PageDataSelector>> pageDataSelectorTypes;
+  protected final Set<Class<? extends PageFilter>> pageFilterTypes;
+  protected final Set<Class<? extends PageProcessor>> pageProcessorTypes;
+  protected final Map<String, Object> properties;
 
   /** YAML object mapper, used to read source models and type descriptions. */
-  protected ObjectMapper objectMapper;
+  protected final ObjectMapper objectMapper;
 
   protected SiteConsole console;
 
-  protected List<SiteEventListener> eventListeners;
-
-  protected SiteEventStoreImpl eventStore;
-
-  /** Generator extensions. */
-  protected Set<Object> extensions;
-
-  protected Set<Class<? extends PageDataSelector>> pageDataSelectorTypes;
-  protected Set<Class<? extends PageFilter>> pageFilterTypes;
-  protected Set<Class<? extends PageProcessor>> pageProcessorTypes;
-
-  protected Map<String, Object> properties;
-
-  private final SiteConfInjector injector;
-
-  SiteConfImpl() {
-    pluginManager = new SitePluginManagerImpl();
+  public SiteConfImpl() {
+    injector = new SiteConfInjector(this);
 
     eventListeners = new LinkedList<>();
-    eventStore = new SiteEventStoreImpl();
-
     extensions = new HashSet<>();
     pageDataSelectorTypes = new HashSet<>();
     pageFilterTypes = new HashSet<>();
     pageProcessorTypes = new HashSet<>();
     properties = new HashMap<>();
-
-    // initialize injector
-    injector = new SiteConfInjector(this);
-  }
-
-  /**
-   * Completes the configuration.
-   * 
-   * @return The configuration.
-   */
-  protected SiteConfImpl complete() {
-    if (console == null) {
-      console = new SiteConsoleImpl();
-    }
-
-    eventListeners.add(0, eventStore);
-
-    // wrap in unmodifiable collections
-    eventListeners = Collections.unmodifiableList(eventListeners);
-    extensions = Collections.unmodifiableSet(extensions);
-    pageDataSelectorTypes = Collections.unmodifiableSet(pageDataSelectorTypes);
-    pageFilterTypes = Collections.unmodifiableSet(pageFilterTypes);
-    pageProcessorTypes = Collections.unmodifiableSet(pageProcessorTypes);
-    properties = Collections.unmodifiableMap(properties);
 
     // configure YAML object mapper
     objectMapper = new ObjectMapper(new YAMLFactory());
@@ -103,7 +66,8 @@ class SiteConfImpl implements SiteConf {
     objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
-    return this;
+    // default console
+    console = new SiteConsoleImpl();
   }
 
   @Override
@@ -165,23 +129,28 @@ class SiteConfImpl implements SiteConf {
   }
 
   @Override
-  public SiteEventStore getEventStore() {
-    return eventStore;
+  public Set<Object> getExtensions() {
+    return extensions;
   }
 
   @Override
-  public TypeLookup<PageDataSelector> getPageDataSelectorTypes() {
-    return new TypeLookupImpl<>(pageDataSelectorTypes);
+  public Set<Class<? extends PageDataSelector>> getPageDataSelectorTypes() {
+    return pageDataSelectorTypes;
   }
 
   @Override
-  public TypeLookup<PageFilter> getPageFilterTypes() {
-    return new TypeLookupImpl<>(pageFilterTypes);
+  public Set<Class<? extends PageFilter>> getPageFilterTypes() {
+    return pageFilterTypes;
   }
 
   @Override
-  public TypeLookup<PageProcessor> getPageProcessorTypes() {
-    return new TypeLookupImpl<>(pageProcessorTypes);
+  public Set<Class<? extends PageProcessor>> getPageProcessorTypes() {
+    return pageProcessorTypes;
+  }
+
+  @Override
+  public Map<String, Object> getProperties() {
+    return properties;
   }
 
   @Override
@@ -220,5 +189,9 @@ class SiteConfImpl implements SiteConf {
     } catch (IOException e) {
       throw new RuntimeException(String.format("Type description '%s' could not be read", typeName), e);
     }
+  }
+
+  public void setConsole(SiteConsole console) {
+    this.console = console;
   }
 }

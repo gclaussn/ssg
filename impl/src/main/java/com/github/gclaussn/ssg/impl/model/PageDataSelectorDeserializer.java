@@ -2,11 +2,12 @@ package com.github.gclaussn.ssg.impl.model;
 
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.data.PageDataSelector;
+import com.github.gclaussn.ssg.impl.conf.TypeLookupImpl;
 
 class PageDataSelectorDeserializer extends AbstractBeanDeserializer<PageDataSelectorBeanImpl, PageDataSelector> {
 
   PageDataSelectorDeserializer(Site site) {
-    super(site, site.getConf().getPageDataSelectorTypes());
+    super(site, new TypeLookupImpl<>(site.getConf().getPageDataSelectorTypes()));
   }
 
   @Override

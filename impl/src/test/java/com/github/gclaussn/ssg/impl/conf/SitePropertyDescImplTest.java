@@ -1,4 +1,4 @@
-package com.github.gclaussn.ssg.impl;
+package com.github.gclaussn.ssg.impl.conf;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;

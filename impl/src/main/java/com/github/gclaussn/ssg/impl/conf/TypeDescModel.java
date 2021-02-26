@@ -1,4 +1,4 @@
-package com.github.gclaussn.ssg.impl;
+package com.github.gclaussn.ssg.impl.conf;
 
 import java.util.Map;
 

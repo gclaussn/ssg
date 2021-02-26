@@ -16,7 +16,7 @@ import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.error.SiteErrorBuilder;
 import com.github.gclaussn.ssg.error.SiteErrorType;
-import com.github.gclaussn.ssg.impl.SourceImpl;
+import com.github.gclaussn.ssg.impl.model.SourceImpl;
 
 import de.neuland.jade4j.exceptions.JadeException;
 
