@@ -6,11 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -69,15 +67,6 @@ class SiteGeneratorImpl implements SiteGenerator {
     configuration.getFilters().put("md", markdownFilter);
   }
 
-  protected Map<String, Object> buildMetadata(Page page) {
-    Map<String, Object> meta = new HashMap<>();
-    meta.put("id", page.getId());
-    meta.put("subId", page.getSubId().orElse(null));
-    meta.put("url", page.getUrl());
-
-    return meta;
-  }
-
   protected PageData compileExtensions(Set<Object> extensions) {
     PageDataBuilder builder = PageData.builder();
 
@@ -99,8 +88,6 @@ class SiteGeneratorImpl implements SiteGenerator {
 
     // put page data
     builder.putRoot(page.getData());
-
-    builder.put(PageData.META, buildMetadata(page));
 
     // put data from page includes
     for (PageInclude pageInclude : resolvePageIncludes(page)) {

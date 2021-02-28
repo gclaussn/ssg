@@ -3,21 +3,15 @@ package com.github.gclaussn.ssg.impl;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import com.github.gclaussn.ssg.Page;
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataNode;
 import com.github.gclaussn.ssg.data.PageDataNodeType;
@@ -36,21 +30,6 @@ public class SiteGeneratorImplTest {
     SiteImpl site = new SiteImpl(new SiteBuilderImpl(), sitePath);
 
     generator = new SiteGeneratorImpl(site);
-  }
-
-  @Test
-  public void testBuildMetadata() {
-    Page page = Mockito.mock(Page.class);
-    when(page.getId()).thenReturn("index-page");
-    when(page.getSubId()).thenReturn(Optional.empty());
-    when(page.getUrl()).thenReturn("/index");
-
-    Map<String, Object> meta = generator.buildMetadata(page);
-    assertThat(meta, notNullValue());
-    assertThat(meta.size(), is(3));
-    assertThat(meta.get("id"), is(page.getId()));
-    assertThat(meta.get("setId"), nullValue());
-    assertThat(meta.get("url"), equalTo(page.getUrl()));
   }
 
   @Test

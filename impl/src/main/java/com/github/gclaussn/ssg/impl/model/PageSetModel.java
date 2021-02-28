@@ -2,10 +2,10 @@ package com.github.gclaussn.ssg.impl.model;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.gclaussn.ssg.data.PageData;
 
 class PageSetModel {
 
@@ -13,7 +13,7 @@ class PageSetModel {
 
   @JsonProperty("base")
   protected String basePath;
-  protected PageData data;
+  protected Map<String, Object> data;
   protected List<PageDataSelectorBeanImpl> dataSelectors;
   protected List<PageFilterBeanImpl> filters;
   protected Set<String> includes;

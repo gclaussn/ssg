@@ -20,11 +20,13 @@ import org.junit.Test;
 
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SourceType;
+import com.github.gclaussn.ssg.data.PageData;
+import com.github.gclaussn.ssg.data.PageDataNode;
+import com.github.gclaussn.ssg.data.PageDataNodeType;
 import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.error.SiteErrorType;
 import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.file.SiteFileType;
-import com.github.gclaussn.ssg.impl.SiteImplTest;
 
 public class SiteModelRepositoryTest {
 
@@ -32,10 +34,35 @@ public class SiteModelRepositoryTest {
 
   @Before
   public void setUp() {
-    String packageName = SiteImplTest.class.getPackage().getName().replace('.', '/');
+    String packageName = SiteModelRepositoryTest.class.getPackage().getName().replace('.', '/');
     Path sitePath = Paths.get("./src/test/resources").resolve(packageName);
 
     repository = new SiteModelRepository(Site.from(sitePath));
+  }
+
+  @Test
+  public void testBuildPageData() {
+    PageImpl page = new PageImpl(null);
+    page.id = "index-page";
+    page.markdown = "Test 123";
+    page.subId = null;
+    page.url = "/index";
+
+    PageData data = repository.buildPageData(page, Collections.singletonMap("x", "y"));
+    assertThat(data, notNullValue());
+    assertThat(data.has(PageData.MARKDOWN), is(true));
+    assertThat(data.get(PageData.MARKDOWN).getType(), is(PageDataNodeType.STRING));
+    assertThat(data.get(PageData.MARKDOWN).as(String.class), equalTo(page.getMarkdown().get()));
+    assertThat(data.has(PageData.META), is(true));
+    assertThat(data.get(PageData.META).getType(), is(PageDataNodeType.MAP));
+    assertThat(data.has("x"), is(true));
+    assertThat(data.get("x").getType(), is(PageDataNodeType.STRING));
+    assertThat(data.get("x").as(String.class), equalTo("y"));
+    
+    PageDataNode meta = data.get(PageData.META);
+    assertThat(meta.get("id").as(String.class), equalTo(page.getId()));
+    assertThat(meta.get("setId").isNull(), is(true));
+    assertThat(meta.get("url").as(String.class), equalTo(page.getUrl()));
   }
 
   @Test
@@ -138,7 +165,8 @@ public class SiteModelRepositoryTest {
     PageImpl page = repository.pages.get(pageId);
     assertThat(page, notNullValue());
     assertThat(page.getData(), notNullValue());
-    assertThat(page.getData().getRootMap().size(), is(0));
+    assertThat(page.getData().getRootMap().size(), is(1));
+    assertThat(page.getData().has(PageData.META), is(true));
     assertThat(page.getId(), equalTo(pageId));
     assertThat(page.getModelPath().isPresent(), is(false));
     assertThat(page.getPageIncludes(), notNullValue());
@@ -205,5 +233,25 @@ public class SiteModelRepositoryTest {
     assertThat(page.getTemplateName(), equalTo("page-with-custom-template.jade"));
 
     assertThat(repository.pages.containsKey(pageId), is(true));
+  }
+
+  @Test
+  public void shouldLoadPageWithMarkdownFrontMatter() {
+    String pageId = "page-with-markdown-front-matter";
+
+    Optional<SiteError> error = repository.loadPage(pageId);
+    assertThat(error.isPresent(), is(false));
+
+    PageImpl page = repository.pages.get(pageId);
+    assertThat(page, notNullValue());
+    assertThat(page.getData().has("x"), is(true));
+    assertThat(page.getData().get("x").getType(), is(PageDataNodeType.STRING));
+    assertThat(page.getData().get("x").as(String.class), equalTo("y"));
+    assertThat(page.getMarkdown().isPresent(), is(true));
+    assertThat(page.getMarkdown().get(), containsString("Test 123"));
+    assertThat(page.getModelPath().isPresent(), is(true));
+
+    Path modelPath = repository.site.getSourcePath().resolve(pageId + ".md");
+    assertThat(page.getModelPath().get(), equalTo(modelPath));
   }
 }

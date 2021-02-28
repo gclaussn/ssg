@@ -10,12 +10,14 @@ import static com.github.gclaussn.ssg.event.SiteEventType.LOAD_PAGE_SET;
 import static com.github.gclaussn.ssg.event.SiteEventType.LOAD_SITE;
 import static com.github.gclaussn.ssg.file.SiteFileType.HTML;
 import static com.github.gclaussn.ssg.file.SiteFileType.JADE;
+import static com.github.gclaussn.ssg.file.SiteFileType.MD;
 import static com.github.gclaussn.ssg.file.SiteFileType.YAML;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -50,7 +52,7 @@ import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventBuilder;
-import com.github.gclaussn.ssg.impl.SourceImpl;
+import com.github.gclaussn.ssg.impl.markdown.MarkdownFile;
 import com.github.gclaussn.ssg.model.NodeModules;
 
 public class SiteModelRepository implements AutoCloseable {
@@ -74,7 +76,6 @@ public class SiteModelRepository implements AutoCloseable {
 
     // configure YAML object mapper
     SimpleModule module = new SimpleModule();
-    module.addDeserializer(PageData.class, new PageDataDeserializer());
     module.addDeserializer(PageDataSelectorBeanImpl.class, new PageDataSelectorDeserializer(site));
     module.addDeserializer(PageFilterBeanImpl.class, new PageFilterDeserializer(site));
     module.addDeserializer(PageProcessorBeanImpl.class, new PageProcessorDeserializer(site));
@@ -85,6 +86,27 @@ public class SiteModelRepository implements AutoCloseable {
     objectMapper.registerModule(module);
     objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+  }
+
+  protected PageData buildPageData(PageImpl page, Map<String, Object> data) {
+    Map<String, Object> meta = new HashMap<>();
+    meta.put("id", page.id);
+    meta.put("subId", page.subId);
+    meta.put("url", page.url);
+
+    PageDataBuilder builder = PageData.builder();
+
+    if (data != null) {
+      builder.putRoot(data);
+    }
+
+    builder.put(PageData.META, meta);
+
+    if (page.markdown != null) {
+      builder.put(PageData.MARKDOWN, page.markdown);
+    }
+
+    return builder.build();
   }
 
   /**
@@ -370,23 +392,28 @@ public class SiteModelRepository implements AutoCloseable {
 
     try {
       model = readPageModel(pageId);
-    } catch (SiteException e) {
-      eventBuilder.error(e.getError()).buildAndPublish(this::publish);
-      return Optional.of(e.getError());
+    } catch (IOException e) {
+      SiteError error = SiteError.builder(site).source(PAGE, pageId).errorModelNotRead(e);
+
+      eventBuilder.error(error).buildAndPublish(this::publish);
+      return Optional.of(error);
     }
 
     String outputName = orElse(model.outputName, HTML.appendTo(pageId));
 
     PageImpl page = new PageImpl(site);
-    page.data = orElse(model.data, PageData::empty);
     page.dataSelectors = orElse(model.dataSelectors, Collections::emptyList);
     page.id = pageId;
     page.includes = orElse(model.includes, Collections::emptySet);
+    page.markdown = model.markdown;
     page.modelPath = model.filePath;
     page.outputName = outputName;
     page.skip = orElse(model.skip, Boolean.FALSE);
     page.templateName = JADE.appendTo(pageId);
     page.url = buildUrl(outputName);
+
+    // build page data
+    page.data = buildPageData(page, model.data);
 
     // initialize beans
     try {
@@ -417,18 +444,20 @@ public class SiteModelRepository implements AutoCloseable {
 
     try {
       model = readPageModel(pageId);
-    } catch (SiteException e) {
-      eventBuilder.error(e.getError()).buildAndPublish(this::publish);
-      return Optional.of(e.getError());
+    } catch (IOException e) {
+      SiteError error = SiteError.builder(site).source(PAGE, pageId).errorModelNotRead(e);
+
+      eventBuilder.error(error).buildAndPublish(this::publish);
+      return Optional.of(error);
     }
 
     String outputName = orElse(model.outputName, buildOutputName(pageSet, pageId));
 
     PageImpl page = new PageImpl(site);
-    page.data = orElse(model.data, PageData::empty);
     page.dataSelectors = orElse(model.dataSelectors, Collections::emptyList);
     page.id = pageId;
     page.includes = orElse(model.includes, pageSet.includes);
+    page.markdown = model.markdown;
     page.modelPath = model.filePath;
     page.outputName = outputName;
     page.setId = pageSetId;
@@ -441,6 +470,9 @@ public class SiteModelRepository implements AutoCloseable {
       // if template does not exist, use template of page set
       page.templateName = pageSet.getTemplateName();
     }
+
+    // build page data
+    page.data = buildPageData(page, orElse(model.data, pageSet.data::getRootMap));
 
     // initialize beans
     try {
@@ -482,13 +514,15 @@ public class SiteModelRepository implements AutoCloseable {
 
     try {
       model = readPageIncludeModel(pageIncludeId);
-    } catch (SiteException e) {
-      eventBuilder.error(e.getError()).buildAndPublish(this::publish);
-      return Optional.of(e.getError());
+    } catch (IOException e) {
+      SiteError error = SiteError.builder(site).source(PAGE_INCLUDE, pageIncludeId).errorModelNotRead(e);
+
+      eventBuilder.error(error).buildAndPublish(this::publish);
+      return Optional.of(error);
     }
 
     PageIncludeImpl pageInclude = new PageIncludeImpl(this);
-    pageInclude.data = orElse(model.data, PageData::empty);
+    pageInclude.data = model.data != null ? PageData.of(model.data) : PageData.empty();
     pageInclude.id = pageIncludeId;
     pageInclude.includes = orElse(model.includes, Collections::emptySet);
     pageInclude.modelPath = model.filePath;
@@ -540,14 +574,16 @@ public class SiteModelRepository implements AutoCloseable {
 
     try {
       model = readPageSetModel(pageSetId);
-    } catch (SiteException e) {
-      eventBuilder.error(e.getError()).buildAndPublish(this::publish);
-      return Collections.singletonList(e.getError());
+    } catch (IOException e) {
+      SiteError error = SiteError.builder(site).source(PAGE_SET, pageSetId).errorModelNotRead(e);
+
+      eventBuilder.error(error).buildAndPublish(this::publish);
+      return Collections.singletonList(error);
     }
 
     PageSetImpl pageSet = new PageSetImpl(site);
     pageSet.basePath = model.basePath;
-    pageSet.data = orElse(model.data, PageData::empty);
+    pageSet.data = model.data != null ? PageData.of(model.data) : PageData.empty();
     pageSet.dataSelectors = orElse(model.dataSelectors, Collections::emptyList);
     pageSet.filters = orElse(model.filters, Collections::emptyList);
     pageSet.id = pageSetId;
@@ -627,58 +663,67 @@ public class SiteModelRepository implements AutoCloseable {
     site.getConf().publish(event);
   }
 
-  protected PageModel readPageModel(String pageId) {
-    Path filePath = site.getSourcePath().resolve(YAML.appendTo(pageId));
+  protected PageModel readPageModel(String pageId) throws IOException {
+    Path yamlPath = site.getSourcePath().resolve(YAML.appendTo(pageId));
+    if (Files.exists(yamlPath)) {
+      PageModel model = objectMapper.readValue(yamlPath.toFile(), PageModel.class);
+      model.filePath = yamlPath;
 
-    if (!Files.exists(filePath)) {
+      return model;
+    }
+
+    Path mdPath = site.getSourcePath().resolve(MD.appendTo(pageId));
+    if (!Files.exists(mdPath)) {
       return new PageModel();
     }
 
+    MarkdownFile mdFile = MarkdownFile.from(mdPath);
+
     PageModel model;
-    try {
-      model = objectMapper.readValue(filePath.toFile(), PageModel.class);
-      model.filePath = filePath;
-    } catch (IOException e) {
-      throw SiteError.builder(site).source(PAGE, pageId).errorModelNotRead(e).toException();
+    if (mdFile.hasYaml()) {
+      model = objectMapper.readValue(mdFile.getYaml(), PageModel.class);
+    } else {
+      model = new PageModel();
     }
+
+    model.filePath = mdPath;
+    model.markdown = mdFile.getMarkdown();
 
     return model;
   }
 
-  protected PageIncludeModel readPageIncludeModel(String pageIncludeId) {
+  protected PageIncludeModel readPageIncludeModel(String pageIncludeId) throws IOException {
     Path filePath = site.getSourcePath().resolve(YAML.appendTo(pageIncludeId));
 
     if (!Files.exists(filePath)) {
       return new PageIncludeModel();
     }
 
-    PageIncludeModel model;
-    try {
-      model = objectMapper.readValue(filePath.toFile(), PageIncludeModel.class);
-      model.filePath = filePath;
-    } catch (IOException e) {
-      throw SiteError.builder(site).source(PAGE_INCLUDE, pageIncludeId).errorModelNotRead(e).toException();
-    }
+    PageIncludeModel model = objectMapper.readValue(filePath.toFile(), PageIncludeModel.class);
+    model.filePath = filePath;
 
     return model;
   }
 
-  protected PageSetModel readPageSetModel(String pageSetId) {
+  protected PageSetModel readPageSetModel(String pageSetId) throws IOException {
     Path filePath = site.getSourcePath().resolve(YAML.appendTo(pageSetId));
 
     if (!Files.exists(filePath)) {
       return new PageSetModel();
     }
 
-    PageSetModel model;
-    try {
-      model = objectMapper.readValue(filePath.toFile(), PageSetModel.class);
-      model.filePath = filePath;
-    } catch (IOException e) {
-      throw SiteError.builder(site).source(PAGE_SET, pageSetId).errorModelNotRead(e).toException();
-    }
+    PageSetModel model = objectMapper.readValue(filePath.toFile(), PageSetModel.class);
+    model.filePath = filePath;
 
     return model;
+  }
+  
+  protected SiteModel readSiteModel(Path filePath) {
+    try {
+      return objectMapper.readValue(filePath.toFile(), SiteModel.class);
+    } catch (IOException e) {
+      throw SiteError.builder(site).source(SITE, null).errorModelNotRead(e).toException();
+    }
   }
 
   protected void removePageSet(String pageSetId) {
@@ -689,14 +734,6 @@ public class SiteModelRepository implements AutoCloseable {
     PageSetImpl pageSet = pageSets.remove(pageSetId);
 
     pageSet.pages.forEach(this.pages::remove);
-  }
-
-  protected SiteModel readSiteModel(Path filePath) {
-    try {
-      return objectMapper.readValue(filePath.toFile(), SiteModel.class);
-    } catch (IOException e) {
-      throw SiteError.builder(site).source(SITE, null).errorModelNotRead(e).toException();
-    }
   }
 
   protected void reset() {

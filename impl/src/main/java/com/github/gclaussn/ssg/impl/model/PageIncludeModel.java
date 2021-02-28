@@ -1,14 +1,13 @@
 package com.github.gclaussn.ssg.impl.model;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
-
-import com.github.gclaussn.ssg.data.PageData;
 
 class PageIncludeModel {
 
   protected transient Path filePath;
 
-  protected PageData data;
+  protected Map<String, Object> data;
   protected Set<String> includes;
 }

@@ -22,6 +22,7 @@ class PageImpl extends AbstractSource implements Page {
   protected PageData data;
   protected List<PageDataSelectorBeanImpl> dataSelectors;
   protected Set<String> includes;
+  protected String markdown;
   protected Path modelPath;
   protected String outputName;
   protected String rejectedBy;
@@ -78,6 +79,11 @@ class PageImpl extends AbstractSource implements Page {
   @Override
   public String getId() {
     return id;
+  }
+
+  @Override
+  public Optional<String> getMarkdown() {
+    return Optional.ofNullable(markdown);
   }
 
   @Override

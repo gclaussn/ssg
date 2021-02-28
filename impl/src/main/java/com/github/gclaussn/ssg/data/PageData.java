@@ -7,8 +7,10 @@ import com.github.gclaussn.ssg.impl.data.PageDataBuilderImpl;
 
 public interface PageData {
 
-  /** Name of the model, that provides the metadata of a {@link Page}. */
+  /** Key, that provides the metadata of a {@link Page}. */
   static final String META = "_meta";
+  /** Key, that provides the Markdown code, if the {@link Page} is defined by a Markdown file. */
+  static final String MARKDOWN = "_md";
 
   static PageDataBuilder builder() {
     return new PageDataBuilderImpl();

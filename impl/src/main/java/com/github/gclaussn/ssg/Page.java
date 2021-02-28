@@ -34,7 +34,7 @@ public interface Page extends Source {
   Optional<SiteError> generate();
 
   /**
-   * Returns the data, specified within the page's YAML file.
+   * Returns the data, specified within the page's YAML or Markdown file.
    * 
    * @return The page data.
    */
@@ -51,7 +51,14 @@ public interface Page extends Source {
   List<PageDataSelectorBean> getDataSelectors();
 
   /**
-   * Returns the path to the page's model (YAML) file.
+   * Returns the Markdown code, if the page is defined by a Markdown file.
+   * 
+   * @return The Markdown code or an empty optional.
+   */
+  Optional<String> getMarkdown();
+
+  /**
+   * Returns the path to the page's model (YAML or Markdown) file.
    * 
    * @return The model path, if the file exists. Otherwise an empty optional.
    */
