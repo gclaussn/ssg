@@ -34,7 +34,7 @@ public class AbstractBeanDeserializerTest {
     siteConf.getPageDataSelectorTypes().add(PageSetSelector.class);
 
     Site site = Mockito.mock(Site.class);
-    when(site.getConf()).thenReturn(siteConf);
+    when(site.getConfiguration()).thenReturn(siteConf);
 
     Collections.singleton(PageSetSelector.class);
 

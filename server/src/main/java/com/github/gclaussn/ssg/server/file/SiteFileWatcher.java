@@ -14,7 +14,7 @@ public interface SiteFileWatcher {
   static final String TYPE = "ssg.file.watcher";
 
   /** Name of the file watcher thread. */
-  static final String THREAD_NAME = "ssg-file";
+  static final String THREAD_NAME = "file";
 
   /**
    * Creates a new file watcher, watching the sources of the given site.

@@ -10,7 +10,7 @@ import com.github.gclaussn.ssg.Site;
 import de.neuland.jade4j.template.TemplateLoader;
 
 /**
- * Custom file based template loader that does not validate the source path premature.
+ * Custom file based JADE template loader that does not validate the source path premature.
  */
 class JadeTemplateLoader implements TemplateLoader {
 

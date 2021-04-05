@@ -1,0 +1,9 @@
+pages:
+- xxx
+pageSets:
+- yyy
+node:
+  packages:
+  - font-awesome: 1.0.3
+  includes:
+  -

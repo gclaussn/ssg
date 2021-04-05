@@ -4,6 +4,7 @@ import static com.github.gclaussn.ssg.file.SiteFileType.YAML;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -13,28 +14,29 @@ import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventStore;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;
+import com.github.gclaussn.ssg.file.SiteFileType;
 import com.github.gclaussn.ssg.impl.SiteBuilderImpl;
+import com.github.gclaussn.ssg.npm.NodePackageSpec;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
 /**
  * Static site representation, which loades pages and page sets that are defined in its
  * {@code site.yaml} file.<br>
  * <br>
- * A {@link Site} can also be driven by file events (create, modify, delete).<br>
- * It can be used in combination with a {@link SiteFileEventListener} - a watcher (thread) that is
- * watching for file events on the {@code site.yaml} and recursively on the source directory.
+ * A site can also be driven by file events (create, modify, delete) - see
+ * {@link SiteFileEventListener}. It handles events regarding the {@code site.yaml} file and all
+ * source files ({@code src/}) of type {@link SiteFileType#YAML}, {@link SiteFileType#JADE} and
+ * {@link SiteFileType#MD}.
  */
-public interface Site extends AutoCloseable {
+public interface Site extends SiteFileEventListener, AutoCloseable {
 
   /** Name of the site model (YAML) file. */
   static final String MODEL_NAME = YAML.appendTo("site");
 
-  /** Node modules folder. */
-  static final String NODE_MODULES = "node_modules";
   /** Name of the folder, that is used as target location for the generated HTML output. */
   static final String OUTPUT = "out";
   /** Name of the folder, that provides public assets like scripts, style sheets and images. */
-  static final String PUBLIC = "public";
+  static final String PUBLIC = "pub";
   /** Name of the source folder, containing YAML and JADE files. */
   static final String SOURCE = "src";
 
@@ -101,7 +103,7 @@ public interface Site extends AutoCloseable {
    * 
    * @return The site's configuration.
    */
-  SiteConf getConf();
+  SiteConf getConfiguration();
 
   /**
    * Provides the underlying {@link SiteEvent} store.
@@ -116,6 +118,13 @@ public interface Site extends AutoCloseable {
    * @return The site generator.
    */
   SiteGenerator getGenerator();
+
+  /**
+   * Gets the node package specification, if defined in {@code site.yaml} under property "node".
+   * 
+   * @return The specified node packages. Otherwise an empty optional.
+   */
+  Optional<NodePackageSpec> getNodePackages();
 
   /**
    * Provides the path to the directory, where the generator output is written to.
@@ -143,6 +152,12 @@ public interface Site extends AutoCloseable {
    */
   Path getPath();
 
+  /**
+   * Gets the plugin manager, which is able to list the registered plugins and execute actions,
+   * provided by the plugins, against the site.
+   * 
+   * @return The site's plugin manager.
+   */
   SitePluginManager getPluginManager();
 
   /**
@@ -214,7 +229,7 @@ public interface Site extends AutoCloseable {
 
   /**
    * Serves all files that are part of the generated site. This includes output files (generated
-   * pages) as well as public and node modules files if present.
+   * pages) as well as public files and Node.js modules, if present.
    * 
    * @return A stream serving all {@link SiteOutput}s.
    */

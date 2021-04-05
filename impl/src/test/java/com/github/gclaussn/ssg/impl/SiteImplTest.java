@@ -25,6 +25,11 @@ public class SiteImplTest {
   }
 
   @Test
+  public void testGetConfiguration() {
+    assertThat(site.getConfiguration(), notNullValue());
+  }
+
+  @Test
   public void testGetGenerator() {
     assertThat(site.getGenerator(), notNullValue());
   }

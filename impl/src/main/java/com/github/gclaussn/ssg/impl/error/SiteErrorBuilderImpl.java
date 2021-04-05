@@ -1,8 +1,10 @@
 package com.github.gclaussn.ssg.impl.error;
 
+import static com.github.gclaussn.ssg.file.SiteFileType.MD;
 import static com.github.gclaussn.ssg.file.SiteFileType.YAML;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
@@ -80,6 +82,10 @@ public class SiteErrorBuilderImpl implements SiteErrorBuilder {
     if (jsonLocation != null) {
       location.line = jsonLocation.getLineNr();
       location.column = jsonLocation.getColumnNr();
+    }
+    if (jsonLocation != null && MD.isPresent(location.path)) {
+      // due to Markdown front matter separator
+      location.line += 1;
     }
 
     return error;
@@ -191,8 +197,13 @@ public class SiteErrorBuilderImpl implements SiteErrorBuilder {
   protected Path getModelPath() {
     if (error.source.getType() == SourceType.SITE) {
       return site.getPath().resolve(Site.MODEL_NAME);
+    }
+
+    Path yamlPath = site.getSourcePath().resolve(YAML.appendTo(error.source.getId()));
+    if (Files.exists(yamlPath)) {
+      return yamlPath;
     } else {
-      return site.getSourcePath().resolve(YAML.appendTo(error.source.getId()));
+      return site.getSourcePath().resolve(MD.appendTo(error.source.getId()));
     }
   }
 }

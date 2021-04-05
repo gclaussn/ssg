@@ -10,6 +10,9 @@ import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.PathConverter;
 
+/**
+ * Main command.
+ */
 public class Main {
 
   @Parameter(names = {"--help"}, description = "Display this help", help = true)

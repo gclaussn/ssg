@@ -21,7 +21,7 @@ import org.junit.Test;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.data.PageData;
-import com.github.gclaussn.ssg.data.PageDataNode;
+import com.github.gclaussn.ssg.data.PageDataBuilder;
 import com.github.gclaussn.ssg.data.PageDataNodeType;
 import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.error.SiteErrorType;
@@ -41,28 +41,31 @@ public class SiteModelRepositoryTest {
   }
 
   @Test
-  public void testBuildPageData() {
+  public void testAddMetadata() {
     PageImpl page = new PageImpl(null);
     page.id = "index-page";
     page.markdown = "Test 123";
     page.subId = null;
     page.url = "/index";
 
-    PageData data = repository.buildPageData(page, Collections.singletonMap("x", "y"));
+    PageDataBuilder dataBuilder = PageData.builder().putRoot(Collections.singletonMap("x", "y"));
+
+    repository.addMetadata(dataBuilder, page);
+
+    PageData data = dataBuilder.build();
     assertThat(data, notNullValue());
+    assertThat(data.has(PageData.ID), is(true));
+    assertThat(data.get(PageData.ID).getType(), is(PageDataNodeType.STRING));
+    assertThat(data.get(PageData.ID).as(String.class), equalTo(page.id));
     assertThat(data.has(PageData.MARKDOWN), is(true));
     assertThat(data.get(PageData.MARKDOWN).getType(), is(PageDataNodeType.STRING));
     assertThat(data.get(PageData.MARKDOWN).as(String.class), equalTo(page.getMarkdown().get()));
-    assertThat(data.has(PageData.META), is(true));
-    assertThat(data.get(PageData.META).getType(), is(PageDataNodeType.MAP));
+    assertThat(data.has(PageData.SET_ID), is(false));
+    assertThat(data.has(PageData.SUB_ID), is(false));
+    assertThat(data.has(PageData.URL), is(true));
     assertThat(data.has("x"), is(true));
     assertThat(data.get("x").getType(), is(PageDataNodeType.STRING));
     assertThat(data.get("x").as(String.class), equalTo("y"));
-    
-    PageDataNode meta = data.get(PageData.META);
-    assertThat(meta.get("id").as(String.class), equalTo(page.getId()));
-    assertThat(meta.get("setId").isNull(), is(true));
-    assertThat(meta.get("url").as(String.class), equalTo(page.getUrl()));
   }
 
   @Test
@@ -78,6 +81,11 @@ public class SiteModelRepositoryTest {
 
     assertThat(repository.buildOutputName(pageSet, "posts/my-post"), equalTo("news/my-post.html"));
     assertThat(repository.buildOutputName(pageSet, "posts/2020/05/my-post"), equalTo("news/2020/05/my-post.html"));
+
+    // base path empty
+    pageSet.basePath = "";
+
+    assertThat(repository.buildOutputName(pageSet, "posts/2020/05/my-post"), equalTo("2020/05/my-post.html"));
   }
 
   @Test
@@ -90,17 +98,19 @@ public class SiteModelRepositoryTest {
   public void testExtractId() {
     Path yamlPath = repository.site.getSourcePath().resolve("test/posts.yaml");
     Path jadePath = repository.site.getSourcePath().resolve("test/posts.jade");
+    Path mdPath = repository.site.getSourcePath().resolve("test/posts.md");
 
     assertThat(repository.extractId(yamlPath), equalTo("test/posts"));
     assertThat(repository.extractId(jadePath), equalTo("test/posts"));
+    assertThat(repository.extractId(mdPath), equalTo("test/posts"));
   }
 
   @Test
-  public void testExtractSetId() {
+  public void testFindPageSetId() {
     repository.model = new SiteModel();
     repository.model.pageSets = Collections.singleton("posts");
 
-    Optional<String> setId = repository.extractSetId("posts/hello-world");
+    Optional<String> setId = repository.findPageSetId("posts/hello-world");
     assertThat(setId.isPresent(), is(true));
     assertThat(setId.get(), equalTo("posts"));
   }
@@ -165,8 +175,10 @@ public class SiteModelRepositoryTest {
     PageImpl page = repository.pages.get(pageId);
     assertThat(page, notNullValue());
     assertThat(page.getData(), notNullValue());
-    assertThat(page.getData().getRootMap().size(), is(1));
-    assertThat(page.getData().has(PageData.META), is(true));
+    assertThat(page.getData().getRootMap().size(), is(2));
+    assertThat(page.getData().has(PageData.ID), is(true));
+    assertThat(page.getData().has(PageData.SUB_ID), is(false));
+    assertThat(page.getData().has(PageData.URL), is(true));
     assertThat(page.getId(), equalTo(pageId));
     assertThat(page.getModelPath().isPresent(), is(false));
     assertThat(page.getPageIncludes(), notNullValue());

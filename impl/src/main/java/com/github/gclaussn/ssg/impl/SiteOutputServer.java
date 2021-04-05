@@ -11,16 +11,17 @@ import java.util.stream.Stream;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SiteOutput;
 import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.model.NodeModules;
+import com.github.gclaussn.ssg.npm.NodePackageManager;
+import com.github.gclaussn.ssg.npm.NodePackageSpec;
 
 class SiteOutputServer {
 
-  /** Prefix for Node module file resources. */
-  protected static final String NODE_MODULES = String.format("%s/", Site.NODE_MODULES);
+  /** Prefix for Node.js module file resources. */
+  protected static final String NODE_MODULES = String.format("%s/", NodePackageManager.NODE_MODULES);
 
-  private final SiteImpl site;
+  private final Site site;
 
-  SiteOutputServer(SiteImpl site) {
+  SiteOutputServer(Site site) {
     this.site = site;
   }
 
@@ -109,16 +110,16 @@ class SiteOutputServer {
   }
 
   protected Stream<SiteOutput> serveNodeModulesFiles() throws IOException {
-    Path path = site.getPath().resolve(Site.NODE_MODULES);
+    Path path = site.getPath().resolve(NodePackageManager.NODE_MODULES);
     if (!Files.isDirectory(path)) {
       return Stream.empty();
     }
     
     Stream<Path> stream = Files.walk(path).filter(Files::isRegularFile);
 
-    Optional<NodeModules> nodeModules = site.repository.getNodeModules();
-    if (nodeModules.isPresent()) {
-      stream = stream.filter(nodeModules.get().getMatcher());
+    Optional<NodePackageSpec> spec = site.getNodePackages();
+    if (spec.isPresent()) {
+      stream = stream.filter(spec.get().getMatcher());
     }
 
     return stream.map(filePath -> map(site.getPath(), filePath));

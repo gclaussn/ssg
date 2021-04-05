@@ -1,0 +1,3 @@
+node:
+  packages:
+    jquery: 3.6.0

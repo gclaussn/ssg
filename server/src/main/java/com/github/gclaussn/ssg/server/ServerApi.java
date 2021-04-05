@@ -46,6 +46,6 @@ public class ServerApi extends Application {
   }
 
   protected void init(AbstractResource resource) {
-    resource.init(site);
+    resource.site = site;
   }
 }

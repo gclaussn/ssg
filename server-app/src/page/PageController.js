@@ -12,7 +12,6 @@ export default class PageController extends React.Component {
     super(props);
 
     this.state = {
-      code: null,
       error: null,
       page: null,
       pageData: null
@@ -54,18 +53,7 @@ export default class PageController extends React.Component {
   }
 
   _handleError(error) {
-    this.setState({page: null});
-
-    if (error.location === null) {
-      this.setState({error: error, code: null});
-      return;
-    }
-
-    error.getCode().then(code => {
-      this.setState({error: error, code: code});
-    }).catch(err => {
-
-    });
+    this.setState({error: error, page: null});
   }
 
   _getPage = () => {
@@ -109,7 +97,7 @@ export default class PageController extends React.Component {
   }
 
   _renderPageError() {
-    const { code, error } = this.state;
+    const { error } = this.state;
 
     return (
       <div>
@@ -118,7 +106,7 @@ export default class PageController extends React.Component {
             <i className="fas fa-arrow-left" />
           </Link>
         </div>
-        <SiteErrorViewer code={code} error={error} />
+        <SiteErrorViewer error={error} />
       </div>
     )
   }

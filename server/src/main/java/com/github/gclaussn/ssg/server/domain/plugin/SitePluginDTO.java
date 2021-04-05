@@ -10,8 +10,8 @@ public class SitePluginDTO {
 
   public static SitePluginDTO of(SitePluginDesc desc) {
     SitePluginDTO target = new SitePluginDTO();
+    target.actions = new LinkedList<>(desc.getActions());
     target.documentation = desc.getDocumentation();
-    target.goals = new LinkedList<>(desc.getGoals());
     target.name = desc.getName();
     target.properties = desc.getProperties().stream().map(SitePropertyDTO::of).collect(Collectors.toList());
     target.typeName = desc.getTypeName();
@@ -19,18 +19,18 @@ public class SitePluginDTO {
     return target;
   }
 
+  private List<String> actions;
   private String documentation;
-  private List<String> goals;
   private String name;
   private List<SitePropertyDTO> properties;
   private String typeName;
 
-  public String getDocumentation() {
-    return documentation;
+  public List<String> getActions() {
+    return actions;
   }
 
-  public List<String> getGoals() {
-    return goals;
+  public String getDocumentation() {
+    return documentation;
   }
 
   public String getName() {

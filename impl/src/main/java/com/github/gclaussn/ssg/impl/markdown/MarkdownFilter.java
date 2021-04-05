@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.gclaussn.ssg.Site;
+import com.vladsch.flexmark.ext.admonition.AdmonitionExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 
@@ -21,8 +22,15 @@ public class MarkdownFilter implements Filter {
   private final HtmlRenderer renderer;
 
   public MarkdownFilter(Site site) {
-    parser = Parser.builder().build();
-    renderer = HtmlRenderer.builder().extensions(Arrays.asList(new PageLinkExtension(site))).build();
+    AdmonitionExtension admonitionExtension = AdmonitionExtension.create();
+
+    parser = Parser.builder()
+        .extensions(Arrays.asList(admonitionExtension))
+        .build();
+
+    renderer = HtmlRenderer.builder()
+        .extensions(Arrays.asList(admonitionExtension, new PageLinkExtension(site)))
+        .build();
   }
 
   @Override

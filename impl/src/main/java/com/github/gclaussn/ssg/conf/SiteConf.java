@@ -66,6 +66,15 @@ public interface SiteConf {
 
   Object getProperty(String propertyName);
 
+  /**
+   * Injects {@link SiteProperty} fields of the given instance.
+   * 
+   * @param <T> The instance type.
+   * 
+   * @param instance A specific instance, that must not be {@code null}.
+   * 
+   * @return The instance.
+   */
   <T> T inject(T instance);
 
   <T> T inject(T instance, Map<String, Object> additionalProperties);

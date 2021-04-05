@@ -2,7 +2,7 @@ import React from "react";
 import { Route } from "react-router-dom";
 import { Switch, withRouter } from "react-router";
 
-import Server from "model/Server";
+import Server from "server/Server";
 
 import { eventStream } from "service/SiteEventStream";
 
@@ -16,7 +16,9 @@ import PageSetTableView from "page-set/PageSetTableView";
 import PageSetView from "page-set/PageSetView";
 
 import SitePluginView from "plugin/SitePluginView";
-import SitePluginGoalView from "plugin/SitePluginGoalView";
+import SitePluginActionView from "plugin/SitePluginActionView";
+
+import StopView from "server/StopView";
 
 class App extends React.Component {
   constructor(props) {
@@ -48,11 +50,12 @@ class App extends React.Component {
           <Route exact path="/pages" component={PageTableView} />
           <Route exact path="/page-sets" component={PageSetTableView} />
           <Route exact path="/plugins" component={SitePluginView} />
+          <Route exact path="/stop" component={StopView} />
 
           <Route path="/pages/:pageId+/data" render={this._renderPageDataView} />
           <Route path="/pages/:pageId+" render={this._renderPageView} />
           <Route path="/page-sets/:pageSetId+" render={this._renderPageSetView} />
-          <Route path="/plugin-goals/:typeName+" component={SitePluginGoalView} />
+          <Route path="/plugin-actions/:typeName+" component={SitePluginActionView} />
           <Route component={PageTableView} />
         </Switch>
       </div>

@@ -5,6 +5,7 @@ import static com.github.gclaussn.ssg.SourceType.PAGE_INCLUDE;
 import static com.github.gclaussn.ssg.SourceType.PAGE_SET;
 import static com.github.gclaussn.ssg.SourceType.SITE;
 import static com.github.gclaussn.ssg.SourceType.UNKNOWN;
+import static com.github.gclaussn.ssg.event.SiteEventType.LOAD_PAGE;
 import static com.github.gclaussn.ssg.event.SiteEventType.LOAD_PAGE_INCLUDE;
 import static com.github.gclaussn.ssg.event.SiteEventType.LOAD_PAGE_SET;
 import static com.github.gclaussn.ssg.event.SiteEventType.LOAD_SITE;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -53,7 +53,8 @@ import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventBuilder;
 import com.github.gclaussn.ssg.impl.markdown.MarkdownFile;
-import com.github.gclaussn.ssg.model.NodeModules;
+import com.github.gclaussn.ssg.impl.npm.NodePackageSpecDeserializer;
+import com.github.gclaussn.ssg.npm.NodePackageSpec;
 
 public class SiteModelRepository implements AutoCloseable {
 
@@ -76,6 +77,7 @@ public class SiteModelRepository implements AutoCloseable {
 
     // configure YAML object mapper
     SimpleModule module = new SimpleModule();
+    module.addDeserializer(NodePackageSpec.class, new NodePackageSpecDeserializer());
     module.addDeserializer(PageDataSelectorBeanImpl.class, new PageDataSelectorDeserializer(site));
     module.addDeserializer(PageFilterBeanImpl.class, new PageFilterDeserializer(site));
     module.addDeserializer(PageProcessorBeanImpl.class, new PageProcessorDeserializer(site));
@@ -88,25 +90,12 @@ public class SiteModelRepository implements AutoCloseable {
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
   }
 
-  protected PageData buildPageData(PageImpl page, Map<String, Object> data) {
-    Map<String, Object> meta = new HashMap<>();
-    meta.put("id", page.id);
-    meta.put("subId", page.subId);
-    meta.put("url", page.url);
-
-    PageDataBuilder builder = PageData.builder();
-
-    if (data != null) {
-      builder.putRoot(data);
-    }
-
-    builder.put(PageData.META, meta);
-
-    if (page.markdown != null) {
-      builder.put(PageData.MARKDOWN, page.markdown);
-    }
-
-    return builder.build();
+  protected void addMetadata(PageDataBuilder dataBuilder, PageImpl page) {
+    dataBuilder.put(PageData.ID, page.id);
+    dataBuilder.putIfNotNull(PageData.MARKDOWN, page.markdown);
+    dataBuilder.putIfNotNull(PageData.SET_ID, page.setId);
+    dataBuilder.putIfNotNull(PageData.SUB_ID, page.subId);
+    dataBuilder.put(PageData.URL, page.url);
   }
 
   /**
@@ -120,6 +109,7 @@ public class SiteModelRepository implements AutoCloseable {
    * null     | posts/my-post         | posts/my-post.html
    * news     | posts/my-post         | news/my-post.html
    * news     | posts/2020/05/my-post | news/2020/05/my-post.html
+   * ""       | posts/2020/05/my-post | 2020/05/my-post.html
    * </pre>
    * 
    * @param pageSet The related page set.
@@ -137,7 +127,7 @@ public class SiteModelRepository implements AutoCloseable {
 
     return new StringBuilder(pageSet.basePath.length() + subId.length() + 6)
         .append(pageSet.basePath)
-        .append('/')
+        .append(pageSet.basePath.isBlank() ? "" : "/")
         .append(HTML.appendTo(subId))
         .toString();
   }
@@ -168,8 +158,6 @@ public class SiteModelRepository implements AutoCloseable {
       pageIds = Files.walk(path, Integer.MAX_VALUE)
           // filter regular files
           .filter(Files::isRegularFile)
-          // filter YAML files
-          .filter(YAML::isPresent)
           // extract ID from file path
           .map(this::extractId)
           // collect IDs
@@ -190,46 +178,40 @@ public class SiteModelRepository implements AutoCloseable {
 
   /**
    * Extracts the ID of a page, a page set or a page include from a given path within the source
-   * folder - e.g. "/site/src/events/2020-04-25.yaml" -> events/2020-04-25
+   * folder - e.g. "/site/src/events/2020-04-25.yaml" -> events/2020-04-25<br>
+   * This method supports YAML, JADE and Markdown files as well as other file extensions, since it
+   * simply strips the file extension.
    * 
-   * @param path Path of a YAML or JADE file within the source folder.
+   * @param path Path of a file within the source folder.
    * 
    * @return The extracted ID.
    */
   protected String extractId(Path path) {
     String relativePath = site.getSourcePath().relativize(path).toString();
 
-    // -5: the length of .yaml or .jade file extensions
-    String relativePathWithoutExtension = relativePath.substring(0, relativePath.length() - 5);
-
-    if (relativePathWithoutExtension.startsWith("..")) {
+    if (relativePath.startsWith("..")) {
       // in case of site.yaml
       return null;
     }
 
-    // ensure unix file separator
-    int index = relativePathWithoutExtension.indexOf('\\');
-    if (index >= 0) {
-      return relativePathWithoutExtension.replace('\\', '/');
-    } else {
-      return relativePathWithoutExtension;
-    }
-  }
-
-  protected Optional<String> extractSetId(String pageId) {
-    // use page ID as intial value
-    String pageSetId = pageId;
-
     int index;
-    while ((index = pageSetId.lastIndexOf('/')) != -1) {
-      pageSetId = pageSetId.substring(0, index);
 
-      if (model.pageSets.contains(pageSetId)) {
-        return Optional.of(pageSetId);
-      }
+    index = relativePath.lastIndexOf('.');
+
+    String id;
+    if (index != -1) {
+      id = relativePath.substring(0, index);
+    } else {
+      id = relativePath;
     }
 
-    return Optional.empty();
+    // ensure unix file separator
+    index = id.indexOf('\\');
+    if (index >= 0) {
+      return id.replace('\\', '/');
+    } else {
+      return id;
+    }
   }
 
   protected String extractSubId(String pageSetId, String pageId) {
@@ -253,13 +235,32 @@ public class SiteModelRepository implements AutoCloseable {
     return Optional.empty();
   }
 
-  public Optional<NodeModules> getNodeModules() {
-    if (!isLoaded()) {
-      // special case for serving site output without loading all sources
-      model = loadSiteModel();
+  public Optional<String> findPageSetId(String pageId) {
+    // use page ID as intial value
+    String pageSetId = pageId;
+
+    int index;
+    while ((index = pageSetId.lastIndexOf('/')) != -1) {
+      pageSetId = pageSetId.substring(0, index);
+
+      if (model.pageSets.contains(pageSetId)) {
+        return Optional.of(pageSetId);
+      }
     }
 
-    return Optional.of(model.nodeModules);
+    return Optional.empty();
+  }
+
+  public Optional<NodePackageSpec> getNodePackageSpec() {
+    if (isLoaded()) {
+      return Optional.ofNullable(model.nodePackageSpec);
+    }
+
+    // special case for installing node packages or serving site output
+    // without loading the whole site
+    SiteModel model = loadSiteModel();
+
+    return Optional.ofNullable(model.nodePackageSpec);
   }
 
   public Page getPage(String pageId) {
@@ -319,14 +320,9 @@ public class SiteModelRepository implements AutoCloseable {
       return PAGE_SET;
     } else if (isPageInclude(id)) {
       return PAGE_INCLUDE;
+    } else {
+      return UNKNOWN;
     }
-    
-    Optional<String> pageSetId = extractSetId(id);
-    if (pageSetId.isPresent()) {
-      return PAGE_SET;
-    }
-
-    return UNKNOWN;
   }
 
   public boolean isLoaded() {
@@ -385,7 +381,7 @@ public class SiteModelRepository implements AutoCloseable {
   public Optional<SiteError> loadPage(String pageId) {
     pages.remove(pageId);
 
-    SiteEventBuilder eventBuilder = SiteEvent.builder().type(LOAD_PAGE_SET).source(PAGE, pageId);
+    SiteEventBuilder eventBuilder = SiteEvent.builder().type(LOAD_PAGE).source(PAGE, pageId);
 
     // load model
     PageModel model;
@@ -412,8 +408,12 @@ public class SiteModelRepository implements AutoCloseable {
     page.templateName = JADE.appendTo(pageId);
     page.url = buildUrl(outputName);
 
-    // build page data
-    page.data = buildPageData(page, model.data);
+    PageDataBuilder dataBuilder = PageData.builder().putRoot(orElse(model.data, Collections::emptyMap));
+    
+    // add page metadata
+    addMetadata(dataBuilder, page);
+
+    page.data = dataBuilder.build();
 
     // initialize beans
     try {
@@ -432,7 +432,7 @@ public class SiteModelRepository implements AutoCloseable {
   public Optional<SiteError> loadPage(String pageId, String pageSetId) {
     pages.remove(pageId);
 
-    SiteEventBuilder eventBuilder = SiteEvent.builder().type(LOAD_PAGE_SET).source(PAGE, pageId).reference(pageSetId);
+    SiteEventBuilder eventBuilder = SiteEvent.builder().type(LOAD_PAGE).source(PAGE, pageId).reference(pageSetId);
 
     PageSetImpl pageSet = pageSets.get(pageSetId);
     if (pageSet == null) {
@@ -470,9 +470,14 @@ public class SiteModelRepository implements AutoCloseable {
       // if template does not exist, use template of page set
       page.templateName = pageSet.getTemplateName();
     }
+    
+    PageDataBuilder dataBuilder = PageData.builder()
+        .putRoot(pageSet.data)
+        .putRoot(orElse(model.data, Collections::emptyMap));
+    
 
-    // build page data
-    page.data = buildPageData(page, orElse(model.data, pageSet.data::getRootMap));
+    // add page metadata
+    addMetadata(dataBuilder, page);
 
     // initialize beans
     try {
@@ -481,8 +486,6 @@ public class SiteModelRepository implements AutoCloseable {
       eventBuilder.error(e.getError()).buildAndPublish(this::publish);
       return Optional.of(e.getError());
     }
-
-    PageDataBuilder dataBuilder = PageData.builder().putRoot(page.data);
 
     Optional<SiteError> error;
 
@@ -630,7 +633,6 @@ public class SiteModelRepository implements AutoCloseable {
 
   protected SiteModel loadSiteModel() {
     SiteModel model = readSiteModel(site.getPath().resolve(Site.MODEL_NAME));
-    model.nodeModules = orElse(model.nodeModules, NodeModulesImpl::new);
     model.pages = orElse(model.pages, Collections::emptySet);
     model.pageSets = orElse(model.pageSets, Collections::emptySet);
 
@@ -659,8 +661,8 @@ public class SiteModelRepository implements AutoCloseable {
     return Optional.empty();
   }
 
-  protected void publish(SiteEvent event) {
-    site.getConf().publish(event);
+  private void publish(SiteEvent event) {
+    site.getConfiguration().publish(event);
   }
 
   protected PageModel readPageModel(String pageId) throws IOException {

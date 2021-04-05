@@ -25,7 +25,7 @@ public class DateFilterTest {
   @Before
   public void setUp() {
     filter = new DateFilter();
-    filter.source = "date";
+    filter.processorId = "date";
   }
 
   @Test
@@ -33,7 +33,7 @@ public class DateFilterTest {
     Map<String, String> data = new HashMap<>();
 
     Page page = Mockito.mock(Page.class);
-    when(page.getData()).thenReturn(PageData.builder().put(filter.source, data).build());
+    when(page.getData()).thenReturn(PageData.builder().put(filter.processorId, data).build());
 
     data.put(DateProcessor.VALUE, LocalDate.now().plusDays(1L).toString());
     assertThat(filter.filter(page), is(true));

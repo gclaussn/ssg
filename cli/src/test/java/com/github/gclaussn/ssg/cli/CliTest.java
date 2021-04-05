@@ -55,8 +55,8 @@ public class CliTest {
 
   @Test
   public void testDesc() {
-    cli.run(new String[] {"desc", "com.github.gclaussn.ssg.builtin.goal.CpGoal"});
+    cli.run(new String[] {"desc", "com.github.gclaussn.ssg.builtin.action.CpAction"});
 
-    assertThat(out.toString(), startsWith("Copy goal"));
+    assertThat(out.toString(), startsWith("Copy action"));
   }
 }

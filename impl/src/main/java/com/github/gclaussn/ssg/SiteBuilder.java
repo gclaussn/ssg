@@ -7,7 +7,7 @@ import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
-import com.github.gclaussn.ssg.plugin.SitePluginGoal;
+import com.github.gclaussn.ssg.plugin.SitePluginAction;
 
 /**
  * Builder for {@link Site} and {@link EventDrivenSite} instances.
@@ -42,13 +42,13 @@ public interface SiteBuilder {
   SiteBuilder addPageProcessor(Class<? extends PageProcessor> pageProcessorType);
 
   /**
-   * Registers a {@link SitePluginGoal}.
+   * Registers a {@link SitePluginAction}.
    * 
-   * @param pluginGoalType A plugin goal type.
+   * @param pluginActionType A plugin action type.
    * 
    * @return The builder.
    */
-  SiteBuilder addPluginGoal(Class<? extends SitePluginGoal> pluginGoalType);
+  SiteBuilder addPluginAction(Class<? extends SitePluginAction> pluginActionType);
 
   /**
    * Builds the site.
@@ -60,7 +60,7 @@ public interface SiteBuilder {
   Site build(Path sitePath);
 
   /**
-   * Sets the console to be used, e.g. by {@link SitePluginGoal}s.
+   * Sets the console to be used, e.g. by {@link SitePluginAction}s.
    * 
    * @param console A console.
    * 

@@ -1,6 +1,0 @@
-name: Start server goal
-documentation:
-  "Starts the developer server, which maps following urls: REST API /api, Websocket API /wsa, server application /app and the site itself /." 
-properties:
-  ssg.server.host: Host (bind address)
-  ssg.server.port: Port

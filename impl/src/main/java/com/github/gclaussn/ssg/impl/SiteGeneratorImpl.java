@@ -34,6 +34,7 @@ import com.github.gclaussn.ssg.impl.markdown.MarkdownFilter;
 import de.neuland.jade4j.Jade4J.Mode;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.exceptions.JadeException;
+import de.neuland.jade4j.exceptions.JadeParserException;
 import de.neuland.jade4j.filter.Filter;
 import de.neuland.jade4j.template.JadeTemplate;
 
@@ -214,22 +215,26 @@ class SiteGeneratorImpl implements SiteGenerator {
     }
 
     // render page
+    SiteError error = null;
     try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
       JadeTemplate template = configuration.getTemplate(page.getTemplateName());
       configuration.renderTemplate(template, data.getRootMap(), writer);
     } catch (JadeException e) {
-      SiteError error = SiteError.builder(site).source(page).errorPageNotGenerated(e);
-      eventBuilder.error(error);
-      return Optional.of(error);
+      error = SiteError.builder(site).source(page).errorPageNotGenerated(e);
     } catch (IOException e) {
-      SiteError error = SiteError.builder(site).source(page).errorPageNotGenerated(e);
-      eventBuilder.error(error);
-      return Optional.of(error);
-    } finally {
-      publish(eventBuilder.build());
+      error = SiteError.builder(site).source(page).errorPageNotGenerated(e);
+    } catch (Exception e) {
+      // rare case - e.g. script without any content "script."
+      String message = String.format("Unexpected Jade lexer/parser error: %s", e.getMessage());
+      JadeException exception = new JadeParserException(page.getTemplateName(), -1, configuration.getTemplateLoader(), message);
+      error = SiteError.builder(site).source(page).errorPageNotGenerated(exception);
     }
 
-    return Optional.empty();
+    if (error != null) {
+      eventBuilder.error(error).buildAndPublish(this::publish);
+    }
+
+    return Optional.ofNullable(error);
   }
 
   @Override
@@ -310,7 +315,7 @@ class SiteGeneratorImpl implements SiteGenerator {
     return sb.toString();
   }
 
-  protected void publish(SiteEvent event) {
-    site.getConf().publish(event);
+  private void publish(SiteEvent event) {
+    site.getConfiguration().publish(event);
   }
 }

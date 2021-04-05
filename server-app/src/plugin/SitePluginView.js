@@ -19,8 +19,8 @@ export default class SitePluginView extends React.Component {
     });
   }
 
-  _handlePluginGoalClick(pluginGoal) {
-    this.props.history.push(`/plugin-goals/${pluginGoal.replaceAll(".", "/")}`);
+  _handlePluginActionClick(pluginAction) {
+    this.props.history.push(`/plugin-actions/${pluginAction.replaceAll(".", "/")}`);
   }
 
   render() {
@@ -51,7 +51,7 @@ export default class SitePluginView extends React.Component {
             <h6 className="card-subtitle mb-2 text-muted">{plugin.name}</h6>
             <span className="card-text">{plugin.documentation}</span>
 
-            {this._renderPluginGoals(plugin)}
+            {this._renderPluginActions(plugin)}
             {this._renderProperties(plugin)}
           </div>
         </div>
@@ -59,31 +59,31 @@ export default class SitePluginView extends React.Component {
     )
   }
 
-  _renderPluginGoals(plugin) {
-    if (plugin.goals.length === 0) {
+  _renderPluginActions(plugin) {
+    if (plugin.actions.length === 0) {
       return null;
     }
 
     return (
       <div className="pt-3">
-        <span>Goals:</span>
+        <span>Actions:</span>
         <div className="pt-1 list-group">
-          {plugin.goals.map(goal => this._renderPluginGoal(goal))}
+          {plugin.actions.map(pluginAction => this._renderPluginAction(pluginAction))}
         </div>
       </div>
     )
   }
-  _renderPluginGoal(pluginGoal) {
-    const onClick = this._handlePluginGoalClick.bind(this, pluginGoal);
+  _renderPluginAction(pluginAction) {
+    const onClick = this._handlePluginActionClick.bind(this, pluginAction);
 
     return (
       <button
-        key={pluginGoal}
+        key={pluginAction}
         type="button"
         className="list-group-item list-group-item-action"
         onClick={onClick}
       >
-        {pluginGoal}
+        {pluginAction}
       </button>
     )
   }

@@ -10,6 +10,18 @@ public class AbstractResource {
 
   protected Site site;
 
+  protected void checkHasPage(String pageId) {
+    if (!site.hasPage(pageId)) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+  }
+
+  protected void checkHasPageSet(String pageSetId) {
+    if (!site.hasPageSet(pageSetId)) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+  }
+
   protected ServerDTO getServer(HttpHeaders httpHeaders) {
     String headerValue = httpHeaders.getHeaderString(HttpHeaders.HOST);
     if (headerValue == null) {
@@ -26,9 +38,5 @@ public class AbstractResource {
     server.setWebSocketUrl(String.format("ws://%s:%d/wsa", server.getHost(), server.getPort()));
 
     return server;
-  }
-
-  protected void init(Site site) {
-    this.site = site;
   }
 }

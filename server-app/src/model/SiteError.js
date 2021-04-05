@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export default class SitError {
   constructor(data) {
     this._data = data;
@@ -17,18 +15,6 @@ export default class SitError {
     }
   }
 
-  getCode() {
-    const line = this.location.line;
-
-    const from = line > 10 ? (line - 10) : 0;
-
-    return axios.get(`/api/sources/${this._data.sourceId}/${this.getFileType()}?from=${from}&to=${line}`).then(res => {
-      return res.data;
-    }).catch(err => {
-      throw err;
-    });
-  }
-
   get cause() {
     return this._data.cause;
   }
@@ -37,6 +23,9 @@ export default class SitError {
   }
   get message() {
     return this._data.message;
+  }
+  get sourceCode() {
+    return this._data.sourceCode;
   }
   get stackTrace() {
     return this._data.stackTrace;

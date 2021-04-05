@@ -9,16 +9,16 @@ import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.cli.AbstractCommand;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
-@Parameters(commandNames = "exec", commandDescription = "Execute plugin goals")
+@Parameters(commandNames = "exec", commandDescription = "Execute plugin actions")
 public class Exec extends AbstractCommand {
 
-  @Parameter(description = "<plugin goals>", required = true)
-  protected List<String> pluginGoals = new LinkedList<>();
+  @Parameter(description = "<plugin actions>", required = true)
+  protected List<String> pluginActions = new LinkedList<>();
 
   @Override
   public void run(Site site) {
     SitePluginManager pluginManager = site.getPluginManager();
 
-    pluginGoals.forEach(pluginManager::execute);
+    pluginActions.forEach(pluginManager::execute);
   }
 }

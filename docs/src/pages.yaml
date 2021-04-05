@@ -1,0 +1,22 @@
+base: ""
+data:
+  sidebar:
+    menus:
+      - label: Getting Started
+        items:
+          - introduction
+          - configuration
+          - type-script-support
+      - label: Guides
+        items:
+          - label: Docs
+            items:
+              - introduction
+              - sidebar
+              - versioning
+dataSelectors:
+  - id: pages
+    class: PageSetMapper
+    model:
+      pageSetId: pages
+      key: _subId

@@ -7,7 +7,7 @@ import com.github.gclaussn.ssg.impl.conf.TypeLookupImpl;
 class PageProcessorDeserializer extends AbstractBeanDeserializer<PageProcessorBeanImpl, PageProcessor> {
 
   PageProcessorDeserializer(Site site) {
-    super(site, new TypeLookupImpl<>(site.getConf().getPageProcessorTypes()));
+    super(site, new TypeLookupImpl<>(site.getConfiguration().getPageProcessorTypes()));
   }
 
   @Override

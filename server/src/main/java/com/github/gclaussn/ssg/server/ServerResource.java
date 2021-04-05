@@ -42,7 +42,7 @@ public class ServerResource extends AbstractResource {
       }
 
       stopFunction.accept(siteFileWatcher);
-    }, "ssg-server-stop").start();
+    }, "stop").start();
 
     return Response.status(Status.ACCEPTED).build();
   }

@@ -22,11 +22,17 @@ abstract class AbstractBean<T> {
   /** The underlying implementation. */
   protected T impl;
 
+  /**
+   * Initializes the bean, when the site is loaded.
+   */
   protected abstract void init();
 
+  /**
+   * Destroys the bean, when the site is closed or reloaded.
+   */
   protected abstract void destroy();
 
   protected void publish(SiteEvent event) {
-    site.getConf().getEventListeners().forEach(l -> l.onEvent(event));
+    site.getConfiguration().getEventListeners().forEach(l -> l.onEvent(event));
   }
 }

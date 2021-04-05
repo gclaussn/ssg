@@ -9,12 +9,12 @@ import com.github.gclaussn.ssg.data.PageDataNodeType;
 
 public class DateFilter implements PageFilter {
 
-  /** Location of source data, that has been provided by the {@link DateProcessor}. */
-  protected String source;
+  /** ID of {@link DateProcessor}, that has provided the data. */
+  protected String processorId;
 
   @Override
   public boolean filter(Page page) {
-    PageDataNode node = page.getData().get(source);
+    PageDataNode node = page.getData().get(processorId);
     if (!node.isMap()) {
       return false;
     }

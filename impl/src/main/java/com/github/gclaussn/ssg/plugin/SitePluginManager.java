@@ -5,15 +5,15 @@ import java.util.Set;
 
 public interface SitePluginManager {
 
-  void execute(SitePluginGoal pluginGoal);
+  void execute(SitePluginAction pluginAction);
 
-  void execute(SitePluginGoal pluginGoal, Map<String, Object> properties);
+  void execute(SitePluginAction pluginAction, Map<String, Object> properties);
 
-  void execute(String pluginGoal);
+  void execute(String pluginAction);
 
-  void execute(String pluginGoal, Map<String, Object> properties);
+  void execute(String pluginAction, Map<String, Object> properties);
 
   Set<SitePluginDesc> getPlugins();
 
-  SitePluginGoalDesc getPluginGoal(String pluginGoal);
+  SitePluginActionDesc getPluginAction(String pluginAction);
 }

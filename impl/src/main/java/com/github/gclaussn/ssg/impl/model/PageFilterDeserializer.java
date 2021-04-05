@@ -7,7 +7,7 @@ import com.github.gclaussn.ssg.impl.conf.TypeLookupImpl;
 class PageFilterDeserializer extends AbstractBeanDeserializer<PageFilterBeanImpl, PageFilter> {
 
   PageFilterDeserializer(Site site) {
-    super(site, new TypeLookupImpl<>(site.getConf().getPageFilterTypes()));
+    super(site, new TypeLookupImpl<>(site.getConfiguration().getPageFilterTypes()));
   }
 
   @Override

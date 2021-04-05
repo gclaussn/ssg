@@ -6,7 +6,7 @@ import java.util.Map;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.builtin.goal.CpGoal;
+import com.github.gclaussn.ssg.builtin.action.CpAction;
 import com.github.gclaussn.ssg.cli.AbstractCommand;
 
 @Parameters(commandNames = "cp", commandDescription = "Copy the site's output")
@@ -18,8 +18,8 @@ public class Cp extends AbstractCommand {
   @Override
   public void run(Site site) {
     Map<String, Object> properties = new HashMap<String, Object>();
-    properties.put(CpGoal.TARGET, target);
+    properties.put(CpAction.TARGET, target);
 
-    site.getPluginManager().execute(new CpGoal(), properties);
+    site.getPluginManager().execute(new CpAction(), properties);
   }
 }

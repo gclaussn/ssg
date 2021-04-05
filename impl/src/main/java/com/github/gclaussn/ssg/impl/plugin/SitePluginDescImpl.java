@@ -8,7 +8,7 @@ import com.github.gclaussn.ssg.plugin.SitePluginDesc;
 
 class SitePluginDescImpl implements SitePluginDesc {
 
-  protected final Set<String> goals;
+  protected final Set<String> actions;
   protected final Set<SitePropertyDesc> properties;
 
   protected String documentation;
@@ -16,7 +16,7 @@ class SitePluginDescImpl implements SitePluginDesc {
   protected String typeName;
 
   SitePluginDescImpl() {
-    goals = new TreeSet<>();
+    actions = new TreeSet<>();
     properties = new TreeSet<>();
   }
 
@@ -26,13 +26,13 @@ class SitePluginDescImpl implements SitePluginDesc {
   }
 
   @Override
-  public String getDocumentation() {
-    return documentation;
+  public Set<String> getActions() {
+    return actions;
   }
 
   @Override
-  public Set<String> getGoals() {
-    return goals;
+  public String getDocumentation() {
+    return documentation;
   }
 
   @Override

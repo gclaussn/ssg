@@ -1,0 +1,5 @@
+name: Copy action
+documentation:
+  Copies the site's output to a given target directory
+properties:
+  ssg.cp.target: Target directory for the site's output

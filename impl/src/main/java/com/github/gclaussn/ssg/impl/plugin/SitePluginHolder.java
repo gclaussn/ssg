@@ -5,34 +5,34 @@ import java.util.Set;
 
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.plugin.SitePlugin;
-import com.github.gclaussn.ssg.plugin.SitePluginGoal;
+import com.github.gclaussn.ssg.plugin.SitePluginAction;
 
 class SitePluginHolder {
 
   private final SitePlugin plugin;
 
-  private final Set<Class<? extends SitePluginGoal>> pluginGoalTypes;
+  private final Set<Class<? extends SitePluginAction>> pluginActionTypes;
 
   SitePluginHolder(SitePlugin plugin) {
     this.plugin = plugin;
 
-    pluginGoalTypes = new HashSet<>(4);
+    pluginActionTypes = new HashSet<>(4);
   }
 
-  protected void addPluginGoal(Class<? extends SitePluginGoal> pluginGoalType) {
-    pluginGoalTypes.add(pluginGoalType);
+  protected void addPluginAction(Class<? extends SitePluginAction> pluginActionType) {
+    pluginActionTypes.add(pluginActionType);
   }
 
   protected SitePlugin getPlugin() {
     return plugin;
   }
 
-  protected Set<Class<? extends SitePluginGoal>> getPluginGoalTypes() {
-    return pluginGoalTypes;
+  protected Set<Class<? extends SitePluginAction>> getPluginActionTypes() {
+    return pluginActionTypes;
   }
 
   protected void postBuild(Site site) {
-    site.getConf().inject(plugin);
+    site.getConfiguration().inject(plugin);
 
     plugin.postBuild(site);
   }

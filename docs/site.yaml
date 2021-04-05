@@ -1,0 +1,11 @@
+pages:
+  - index
+pageSets:
+  - pages
+node:
+  packages:
+    bootstrap: 5.0.0-alpha1
+    jquery: 3.6.0
+  includes:
+    - "**/bootstrap/dist/css/bootstrap.min.css"
+    - "**/jquery/dist/jquery.min.js"

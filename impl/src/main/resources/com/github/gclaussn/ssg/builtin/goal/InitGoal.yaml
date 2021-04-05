@@ -1,5 +1,0 @@
-name: Init goal
-documentation:
-  Initializes a new site from a predefined template.
-properties:
-  ssg.init.template: Location of the template, used during initialization

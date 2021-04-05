@@ -17,10 +17,10 @@ public class ServerPlugin implements SitePlugin {
     // register event WebSocket endpoint as event listener
     builder.addEventListener(eventEndpoint);
 
-    // make websocket endpoint availabe for the start goal
-    builder.setProperty(StartGoal.SITE_EVENT_ENDPOINT, eventEndpoint);
+    // make websocket endpoint availabe for the start action
+    builder.setProperty(StartAction.SITE_EVENT_ENDPOINT, eventEndpoint);
 
-    // goals
-    builder.addPluginGoal(StartGoal.class);
+    // register actions
+    builder.addPluginAction(StartAction.class);
   }
 }

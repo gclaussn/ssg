@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.file.SiteFileEventType;
+import com.github.gclaussn.ssg.file.SiteFileType;
 
 class PollingFileWatcher extends AbstractFileWatcher implements Runnable, ThreadFactory {
 
@@ -67,7 +68,7 @@ class PollingFileWatcher extends AbstractFileWatcher implements Runnable, Thread
 
   protected void handleEvent(SiteFile file) {
     SiteFileEventImpl siteFileEvent = new SiteFileEventImpl();
-    siteFileEvent.fileType = mapFileType(file.path);
+    siteFileEvent.fileType = SiteFileType.of(file.path);
     siteFileEvent.path = file.path;
     siteFileEvent.timestamp = file.lastModifiedTime;
 

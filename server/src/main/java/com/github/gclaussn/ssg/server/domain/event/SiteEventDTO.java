@@ -6,7 +6,7 @@ import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventType;
-import com.github.gclaussn.ssg.server.domain.SiteErrorDTO;
+import com.github.gclaussn.ssg.server.domain.error.SiteErrorDTO;
 
 public class SiteEventDTO {
 

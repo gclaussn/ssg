@@ -3,7 +3,9 @@
 .settings/
 target/
 
-examples/**/out/
+docs/node_modules/
+docs/out/
+templates/**/out/
 
 server-app/build/
 server-app/node_modules

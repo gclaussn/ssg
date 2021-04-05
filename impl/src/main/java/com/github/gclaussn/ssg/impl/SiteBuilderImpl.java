@@ -14,7 +14,7 @@ import com.github.gclaussn.ssg.event.SiteEventListener;
 import com.github.gclaussn.ssg.impl.conf.SiteConfImpl;
 import com.github.gclaussn.ssg.impl.event.SiteEventStoreImpl;
 import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
-import com.github.gclaussn.ssg.plugin.SitePluginGoal;
+import com.github.gclaussn.ssg.plugin.SitePluginAction;
 
 public class SiteBuilderImpl implements SiteBuilder {
 
@@ -71,10 +71,10 @@ public class SiteBuilderImpl implements SiteBuilder {
   }
 
   @Override
-  public SiteBuilder addPluginGoal(Class<? extends SitePluginGoal> pluginGoalType) {
-    Objects.requireNonNull(pluginGoalType, "plugin goal type is null");
+  public SiteBuilder addPluginAction(Class<? extends SitePluginAction> pluginActionType) {
+    Objects.requireNonNull(pluginActionType, "plugin action type is null");
 
-    pluginManager.addPluginGoal(pluginGoalType);
+    pluginManager.addPluginAction(pluginActionType);
     return this;
   }
 

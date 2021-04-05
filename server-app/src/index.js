@@ -13,7 +13,7 @@ import "./index.css";
 
 ReactDOM.render(
   <Router basename="/app">
-      <AppNav />
-      <App />
+    <AppNav />
+    <App />
   </Router>
 , document.getElementById("app"));

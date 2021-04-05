@@ -16,8 +16,8 @@ public class SitePluginManagerImplTest {
   }
 
   @Test
-  public void testBuildPluginGoalId() {
-    assertThat(manager.buildPluginGoalId("TestGoal"), equalTo("test"));
-    assertThat(manager.buildPluginGoalId("TestSomethingGoal"), equalTo("test-something"));
+  public void testBuildPluginActionId() {
+    assertThat(manager.buildPluginActionId("TestAction"), equalTo("test"));
+    assertThat(manager.buildPluginActionId("TestSomethingAction"), equalTo("test-something"));
   }
 }

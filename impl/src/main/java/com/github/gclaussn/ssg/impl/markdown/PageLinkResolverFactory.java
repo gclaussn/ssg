@@ -2,10 +2,12 @@ package com.github.gclaussn.ssg.impl.markdown;
 
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.github.gclaussn.ssg.Site;
 import com.vladsch.flexmark.html.LinkResolver;
 import com.vladsch.flexmark.html.LinkResolverFactory;
-import com.vladsch.flexmark.html.renderer.LinkResolverContext;
+import com.vladsch.flexmark.html.renderer.LinkResolverBasicContext;
 
 class PageLinkResolverFactory implements LinkResolverFactory {
 
@@ -16,12 +18,12 @@ class PageLinkResolverFactory implements LinkResolverFactory {
   }
 
   @Override
-  public Set<Class<? extends LinkResolverFactory>> getAfterDependents() {
+  public Set<Class<?>> getAfterDependents() {
     return null;
   }
 
   @Override
-  public Set<Class<? extends LinkResolverFactory>> getBeforeDependents() {
+  public Set<Class<?>> getBeforeDependents() {
     return null;
   }
 
@@ -31,7 +33,7 @@ class PageLinkResolverFactory implements LinkResolverFactory {
   }
 
   @Override
-  public LinkResolver create(LinkResolverContext context) {
+  public @NotNull LinkResolver apply(@NotNull LinkResolverBasicContext context) {
     return new PageLinkResolver(site);
   }
 }

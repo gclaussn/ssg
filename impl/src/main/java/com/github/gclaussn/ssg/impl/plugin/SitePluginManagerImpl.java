@@ -20,29 +20,29 @@ import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SiteBuilder;
 import com.github.gclaussn.ssg.conf.TypeDesc;
 import com.github.gclaussn.ssg.plugin.SitePlugin;
+import com.github.gclaussn.ssg.plugin.SitePluginAction;
+import com.github.gclaussn.ssg.plugin.SitePluginActionDesc;
 import com.github.gclaussn.ssg.plugin.SitePluginDesc;
 import com.github.gclaussn.ssg.plugin.SitePluginException;
-import com.github.gclaussn.ssg.plugin.SitePluginGoal;
-import com.github.gclaussn.ssg.plugin.SitePluginGoalDesc;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
 public class SitePluginManagerImpl implements SitePluginManager, SitePlugin {
 
-  /** Common suffix of {@link SitePluginGoal} implementations. */
-  protected static final String PLUGIN_GOAL_SUFFIX = "Goal";
+  /** Common suffix of {@link SitePluginAction} implementations. */
+  protected static final String PLUGIN_ACTION_SUFFIX = "Action";
 
   private final List<SitePluginHolder> plugins;
 
-  private final Set<Class<? extends SitePluginGoal>> pluginGoalTypes;
+  private final Set<Class<? extends SitePluginAction>> pluginActionTypes;
 
-  private final Map<String, Class<? extends SitePluginGoal>> pluginGoalTypeMap;
+  private final Map<String, Class<? extends SitePluginAction>> pluginActionTypeMap;
 
   private Site site;
 
   public SitePluginManagerImpl() {
     plugins = new ArrayList<>();
-    pluginGoalTypes = new HashSet<>();
-    pluginGoalTypeMap = new HashMap<>();
+    pluginActionTypes = new HashSet<>();
+    pluginActionTypeMap = new HashMap<>();
 
   }
 
@@ -50,19 +50,19 @@ public class SitePluginManagerImpl implements SitePluginManager, SitePlugin {
     plugins.add(new SitePluginHolder(plugin));
   }
 
-  public void addPluginGoal(Class<? extends SitePluginGoal> pluginGoalType) {
+  public void addPluginAction(Class<? extends SitePluginAction> pluginActionType) {
     if (plugins.isEmpty()) {
       return;
     }
 
-    plugins.get(plugins.size() - 1).addPluginGoal(pluginGoalType);
-    pluginGoalTypes.add(pluginGoalType);
+    plugins.get(plugins.size() - 1).addPluginAction(pluginActionType);
+    pluginActionTypes.add(pluginActionType);
   }
 
   protected SitePluginDesc buildPluginDesc(SitePluginHolder holder) {
     Class<?> type = holder.getPlugin().getClass();
 
-    TypeDesc typeDesc = site.getConf().describe(type);
+    TypeDesc typeDesc = site.getConfiguration().describe(type);
 
     SitePluginDescImpl desc = new SitePluginDescImpl();
     desc.documentation = typeDesc.getDocumentation();
@@ -70,32 +70,32 @@ public class SitePluginManagerImpl implements SitePluginManager, SitePlugin {
     desc.properties.addAll(typeDesc.getProperties());
     desc.typeName = type.getName();
 
-    holder.getPluginGoalTypes().stream().map(Class::getName).forEach(desc.goals::add);
+    holder.getPluginActionTypes().stream().map(Class::getName).forEach(desc.actions::add);
 
     return desc;
   }
 
-  protected SitePluginGoalDesc buildPluginGoalDesc(Class<? extends SitePluginGoal> pluginGoalType) {
-    TypeDesc typeDesc = site.getConf().describe(pluginGoalType);
+  protected SitePluginActionDesc buildPluginActionDesc(Class<? extends SitePluginAction> pluginActionType) {
+    TypeDesc typeDesc = site.getConfiguration().describe(pluginActionType);
 
-    SitePluginGoalDescImpl desc = new SitePluginGoalDescImpl();
+    SitePluginActionDescImpl desc = new SitePluginActionDescImpl();
     desc.documentation = typeDesc.getDocumentation();
     desc.name = typeDesc.getName();
-    desc.id = buildPluginGoalId(pluginGoalType.getSimpleName());
+    desc.id = buildPluginActionId(pluginActionType.getSimpleName());
     desc.properties = typeDesc.getProperties();
-    desc.typeName = pluginGoalType.getName();
+    desc.typeName = pluginActionType.getName();
 
     return desc;
   }
 
-  protected String buildPluginGoalId(String simpleName) {
-    if (simpleName.equals(PLUGIN_GOAL_SUFFIX)) {
+  protected String buildPluginActionId(String simpleName) {
+    if (simpleName.equals(PLUGIN_ACTION_SUFFIX)) {
       return null;
     }
 
     String stripped;
-    if (simpleName.endsWith(PLUGIN_GOAL_SUFFIX)) {
-      stripped = simpleName.substring(0, simpleName.length() - PLUGIN_GOAL_SUFFIX.length());
+    if (simpleName.endsWith(PLUGIN_ACTION_SUFFIX)) {
+      stripped = simpleName.substring(0, simpleName.length() - PLUGIN_ACTION_SUFFIX.length());
     } else {
       stripped = simpleName;
     }
@@ -116,68 +116,72 @@ public class SitePluginManagerImpl implements SitePluginManager, SitePlugin {
   }
 
   @Override
-  public void execute(SitePluginGoal pluginGoal) {
-    Objects.requireNonNull(pluginGoal, "plugin goal is null");
+  public void execute(SitePluginAction pluginAction) {
+    Objects.requireNonNull(pluginAction, "plugin action is null");
 
-    execute(pluginGoal, Collections.emptyMap());
+    execute(pluginAction, Collections.emptyMap());
   }
 
   @Override
-  public void execute(SitePluginGoal pluginGoal, Map<String, Object> properties) {
-    Objects.requireNonNull(pluginGoal, "plugin goal is null");
+  public void execute(SitePluginAction pluginAction, Map<String, Object> properties) {
+    Objects.requireNonNull(pluginAction, "plugin action is null");
     Objects.requireNonNull(properties, "properties are null");
 
     try {
       // inject properties
-      site.getConf().inject(pluginGoal, properties);
+      site.getConfiguration().inject(pluginAction, properties);
 
-      // execute goal
-      pluginGoal.execute(site);
+      // execute action
+      pluginAction.execute(site);
+    } catch (SitePluginException e) {
+      // rethrow managed exception
+      throw e;
     } catch (Exception e) {
-      throw new SitePluginException(format("Execution of plugin goal '%s' failed", pluginGoal.getClass().getName()), e);
+      String message = format("Execution of plugin action '%s' failed", pluginAction.getClass().getName());
+      throw new SitePluginException(message, e);
     }
   }
 
   @Override
-  public void execute(String pluginGoal) {
-    Objects.requireNonNull(pluginGoal, "plugin goal is null");
+  public void execute(String pluginAction) {
+    Objects.requireNonNull(pluginAction, "plugin action is null");
 
-    execute(pluginGoal, Collections.emptyMap());
+    execute(pluginAction, Collections.emptyMap());
   }
 
   @Override
-  public void execute(String pluginGoal, Map<String, Object> properties) {
-    Objects.requireNonNull(pluginGoal, "plugin goal is null");
+  public void execute(String pluginAction, Map<String, Object> properties) {
+    Objects.requireNonNull(pluginAction, "plugin action is null");
     Objects.requireNonNull(properties, "properties are null");
 
-    Class<? extends SitePluginGoal> pluginGoalType = pluginGoalTypeMap.get(pluginGoal);
-    if (pluginGoalType == null) {
-      // try to find plugin goal type by fully qualified name
-      pluginGoalType = findPluginGoalType(pluginGoal);
+    Class<? extends SitePluginAction> pluginActionType = pluginActionTypeMap.get(pluginAction);
+    if (pluginActionType == null) {
+      // try to find plugin action type by fully qualified name
+      pluginActionType = findPluginActionType(pluginAction);
     }
 
-    SitePluginGoal instance;
+    SitePluginAction instance;
     try {
-      instance = pluginGoalType.getDeclaredConstructor().newInstance();
+      instance = pluginActionType.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
-      throw new SitePluginException(format("Plugin goal '%s' could not be instantiated''", pluginGoalType), e);
+      throw new SitePluginException(format("Plugin action '%s' could not be instantiated''", pluginActionType), e);
     }
 
     execute(instance, properties);
   }
 
-  protected Class<? extends SitePluginGoal> findPluginGoalType(String pluginGoal) {
-    Optional<Class<? extends SitePluginGoal>> pluginGoalType = pluginGoalTypes.stream()
+  protected Class<? extends SitePluginAction> findPluginActionType(String pluginAction) {
+    Optional<Class<? extends SitePluginAction>> pluginActionType = pluginActionTypes.stream()
         // filter type by name
-        .filter(type -> type.getName().equals(pluginGoal))
+        .filter(type -> type.getName().equals(pluginAction))
         // find first
         .findFirst();
 
-    if (pluginGoalType.isEmpty()) {
-      throw new SitePluginException(format("Plugin goal '%s' could not be found", pluginGoal));
+    if (pluginActionType.isEmpty()) {
+      throw new SitePluginException(format("Plugin action '%s' could not be found", pluginAction));
     }
 
-    return pluginGoalType.get();
+    return pluginActionType.get();
   }
 
   @Override
@@ -186,8 +190,8 @@ public class SitePluginManagerImpl implements SitePluginManager, SitePlugin {
   }
 
   @Override
-  public SitePluginGoalDesc getPluginGoal(String pluginGoal) {
-    return buildPluginGoalDesc(findPluginGoalType(pluginGoal));
+  public SitePluginActionDesc getPluginAction(String pluginAction) {
+    return buildPluginActionDesc(findPluginActionType(pluginAction));
   }
 
   @Override
@@ -208,19 +212,19 @@ public class SitePluginManagerImpl implements SitePluginManager, SitePlugin {
     plugins.stream().forEach(plugin -> plugin.postBuild(site));
 
     Set<String> ambiguousNames = new HashSet<>();
-    for (Class<? extends SitePluginGoal> pluginGoalType : pluginGoalTypes) {
-      String id = buildPluginGoalId(pluginGoalType.getSimpleName());
+    for (Class<? extends SitePluginAction> pluginActionType : pluginActionTypes) {
+      String id = buildPluginActionId(pluginActionType.getSimpleName());
       if (id == null) {
         continue;
       }
 
-      boolean ambiguous = pluginGoalTypeMap.put(id, pluginGoalType) != null;
+      boolean ambiguous = pluginActionTypeMap.put(id, pluginActionType) != null;
       if (ambiguous) {
         ambiguousNames.add(id);
       }
     }
 
-    ambiguousNames.forEach(pluginGoalTypeMap::remove);
+    ambiguousNames.forEach(pluginActionTypeMap::remove);
     ambiguousNames.clear();
   }
 

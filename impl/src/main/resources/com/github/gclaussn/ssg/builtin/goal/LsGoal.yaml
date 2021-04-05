@@ -1,3 +1,0 @@
-name: List goal
-documentation:
-  Lists the site's output using the request URI of generated HTML files, public assets and included node_modules resources.

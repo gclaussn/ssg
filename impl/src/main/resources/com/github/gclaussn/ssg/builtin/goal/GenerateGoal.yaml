@@ -1,4 +1,0 @@
-name: Generate goal
-documentation:
-  Generates the HTML output under out/ of the site's pages that have been loaded.
-  Only the pages, which are not skipped nor rejected are generated.

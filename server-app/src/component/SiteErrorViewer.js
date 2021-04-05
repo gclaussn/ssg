@@ -60,9 +60,9 @@ export default class SiteErrorViewer extends React.Component {
   }
 
   _renderCode() {
-    const { code, error } = this.props;
+    const { error } = this.props;
 
-    if (code === null) {
+    if (error.sourceCode === null) {
       return null;
     }
 
@@ -79,10 +79,11 @@ export default class SiteErrorViewer extends React.Component {
           language={fileType === "jade" ? "pug" : fileType}
           lineNumberStyle={this._getLineNumberStyle}
           showLineNumbers={true}
+          startingLineNumber={error.sourceCode.from}
           style={style}
           wrapLines={true}
         >
-          {code + this._getMarker(error)}
+          {error.sourceCode.code + this._getMarker(error)}
         </SyntaxHighlighter>
       </div>
     )

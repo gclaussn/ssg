@@ -3,7 +3,7 @@ package com.github.gclaussn.ssg.impl.markdown;
 import com.github.gclaussn.ssg.Site;
 import com.vladsch.flexmark.html.HtmlRenderer.Builder;
 import com.vladsch.flexmark.html.HtmlRenderer.HtmlRendererExtension;
-import com.vladsch.flexmark.util.options.MutableDataHolder;
+import com.vladsch.flexmark.util.data.MutableDataHolder;
 
 class PageLinkExtension implements HtmlRendererExtension {
 
@@ -14,12 +14,12 @@ class PageLinkExtension implements HtmlRendererExtension {
   }
 
   @Override
-  public void rendererOptions(MutableDataHolder options) {
-    // nothing to do here
+  public void extend(Builder rendererBuilder, String rendererType) {
+    rendererBuilder.linkResolverFactory(new PageLinkResolverFactory(site));
   }
 
   @Override
-  public void extend(Builder rendererBuilder, String rendererType) {
-    rendererBuilder.linkResolverFactory(new PageLinkResolverFactory(site));
+  public void rendererOptions(MutableDataHolder options) {
+    // nothing do to here
   }
 }

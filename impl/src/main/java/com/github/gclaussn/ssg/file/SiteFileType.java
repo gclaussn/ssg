@@ -11,6 +11,22 @@ public enum SiteFileType implements SiteFileExtension {
   YAML,
   UNKNOWN;
 
+  public static SiteFileType of(Path path) {
+    String fileName = path.getFileName().toString();
+
+    if (MD.isPresent(fileName)) {
+      return MD;
+    } else if (YAML.isPresent(fileName)) {
+      return YAML;
+    } else if (JADE.isPresent(fileName)) {
+      return JADE;
+    } else if (HTML.isPresent(fileName)) {
+      return HTML;
+    } else {
+      return UNKNOWN;
+    }
+  }
+
   /** File extension including dot. */
   private final String extension;
 

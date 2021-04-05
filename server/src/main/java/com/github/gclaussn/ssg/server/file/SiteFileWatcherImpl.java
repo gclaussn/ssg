@@ -26,6 +26,7 @@ import org.apache.commons.io.IOUtils;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.file.SiteFileEventType;
+import com.github.gclaussn.ssg.file.SiteFileType;
 
 @SuppressWarnings("unchecked")
 class SiteFileWatcherImpl extends AbstractFileWatcher implements Runnable {
@@ -117,7 +118,7 @@ class SiteFileWatcherImpl extends AbstractFileWatcher implements Runnable {
     }
 
     SiteFileEventImpl siteFileEvent = new SiteFileEventImpl();
-    siteFileEvent.fileType = mapFileType(path);
+    siteFileEvent.fileType = SiteFileType.of(path);
     siteFileEvent.path = path;
     siteFileEvent.timestamp = timestamp;
     siteFileEvent.type = fileEventType;

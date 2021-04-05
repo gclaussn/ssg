@@ -3,8 +3,10 @@ package com.github.gclaussn.ssg.impl.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.npm.NodePackageSpec;
 
 /**
  * Site YAML model.
@@ -18,5 +20,6 @@ class SiteModel {
   @JsonDeserialize(as = LinkedHashSet.class)
   protected Set<String> pageSets;
 
-  protected NodeModulesImpl nodeModules;
+  @JsonProperty("node")
+  protected NodePackageSpec nodePackageSpec;
 }

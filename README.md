@@ -5,6 +5,7 @@ Implementation based on / made possible by:
 - [OpenJDK 14](https://openjdk.java.net/projects/jdk/14/)
 - [SnakeYAML](https://bitbucket.org/asomov/snakeyaml) via [Jackson](https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
 - [jade4j](https://github.com/neuland/jade4j)
+- [flexmark-java](https://github.com/vsch/flexmark-java)
 - [JCommander](https://jcommander.org/)
 
 and many more!
@@ -63,7 +64,7 @@ Prepand `MSYS_NO_PATHCONV=1` for Git Bash (MinGW)
 The container's working directory is `/site`.
 
 ## Documentation 
-The [default site](./examples/default) is a good starting point.
+The [default site](./templates/default) is a good starting point.
 
 ### Site structure
 

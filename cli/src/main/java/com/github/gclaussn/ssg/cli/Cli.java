@@ -16,6 +16,7 @@ import com.github.gclaussn.ssg.cli.cmd.Desc;
 import com.github.gclaussn.ssg.cli.cmd.Exec;
 import com.github.gclaussn.ssg.cli.cmd.Generate;
 import com.github.gclaussn.ssg.cli.cmd.Init;
+import com.github.gclaussn.ssg.cli.cmd.Install;
 import com.github.gclaussn.ssg.cli.cmd.Ls;
 import com.github.gclaussn.ssg.cli.cmd.Plugins;
 import com.github.gclaussn.ssg.cli.cmd.Server;
@@ -52,6 +53,7 @@ public class Cli {
     commands.add(new Exec());
     commands.add(new Generate());
     commands.add(new Init());
+    commands.add(new Install());
     commands.add(new Ls());
     commands.add(new Plugins());
     commands.add(new Server());

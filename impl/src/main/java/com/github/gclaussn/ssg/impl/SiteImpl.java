@@ -30,15 +30,15 @@ import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventStore;
 import com.github.gclaussn.ssg.event.SiteEventType;
 import com.github.gclaussn.ssg.file.SiteFileEvent;
-import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.file.SiteFileEventType;
 import com.github.gclaussn.ssg.impl.conf.SiteConfImpl;
 import com.github.gclaussn.ssg.impl.event.SiteEventStoreImpl;
 import com.github.gclaussn.ssg.impl.model.SiteModelRepository;
 import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
+import com.github.gclaussn.ssg.npm.NodePackageSpec;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
-class SiteImpl implements Site, SiteFileEventListener {
+class SiteImpl implements Site {
 
   protected final SiteConfImpl conf;
   protected final SiteEventStoreImpl eventStore;
@@ -121,7 +121,7 @@ class SiteImpl implements Site, SiteFileEventListener {
   }
 
   @Override
-  public SiteConf getConf() {
+  public SiteConf getConfiguration() {
     return conf;
   }
 
@@ -133,6 +133,11 @@ class SiteImpl implements Site, SiteFileEventListener {
   @Override
   public SiteGenerator getGenerator() {
     return generator;
+  }
+
+  @Override
+  public Optional<NodePackageSpec> getNodePackages() {
+    return repository.getNodePackageSpec();
   }
 
   @Override
@@ -265,7 +270,11 @@ class SiteImpl implements Site, SiteFileEventListener {
         load();
         break;
       case UNKNOWN:
-        // not possible here
+        // if found, load and generate page set instead
+        Optional<String> pageSetId = repository.findPageSetId(sourceId);
+        if (pageSetId.isPresent()) {
+          modifyPageSet(pageSetId.get());
+        }
     }
   }
 
@@ -359,11 +368,6 @@ class SiteImpl implements Site, SiteFileEventListener {
 
     // try to determine, what source (site, page, page include, page set) is affected
     Source source = repository.getSource(event.getPath());
-
-    if (source.getType() == SourceType.UNKNOWN) {
-      // ignore unknown source types
-      return;
-    }
 
     SiteEvent.builder()
         .type(mapEventType(event))

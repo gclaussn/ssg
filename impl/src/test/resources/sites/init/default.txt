@@ -1,4 +1,4 @@
 site.yaml
 src/index.yaml
-public/index.css
+pub/index.css
 node_modules/test/styles.css

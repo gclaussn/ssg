@@ -57,6 +57,14 @@ public class PageDataBuilderImpl implements PageDataBuilder {
   }
 
   @Override
+  public PageDataBuilder putIfNotNull(String location, Object data) {
+    if (data != null) {
+      put(location, data, false);
+    }
+    return this;
+  }
+
+  @Override
   public PageDataBuilder putRoot(Map<String, Object> data) {
     this.data.root.putAll(data);
     return this;

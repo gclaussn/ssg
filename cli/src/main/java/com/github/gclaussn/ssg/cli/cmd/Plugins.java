@@ -19,7 +19,7 @@ public class Plugins extends AbstractCommand {
 
       append(desc);
 
-      site.getConf().getConsole().log(builder.toString());
+      site.getConfiguration().getConsole().log(builder.toString());
     }
   }
 
@@ -36,11 +36,11 @@ public class Plugins extends AbstractCommand {
       builder.newLine().indent().appendWrapped(desc.getDocumentation()).newLine();
     }
 
-    if (!desc.getGoals().isEmpty()) {
-      builder.newLine().indent().append("Goals:");
+    if (!desc.getActions().isEmpty()) {
+      builder.newLine().indent().append("Actions:");
 
       builder.inc();
-      desc.getGoals().forEach(this::append);
+      desc.getActions().forEach(this::append);
       builder.dec();
     }
 
@@ -55,8 +55,8 @@ public class Plugins extends AbstractCommand {
     builder.newLine();
   }
 
-  protected void append(String goal) {
-    builder.newLine().indent().append(goal);
+  protected void append(String action) {
+    builder.newLine().indent().append(action);
   }
 
   protected void append(SitePropertyDesc desc) {

@@ -10,6 +10,8 @@ public interface PageDataBuilder {
 
   PageDataBuilder putIfAbsent(String location, Object data);
 
+  PageDataBuilder putIfNotNull(String location, Object data);
+
   PageDataBuilder putRoot(Map<String, Object> data);
 
   PageDataBuilder putRoot(PageData data);

@@ -3,14 +3,15 @@ package com.github.gclaussn.ssg.conf;
 import java.util.Set;
 
 import com.github.gclaussn.ssg.plugin.SitePlugin;
-import com.github.gclaussn.ssg.plugin.SitePluginGoal;
+import com.github.gclaussn.ssg.plugin.SitePluginAction;
 
 /**
- * Description of a site type.<br>
+ * Description of a type.<br>
+ * 
  * Types are:
  * <ul>
  *   <li>{@link SitePlugin}</li>
- *   <li>{@link SitePluginGoal}</li>
+ *   <li>{@link SitePluginAction}</li>
  * </ul 
  */
 public interface TypeDesc {

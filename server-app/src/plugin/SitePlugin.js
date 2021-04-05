@@ -13,12 +13,12 @@ export default class SitePlugin {
     this._data = data;
   }
 
-  get documentation() {
-    return this._data.documentation;
+  get actions() {
+    return this._data.actions;
   }
 
-  get goals() {
-    return this._data.goals;
+  get documentation() {
+    return this._data.documentation;
   }
 
   get name() {

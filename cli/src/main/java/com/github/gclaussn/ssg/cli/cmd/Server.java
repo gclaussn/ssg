@@ -9,7 +9,7 @@ import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SiteBuilder;
 import com.github.gclaussn.ssg.cli.AbstractCommand;
 import com.github.gclaussn.ssg.cli.Main;
-import com.github.gclaussn.ssg.server.StartGoal;
+import com.github.gclaussn.ssg.server.StartAction;
 import com.github.gclaussn.ssg.server.domain.event.SiteEventLogger;
 
 @Parameters(commandNames = "server", commandDescription = "Run a developer server")
@@ -28,9 +28,9 @@ public class Server extends AbstractCommand {
   @Override
   public void run(Site site) {
     Map<String, Object> properties = new HashMap<String, Object>();
-    properties.put(StartGoal.HOST, host);
-    properties.put(StartGoal.PORT, port);
+    properties.put(StartAction.HOST, host);
+    properties.put(StartAction.PORT, port);
 
-    site.getPluginManager().execute(new StartGoal(), properties);
+    site.getPluginManager().execute(new StartAction(), properties);
   }
 }

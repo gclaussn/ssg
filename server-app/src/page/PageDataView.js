@@ -81,6 +81,7 @@ export default class PagePreview extends React.Component {
           displayDataTypes={false}
           enableClipboard={false}
           name={false}
+          sortKeys={true}
           src={pageData}
         />
       </div>

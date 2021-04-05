@@ -1,9 +1,5 @@
 package com.github.gclaussn.ssg.server.file;
 
-import static com.github.gclaussn.ssg.file.SiteFileType.JADE;
-import static com.github.gclaussn.ssg.file.SiteFileType.YAML;
-
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;
-import com.github.gclaussn.ssg.file.SiteFileType;
 
 abstract class AbstractFileWatcher implements SiteFileWatcher {
 
@@ -34,16 +29,6 @@ abstract class AbstractFileWatcher implements SiteFileWatcher {
   protected abstract void doStop();
 
   protected abstract boolean isStarted();
-
-  protected SiteFileType mapFileType(Path path) {
-    if (YAML.isPresent(path)) {
-      return SiteFileType.YAML;
-    } else if (JADE.isPresent(path)) {
-      return SiteFileType.JADE;
-    } else {
-      return SiteFileType.UNKNOWN;
-    }
-  }
 
   @Override
   public void start(SiteFileEventListener... eventListeners) {

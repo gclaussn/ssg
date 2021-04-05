@@ -10,7 +10,7 @@ class SiteFileWatcherFactory {
   protected static SiteFileWatcherFactory of(Site site) {
     Objects.requireNonNull(site, "site is null");
 
-    return site.getConf().inject(new SiteFileWatcherFactory(site));
+    return site.getConfiguration().inject(new SiteFileWatcherFactory(site));
   }
 
   @SiteProperty(name = SiteFileWatcher.TYPE, defaultValue = "WATCHER_SERVICE")

@@ -1,0 +1,46 @@
+mixin sidebarMenu(menu)
+  a #{menu.label}
+  ul(class="sidebar-menu")
+    each item in menu.items
+      if item.label == null
+        - var page = pages[item]
+
+        li
+          if item == _subId
+            //- current page
+            a(class="active") #{title}
+          else if page != null
+            //- item found
+            a(href=page["_url"]) #{page["title"]}
+          else
+            //- item not found in pages map
+            a #{item}
+      else
+        +sidebarMenu(item)
+
+doctype html
+html(lang=en)
+  head
+    title #{title} | SSG
+
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1, user-scalable=no")
+
+    link(rel="icon", href="data:,")
+
+    link(rel="stylesheet", href="/node_modules/bootstrap/dist/css/bootstrap.min.css")
+    link(rel="stylesheet", href="/style.css")
+
+  body
+    div(class="h-100")
+      div(class="sidebar")
+        div(class="sidebar-content")
+          div(class="sidebar-menu-container")
+            each menu in sidebar.menus
+              +sidebarMenu(menu)
+
+    script(type="text/javascript", src="/node_modules/jquery/dist/jquery.min.js")
+    script.
+      $("xxx");
+
+      const x = "";

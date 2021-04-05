@@ -20,36 +20,46 @@ public class Desc extends AbstractCommand {
 
   @Override
   public void run(Site site) {
-    TypeDesc desc = site.getConf().describe(typeName);
+    TypeDesc desc = site.getConfiguration().describe(typeName);
     
     builder = new CliOutputBuilder();
 
     if (desc.getName() != null) {
-      builder.append(desc.getName()).newLine();
+      builder.append(desc.getName());
+      builder.newLine();
     }
 
     if (desc.getDocumentation() != null) {
-      builder.newLine().appendWrapped(desc.getDocumentation()).newLine();
+      builder.newLine();
+      builder.appendWrapped(desc.getDocumentation());
+      builder.newLine();
     }
 
     if (!desc.getProperties().isEmpty()) {
-      builder.newLine().append("Properties:");
+      builder.newLine();
+      builder.append("Properties:");
 
       builder.inc();
       desc.getProperties().forEach(this::append);
       builder.dec();
     }
 
-    site.getConf().getConsole().log(builder.toString());
+    site.getConfiguration().getConsole().log(builder.toString());
   }
 
   protected void append(SitePropertyDesc desc) {
-    builder.newLine().indent().append(desc.getName()).newLine();
+    builder.newLine();
+    builder.indent();
+    builder.append(desc.getName());
+    builder.newLine();
 
     builder.inc();
 
     if (desc.getDocumentation() != null) {
-      builder.indent().appendWrapped(desc.getDocumentation()).newLine().newLine();
+      builder.indent();
+      builder.appendWrapped(desc.getDocumentation());
+      builder.newLine();
+      builder.newLine();
     }
 
     append("Type", desc.getTypeName());
@@ -61,7 +71,9 @@ public class Desc extends AbstractCommand {
 
   protected void append(String key, String value) {
     if (StringUtils.isNotBlank(value)) {
-      builder.indent().append(String.format("%s: %s", key, value)).newLine();
+      builder.indent();
+      builder.append(String.format("%s: %s", key, value));
+      builder.newLine();
     }
   }
 }
