@@ -31,6 +31,8 @@ import com.github.gclaussn.ssg.conf.TypeDesc;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.file.SiteFileEvent;
+import com.github.gclaussn.ssg.file.SiteFileEventListener;
 
 public class SiteConfImpl implements SiteConf {
 
@@ -39,6 +41,7 @@ public class SiteConfImpl implements SiteConf {
   protected final List<SiteEventListener> eventListeners;
   /** Generator extensions. */
   protected final Set<Object> extensions;
+  protected final List<SiteFileEventListener> fileEventListeners;
   protected final Set<Class<? extends PageDataSelector>> pageDataSelectorTypes;
   protected final Set<Class<? extends PageFilter>> pageFilterTypes;
   protected final Set<Class<? extends PageProcessor>> pageProcessorTypes;
@@ -54,6 +57,7 @@ public class SiteConfImpl implements SiteConf {
 
     eventListeners = new LinkedList<>();
     extensions = new HashSet<>();
+    fileEventListeners = new LinkedList<>();
     pageDataSelectorTypes = new HashSet<>();
     pageFilterTypes = new HashSet<>();
     pageProcessorTypes = new HashSet<>();
@@ -134,6 +138,11 @@ public class SiteConfImpl implements SiteConf {
   }
 
   @Override
+  public List<SiteFileEventListener> getFileEventListeners() {
+    return fileEventListeners;
+  }
+
+  @Override
   public Set<Class<? extends PageDataSelector>> getPageDataSelectorTypes() {
     return pageDataSelectorTypes;
   }
@@ -173,6 +182,11 @@ public class SiteConfImpl implements SiteConf {
   @Override
   public void publish(SiteEvent event) {
     eventListeners.forEach(l -> l.onEvent(event));
+  }
+
+  @Override
+  public void publish(SiteFileEvent event) {
+    fileEventListeners.forEach(l -> l.onEvent(event));
   }
 
   protected TypeDescModel readTypeDescModel(String typeName) {

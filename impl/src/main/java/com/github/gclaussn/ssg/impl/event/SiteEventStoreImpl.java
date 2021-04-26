@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.gclaussn.ssg.Source;
-import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
 import com.github.gclaussn.ssg.event.SiteEventStore;
@@ -73,7 +72,7 @@ public class SiteEventStoreImpl implements SiteEventStore, SiteEventListener, Si
     }
 
     Source source = event.getSource().get();
-    if (source.getType() != SourceType.SITE) {
+    if (source.getType() != null) {
       eventsBySource.computeIfAbsent(source.getId(), this::createQueue).add(event);
     }
   }

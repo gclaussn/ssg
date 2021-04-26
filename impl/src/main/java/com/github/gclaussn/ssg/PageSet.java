@@ -7,8 +7,6 @@ import java.util.Set;
 
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataSelectorBean;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteException;
 
 /**
  * A page set, provides default data and a template for contained pages that are part of the page

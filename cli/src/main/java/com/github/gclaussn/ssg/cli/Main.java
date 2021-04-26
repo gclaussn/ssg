@@ -41,6 +41,11 @@ public class Main {
     return new HashMap<>(properties);
   }
 
+  /**
+   * Returns the path to the site, specified as program argument.
+   * 
+   * @return The site's path or the current working directory, if not specified.
+   */
   public Path getSitePath() {
     return sitePath != null ? sitePath : Paths.get(".").toAbsolutePath().normalize();
   }

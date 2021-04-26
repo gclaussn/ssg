@@ -1,10 +1,9 @@
-package com.github.gclaussn.ssg.server.domain.error;
+package com.github.gclaussn.ssg.server.domain;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteErrorType;
-import com.github.gclaussn.ssg.server.domain.SourceCodeDTO;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteErrorType;
 
 public class SiteErrorDTO {
 

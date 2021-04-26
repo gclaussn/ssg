@@ -7,15 +7,43 @@ if [ -z "$SSG_HOME" ]; then
 fi
 
 if [[ "$(uname)" == "MINGW"* ]]; then
-  CLASSPATH_SEPERATOR=";"
+  classpath_separator=";"
 else
-  CLASSPATH_SEPERATOR=":"
+  classpath_separator=":"
 fi
+
+classpath="${SSG_HOME}/lib/*${classpath_separator}${SSG_HOME}/lib/ext/*"
+
+# find path to site, if specified as argument (--site-path or -s)
+site_path_found=false
+for arg in "$@"
+do
+  if [[ "${arg}" == "--site-path" || "${arg}" == "-s" ]]; then
+    site_path_found=true
+  elif [ "${site_path_found}" = true ]; then
+    site_path="${arg}"
+    break;
+  fi
+done
+
+if [ "${site_path_found}" = true ]; then
+  # append classpath, if the site has a ext/ directory
+  if [ -d "${site_path}/ext" ]; then
+    classpath="${classpath}${classpath_separator}${site_path}/ext/*"
+  fi
+else
+  # append classpath, if working direcotry has a ext/ directory 
+  if [ -d "$(pwd)/ext" ]; then
+    classpath="${classpath}${classpath_separator}$(pwd)/ext/*"
+  fi
+fi
+
+echo $classpath
 
 exec "java" \
   "-Dlogback.configurationFile=${SSG_HOME}/conf/logback.xml" \
   ${JAVA_OPTS} \
-  -classpath "${SSG_HOME}/lib/*${CLASSPATH_SEPERATOR}${SSG_HOME}/lib/ext/*" \
+  -classpath "${classpath}" \
   --add-opens java.base/java.time.format=ALL-UNNAMED \
   --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
   "com.github.gclaussn.ssg.cli.Cli" \

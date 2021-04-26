@@ -1,4 +1,4 @@
-package com.github.gclaussn.ssg.error;
+package com.github.gclaussn.ssg;
 
 public class SiteException extends RuntimeException {
 

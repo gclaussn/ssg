@@ -22,7 +22,7 @@ and many more!
 - Plugin mechanism to provide additional:
   - Page data selector, filter and/or processor types
   - Generator extensions e.g. functions that be used within templates
-  - Plugin goals to execute specific tasks
+  - Plugin actions to execute custom tasks
 
 ## Quickstart
 1. Ensure that Java 14 is installed (`java -version`)

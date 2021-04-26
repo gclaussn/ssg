@@ -1,9 +1,5 @@
 package com.github.gclaussn.ssg.impl;
 
-import static com.github.gclaussn.ssg.event.SiteEventType.CREATE_FILE;
-import static com.github.gclaussn.ssg.event.SiteEventType.DELETE_FILE;
-import static com.github.gclaussn.ssg.event.SiteEventType.MODIFY_FILE;
-
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -19,16 +15,13 @@ import com.github.gclaussn.ssg.Page;
 import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageSet;
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteException;
 import com.github.gclaussn.ssg.SiteGenerator;
 import com.github.gclaussn.ssg.SiteOutput;
 import com.github.gclaussn.ssg.Source;
-import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.conf.SiteConf;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteException;
-import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventStore;
-import com.github.gclaussn.ssg.event.SiteEventType;
 import com.github.gclaussn.ssg.file.SiteFileEvent;
 import com.github.gclaussn.ssg.file.SiteFileEventType;
 import com.github.gclaussn.ssg.impl.conf.SiteConfImpl;
@@ -212,73 +205,7 @@ class SiteImpl implements Site {
     return sourcePath;
   }
 
-  @Override
-  public boolean hasPage(String pageId) {
-    return pageId != null && repository.getPage(pageId) != null;
-  }
-
-  @Override
-  public boolean hasPageInclude(String pageIncludeId) {
-    return pageIncludeId != null && repository.getPageInclude(pageIncludeId) != null;
-  }
-
-  @Override
-  public boolean hasPageSet(String pageSetId) {
-    return pageSetId != null && repository.getPageSet(pageSetId) != null;
-  }
-
-  @Override
-  public boolean isLoaded() {
-    return repository.isLoaded();
-  }
-  
-  @Override
-  public List<SiteError> load() {
-    // clear stored events
-    eventStore.clear();
-
-    return repository.load();
-  }
-
-  protected SiteEventType mapEventType(SiteFileEvent fileEvent) {
-    switch (fileEvent.getType()) {
-      case CREATE:
-        return CREATE_FILE;
-      case MODIFY:
-        return MODIFY_FILE;
-      case DELETE:
-        return DELETE_FILE;
-      default:
-        throw new IllegalArgumentException(String.format("Unsupported file event type %s", fileEvent.getFileType()));
-    }
-  }
-
-  protected void modify(Source source) {
-    String sourceId = source.getId();
-
-    switch (source.getType()) {
-      case PAGE:
-        modifyPage(sourceId);
-        break;
-      case PAGE_INCLUDE:
-        modifyPageInclude(sourceId);
-        break;
-      case PAGE_SET:
-        modifyPageSet(sourceId);
-        break;
-      case SITE:
-        load();
-        break;
-      case UNKNOWN:
-        // if found, load and generate page set instead
-        Optional<String> pageSetId = repository.findPageSetId(sourceId);
-        if (pageSetId.isPresent()) {
-          modifyPageSet(pageSetId.get());
-        }
-    }
-  }
-
-  protected void modifyPage(String pageId) {
+  protected void handlePage(String pageId) {
     Optional<SiteError> error;
     Optional<PageSet> pageSet;
 
@@ -318,7 +245,7 @@ class SiteImpl implements Site {
     analyzePageSetUsage(pageSetId).stream().filter(Page::isGenerated).forEach(Page::generate);
   }
 
-  protected void modifyPageInclude(String pageIncludeId) {
+  protected void handlePageInclude(String pageIncludeId) {
     Queue<String> queue = new LinkedList<>(Collections.singletonList(pageIncludeId));
 
     List<SiteError> errors = repository.loadPageIncludes(queue);
@@ -329,7 +256,7 @@ class SiteImpl implements Site {
     analyzePageIncludeUsage(pageIncludeId).stream().filter(Page::isGenerated).forEach(Page::generate);
   }
 
-  protected void modifyPageSet(String pageSetId) {
+  protected void handlePageSet(String pageSetId) {
     List<SiteError> errors;
 
     // load
@@ -351,36 +278,86 @@ class SiteImpl implements Site {
     analyzePageSetUsage(pageSetId).stream().filter(Page::isGenerated).forEach(Page::generate);
   }
 
-  @Override
-  public void onEvent(SiteFileEvent event) {
-    switch (event.getFileType()) {
-      case YAML:
-      case JADE:
-      case MD:
-        // are supported
-        break;
-      default:
-        // ignore events with file types other than YAML or JADE
-        return;
-    }
-
-    eventStore.onEvent(event);
-
-    // try to determine, what source (site, page, page include, page set) is affected
-    Source source = repository.getSource(event.getPath());
-
-    SiteEvent.builder()
-        .type(mapEventType(event))
-        .source(source)
-        .reference(event.getPath().toString())
-        .buildAndPublish(conf::publish);
-
-    if (source.getType() == SourceType.SITE && event.getType() == SiteFileEventType.DELETE) {
+  protected void handleSite(SiteFileEvent event) {
+    if (event.getType() == SiteFileEventType.DELETE) {
       // ignore deletion of site.yaml
       return;
     }
 
-    modify(source);
+    load();
+  }
+
+  protected void handleSource(SiteFileEvent event) {
+    // try to determine, what source (site, page, page include, page set) is affected
+    Source source = repository.getSource(event.getPath());
+
+    String sourceId = source.getId();
+
+    switch (source.getType()) {
+      case PAGE:
+        handlePage(sourceId);
+        break;
+      case PAGE_INCLUDE:
+        handlePageInclude(sourceId);
+        break;
+      case PAGE_SET:
+        handlePageSet(sourceId);
+        break;
+      case UNKNOWN:
+        // if found, load and generate page set instead
+        Optional<String> pageSetId = repository.findPageSetId(sourceId);
+        if (pageSetId.isPresent()) {
+          handlePageSet(pageSetId.get());
+        }
+    }
+  }
+
+  @Override
+  public boolean hasPage(String pageId) {
+    return pageId != null && repository.getPage(pageId) != null;
+  }
+
+  @Override
+  public boolean hasPageInclude(String pageIncludeId) {
+    return pageIncludeId != null && repository.getPageInclude(pageIncludeId) != null;
+  }
+
+  @Override
+  public boolean hasPageSet(String pageSetId) {
+    return pageSetId != null && repository.getPageSet(pageSetId) != null;
+  }
+
+  @Override
+  public boolean isLoaded() {
+    return repository.isLoaded();
+  }
+
+  @Override
+  public List<SiteError> load() {
+    // clear stored events
+    eventStore.clear();
+
+    return repository.load();
+  }
+
+  /**
+   * Handles the modification of source files.
+   */
+  @Override
+  public void onEvent(SiteFileEvent event) {
+    conf.publish(event);
+
+    if (event.isPublic()) {
+      // do not handle public files any further
+      // since loading and generating does not depend on public files
+      return;
+    }
+
+    if (event.isSource()) {
+      handleSource(event);
+    } else {
+      handleSite(event);
+    }
   }
 
   @Override

@@ -40,7 +40,7 @@ export default class PageView extends React.Component {
   }
 
   _onEvent = (event) => {
-    if (event.hasError()) {
+    if (!event.path && event.hasError()) {
       return;
     }
 

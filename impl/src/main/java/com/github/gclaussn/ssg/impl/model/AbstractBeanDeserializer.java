@@ -18,7 +18,6 @@ import com.github.gclaussn.ssg.conf.TypeLookup;
  * Generic deserializer for beans.<br>
  * Each YAML object node must contain these three fields:
  * <ul>
- *   <li>"id": ID of the bean</li>
  *   <li>"class": Class name of implementation type (fully or simple, if it is a default implementation)</li>
  *   <li>"model": Object node, used deserialize the implementation type</li>
  * </ul>
@@ -29,7 +28,6 @@ import com.github.gclaussn.ssg.conf.TypeLookup;
  */
 abstract class AbstractBeanDeserializer<T, I> extends JsonDeserializer<T> {
 
-  protected static final String FIELD_ID = "id";
   protected static final String FIELD_CLASS = "class";
   protected static final String FIELD_MODEL = "model";
 
@@ -44,11 +42,12 @@ abstract class AbstractBeanDeserializer<T, I> extends JsonDeserializer<T> {
 
   @Override
   public T deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    String id = ctxt.getParser().getCurrentName();
+
     ObjectCodec oc = p.getCodec();
 
     JsonNode jsonNode = oc.readTree(p);
 
-    String id = getId(jsonNode);
     String implClassName = getImplClassName(jsonNode);
 
     Class<? extends I> implClass = lookup(implClassName);
@@ -93,19 +92,6 @@ abstract class AbstractBeanDeserializer<T, I> extends JsonDeserializer<T> {
 
   private RuntimeException fieldNotTextual(String fieldName) {
     return new RuntimeException(format("Field '%s' field must be textual", fieldName));
-  }
-
-  protected String getId(JsonNode jsonNode) {
-    if (!jsonNode.has(FIELD_ID)) {
-      throw fieldNotSet(FIELD_ID);
-    }
-
-    JsonNode idNode = jsonNode.get(FIELD_ID);
-    if (!idNode.isTextual()) {
-      throw fieldNotTextual(FIELD_ID);
-    }
-
-    return idNode.asText();
   }
 
   protected String getImplClassName(JsonNode jsonNode) {

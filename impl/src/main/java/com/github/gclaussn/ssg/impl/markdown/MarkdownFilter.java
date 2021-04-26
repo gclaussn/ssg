@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.SiteGeneratorFn;
 import com.vladsch.flexmark.ext.admonition.AdmonitionExtension;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 
@@ -13,8 +15,35 @@ import de.neuland.jade4j.filter.Filter;
 import de.neuland.jade4j.parser.node.Attr;
 
 /**
- * Custom markdown Jade filter, which renders markdown code and is able to resolve page links e.g.:
- * {@code [My link](<pageId>) -> <a href="<pageUrl>">My link</a>}
+ * Custom Jade filter, which renders Markdown code. This filter can be used in a Jade template via
+ * {@link SiteGeneratorFn#renderMarkdown(String)}:
+ * 
+ * <pre>
+ * :markdown
+ *   # h1
+ *   
+ *   - x
+ *   - y
+ *   - z
+ * </pre>
+ * 
+ * or
+ * 
+ * <pre>
+ * !{_fn.renderMarkdown(_md)}
+ * </pre>
+ * 
+ * Moreover the filter is able to resolve page links e.g.:
+ * 
+ * <pre>
+ * [My link](%pageId%)
+ * </pre>
+ * 
+ * will result in:
+ * 
+ * <pre>
+ * <a href="%pageUrl%">My link</a>
+ * </pre>
  */
 public class MarkdownFilter implements Filter {
 
@@ -23,13 +52,14 @@ public class MarkdownFilter implements Filter {
 
   public MarkdownFilter(Site site) {
     AdmonitionExtension admonitionExtension = AdmonitionExtension.create();
+    TablesExtension tablesExtension = TablesExtension.create();
 
     parser = Parser.builder()
-        .extensions(Arrays.asList(admonitionExtension))
+        .extensions(Arrays.asList(admonitionExtension, tablesExtension))
         .build();
 
     renderer = HtmlRenderer.builder()
-        .extensions(Arrays.asList(admonitionExtension, new PageLinkExtension(site)))
+        .extensions(Arrays.asList(admonitionExtension, tablesExtension, new PageLinkExtension(site)))
         .build();
   }
 

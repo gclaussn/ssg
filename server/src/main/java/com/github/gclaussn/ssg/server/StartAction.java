@@ -123,7 +123,7 @@ public class StartAction implements SitePluginAction {
     LOGGER.info("Serving api:  {}/api", uri);
 
     // start file watcher
-    siteFileWatcher.start(site);
+    siteFileWatcher.start();
 
     // add shutdown hook that notifies the waiting main thread
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {

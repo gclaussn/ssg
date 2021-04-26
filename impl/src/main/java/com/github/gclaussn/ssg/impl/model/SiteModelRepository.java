@@ -3,7 +3,6 @@ package com.github.gclaussn.ssg.impl.model;
 import static com.github.gclaussn.ssg.SourceType.PAGE;
 import static com.github.gclaussn.ssg.SourceType.PAGE_INCLUDE;
 import static com.github.gclaussn.ssg.SourceType.PAGE_SET;
-import static com.github.gclaussn.ssg.SourceType.SITE;
 import static com.github.gclaussn.ssg.SourceType.UNKNOWN;
 import static com.github.gclaussn.ssg.event.SiteEventType.LOAD_PAGE;
 import static com.github.gclaussn.ssg.event.SiteEventType.LOAD_PAGE_INCLUDE;
@@ -44,12 +43,12 @@ import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageProcessorBean;
 import com.github.gclaussn.ssg.PageSet;
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteException;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataBuilder;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventBuilder;
 import com.github.gclaussn.ssg.impl.markdown.MarkdownFile;
@@ -189,11 +188,6 @@ public class SiteModelRepository implements AutoCloseable {
   protected String extractId(Path path) {
     String relativePath = site.getSourcePath().relativize(path).toString();
 
-    if (relativePath.startsWith("..")) {
-      // in case of site.yaml
-      return null;
-    }
-
     int index;
 
     index = relativePath.lastIndexOf('.');
@@ -235,6 +229,15 @@ public class SiteModelRepository implements AutoCloseable {
     return Optional.empty();
   }
 
+  /**
+   * Tries to find the page set, the page with the given ID belongs to.<br>
+   * This method is called when the page's Markdown, Jade or YAML file was modified, but the page
+   * itself is not loaded - either the page is new, or there was an previous model related error.
+   * 
+   * @param pageId A specific page ID.
+   * 
+   * @return The ID of the page set or an empty optional.
+   */
   public Optional<String> findPageSetId(String pageId) {
     // use page ID as intial value
     String pageSetId = pageId;
@@ -304,9 +307,7 @@ public class SiteModelRepository implements AutoCloseable {
    * @return The source type or {@link SourceType#UNKNOWN}, if the given source is not known.
    */
   protected SourceType getSourceType(String id) {
-    if (id == null) {
-      return SITE;
-    } else if (pages.containsKey(id)) {
+    if (pages.containsKey(id)) {
       return PAGE;
     } else if (pageIncludes.containsKey(id)) {
       return PAGE_INCLUDE;
@@ -398,7 +399,7 @@ public class SiteModelRepository implements AutoCloseable {
     String outputName = orElse(model.outputName, HTML.appendTo(pageId));
 
     PageImpl page = new PageImpl(site);
-    page.dataSelectors = orElse(model.dataSelectors, Collections::emptyList);
+    page.dataSelectors = toList(model.dataSelectors);
     page.id = pageId;
     page.includes = orElse(model.includes, Collections::emptySet);
     page.markdown = model.markdown;
@@ -454,7 +455,7 @@ public class SiteModelRepository implements AutoCloseable {
     String outputName = orElse(model.outputName, buildOutputName(pageSet, pageId));
 
     PageImpl page = new PageImpl(site);
-    page.dataSelectors = orElse(model.dataSelectors, Collections::emptyList);
+    page.dataSelectors = toList(model.dataSelectors);
     page.id = pageId;
     page.includes = orElse(model.includes, pageSet.includes);
     page.markdown = model.markdown;
@@ -587,12 +588,12 @@ public class SiteModelRepository implements AutoCloseable {
     PageSetImpl pageSet = new PageSetImpl(site);
     pageSet.basePath = model.basePath;
     pageSet.data = model.data != null ? PageData.of(model.data) : PageData.empty();
-    pageSet.dataSelectors = orElse(model.dataSelectors, Collections::emptyList);
-    pageSet.filters = orElse(model.filters, Collections::emptyList);
+    pageSet.dataSelectors = toList(model.dataSelectors);
+    pageSet.filters = toList(model.filters);
     pageSet.id = pageSetId;
     pageSet.includes = orElse(model.includes, Collections::emptySet);
     pageSet.pages = new LinkedHashSet<>();
-    pageSet.processors = orElse(model.processors, Collections::emptyList);
+    pageSet.processors = toList(model.processors);
     pageSet.templateName = JADE.appendTo(pageSetId);
     pageSet.skip = orElse(model.skip, Boolean.FALSE);
 
@@ -724,7 +725,7 @@ public class SiteModelRepository implements AutoCloseable {
     try {
       return objectMapper.readValue(filePath.toFile(), SiteModel.class);
     } catch (IOException e) {
-      throw SiteError.builder(site).source(SITE, null).errorModelNotRead(e).toException();
+      throw SiteError.builder(site).source(null, null).errorModelNotRead(e).toException();
     }
   }
 
@@ -748,5 +749,9 @@ public class SiteModelRepository implements AutoCloseable {
     pages.clear();
     pageIncludes.clear();
     pageSets.clear();
+  }
+
+  private <T> List<T> toList(Map<String, T> map) {
+    return map != null ? new LinkedList<>(map.values()) : Collections.emptyList();
   }
 }

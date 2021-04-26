@@ -4,12 +4,14 @@ import static com.github.gclaussn.ssg.test.CustomMatcher.isDirectory;
 import static com.github.gclaussn.ssg.test.CustomMatcher.isFile;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -18,6 +20,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.npm.NodePackageManager;
 
 public class DefaultPluginTest {
@@ -44,8 +47,13 @@ public class DefaultPluginTest {
 
     site.getPluginManager().execute("init", properties);
 
-    site.load();
-    site.generate();
+    List<SiteError> errors;
+
+
+    errors = site.load();
+    assertThat(errors, hasSize(0));
+    errors = site.generate();
+    assertThat(errors, hasSize(0));
 
     Path target = Files.createDirectories(site.getPath().resolve("target"));
 

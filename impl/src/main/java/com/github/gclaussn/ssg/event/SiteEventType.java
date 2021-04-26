@@ -6,11 +6,6 @@ public enum SiteEventType {
   LOAD_SITE,
   GENERATE_SITE,
 
-  // Site file events
-  CREATE_FILE,
-  MODIFY_FILE,
-  DELETE_FILE,
-
   // Source related events
   LOAD_PAGE,
   LOAD_PAGE_INCLUDE,

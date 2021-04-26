@@ -1,4 +1,4 @@
-package com.github.gclaussn.ssg.impl.error;
+package com.github.gclaussn.ssg.impl;
 
 import static com.github.gclaussn.ssg.file.SiteFileType.MD;
 import static com.github.gclaussn.ssg.file.SiteFileType.YAML;
@@ -13,11 +13,11 @@ import java.util.ResourceBundle;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteErrorBuilder;
+import com.github.gclaussn.ssg.SiteErrorType;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteErrorBuilder;
-import com.github.gclaussn.ssg.error.SiteErrorType;
 import com.github.gclaussn.ssg.impl.model.SourceImpl;
 
 import de.neuland.jade4j.exceptions.JadeException;
@@ -180,6 +180,10 @@ public class SiteErrorBuilderImpl implements SiteErrorBuilder {
   }
 
   protected String getModelName() {
+    if (error.source.getType() == null) {
+      return "Site";
+    }
+
     switch (error.source.getType()) {
       case PAGE:
         return "Page";
@@ -187,15 +191,13 @@ public class SiteErrorBuilderImpl implements SiteErrorBuilder {
         return "Page include";
       case PAGE_SET:
         return "Page set";
-      case SITE:
-        return "Site";
       default:
         return "Unknown";
     }
   }
 
   protected Path getModelPath() {
-    if (error.source.getType() == SourceType.SITE) {
+    if (error.source.getType() == null) {
       return site.getPath().resolve(Site.MODEL_NAME);
     }
 

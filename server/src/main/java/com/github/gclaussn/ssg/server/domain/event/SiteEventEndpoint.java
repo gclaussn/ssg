@@ -17,12 +17,15 @@ import javax.websocket.Session;
 
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.file.SiteFileEvent;
+import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.file.SiteFileType;
+import com.github.gclaussn.ssg.server.domain.SiteErrorDTO;
+import com.github.gclaussn.ssg.server.domain.SiteErrorLocationDTO;
 import com.github.gclaussn.ssg.server.domain.SourceCodeDTO;
-import com.github.gclaussn.ssg.server.domain.error.SiteErrorDTO;
-import com.github.gclaussn.ssg.server.domain.error.SiteErrorLocationDTO;
+import com.github.gclaussn.ssg.server.domain.file.SiteFileEventDTO;
 
-public class SiteEventEndpoint implements SiteEventListener, AutoCloseable {
+public class SiteEventEndpoint implements SiteEventListener, SiteFileEventListener, AutoCloseable {
 
   private final Map<String, Session> sessions;
 
@@ -111,6 +114,13 @@ public class SiteEventEndpoint implements SiteEventListener, AutoCloseable {
       // enrich error
       error.setSourceCode(sourceCode);
     }
+
+    sessions.values().stream().filter(Session::isOpen).forEach(session -> session.getAsyncRemote().sendObject(data));
+  }
+
+  @Override
+  public void onEvent(SiteFileEvent event) {
+    SiteFileEventDTO data = SiteFileEventDTO.of(event);
 
     sessions.values().stream().filter(Session::isOpen).forEach(session -> session.getAsyncRemote().sendObject(data));
   }

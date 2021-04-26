@@ -17,9 +17,8 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.SourceType;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteErrorType;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteErrorType;
 
 public class SitesTest {
 
@@ -45,7 +44,7 @@ public class SitesTest {
     assertThat(error.getMessage(), notNullValue());
     assertThat(error.getSource().isPresent(), is(true));
     assertThat(error.getSource().get().getId(), nullValue());
-    assertThat(error.getSource().get().getType(), is(SourceType.SITE));
+    assertThat(error.getSource().get().getType(), nullValue());
     assertThat(error.getLocation().isPresent(), is(true));
     assertThat(error.getLocation().get().getPath(), equalTo(sitePath.resolve(Site.MODEL_NAME)));
     assertThat(error.getLocation().get().getLine(), is(1));
@@ -69,7 +68,7 @@ public class SitesTest {
     assertThat(error.getMessage(), notNullValue());
     assertThat(error.getSource().isPresent(), is(true));
     assertThat(error.getSource().get().getId(), nullValue());
-    assertThat(error.getSource().get().getType(), is(SourceType.SITE));
+    assertThat(error.getSource().get().getType(), nullValue());
     assertThat(error.getLocation().isPresent(), is(true));
     assertThat(error.getLocation().get().getPath(), equalTo(sitePath.resolve(Site.MODEL_NAME)));
     assertThat(error.getLocation().get().getLine(), is(-1));

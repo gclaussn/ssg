@@ -1,204 +1,204 @@
 package com.github.gclaussn.ssg.server.file;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-
 import java.io.IOException;
-import java.nio.file.ClosedWatchServiceException;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.file.SiteFileEventType;
 import com.github.gclaussn.ssg.file.SiteFileType;
 
-@SuppressWarnings("unchecked")
-class SiteFileWatcherImpl extends AbstractFileWatcher implements Runnable {
+class SiteFileWatcherImpl implements SiteFileWatcher, Runnable, ThreadFactory {
 
-  private static final long TIMEOUT = 100L;
+  private static final Logger LOGGER = LoggerFactory.getLogger(SiteFileWatcherImpl.class);
 
-  /** Array of event kinds, which should be watched. */
-  private static final WatchEvent.Kind<Path>[] EVENTS;
+  private static final long POLL_PERIOD = 500L;
 
-  static {
-    EVENTS = (WatchEvent.Kind<Path>[]) new WatchEvent.Kind[3];
-    EVENTS[0] = ENTRY_CREATE;
-    EVENTS[1] = ENTRY_MODIFY;
-    EVENTS[2] = ENTRY_DELETE;
+  /** The site to overwatch. */
+  private final Site site;
+
+  /** The event listener to inform, separated from the {@link #site} field for better testing. */
+  private final SiteFileEventListener fileEventListener;
+
+  private final Path siteModelPath;
+
+  private SiteFile siteModel;
+  private SiteDirectory sourceDirectory;
+  private SiteDirectory publicDirectory;
+
+  private final Set<SiteFile> changeSet;
+
+  private ScheduledExecutorService executorService;
+
+  private boolean createdOnly;
+
+  SiteFileWatcherImpl(Site site) {
+    this(site, site);
   }
 
-  private final Map<WatchKey, Path> keys;
+  protected SiteFileWatcherImpl(Site site, SiteFileEventListener fileEventListener) {
+    this.site = site;
+    this.fileEventListener = fileEventListener;
 
-  /** The watch service instance, if started (see {@link #start()}). Otherwise {@code null}. */
-  private WatchService watchService;
+    siteModelPath = site.getPath().resolve(Site.MODEL_NAME);
 
-  SiteFileWatcherImpl() {
-    keys = new HashMap<>();
+    changeSet = new TreeSet<>();
   }
 
-  @Override
-  protected void doStart() {
-    Objects.requireNonNull(eventListeners, "event listeners are null");
-
-    try {
-      watchService = FileSystems.getDefault().newWatchService();
-    } catch (UnsupportedOperationException e) {
-      throw new RuntimeException("File watch service is not supported by this file system", e);
-    } catch (IOException e) {
-      throw new RuntimeException("File watch service could not be created", e);
-    }
-
-    try {
-      // register directory of site.yaml
-      WatchKey key = site.getPath().register(watchService, EVENTS);
-      keys.put(key, site.getPath());
-
-      // register source directory recursively
-      Files.walkFileTree(site.getSourcePath(), new DirectoryWalker());
-    } catch (IOException e) {
-      throw new RuntimeException("Directories could not be registered at file watch service", e);
-    }
-
-    new Thread(this, THREAD_NAME).start();
-  }
-
-  @Override
-  protected void doStop() {
-    IOUtils.closeQuietly(watchService);
-  }
-
-  @Override
-  public SiteFileWatcherType getType() {
-    return SiteFileWatcherType.WATCHER_SERVICE;
-  }
-
-  protected void handleEvent(WatchEvent<?> event, WatchKey key, long timestamp) throws IOException {
-    Path context = (Path) event.context();
-
-    // get directory related to watch key
-    Path directory = keys.get(key);
-
-    // resolve the path of the current event
-    Path path = directory.resolve(context);
-    if (directory.equals(site.getPath()) && !context.toString().equals(Site.MODEL_NAME)) {
-      // ignore all files beside site.yaml
-      return;
-    }
-
-    SiteFileEventType fileEventType = mapFileEventType(event);
-    if (fileEventType == null) {
-      // ignore events with unknown type
-      return;
-    }
-
-    if (Files.isDirectory(path)) {
-      if (fileEventType == SiteFileEventType.CREATE) {
-        // register newly created directory and possible sub directories
-        Files.walkFileTree(path, new DirectoryWalker());
-      }
-
-      // directory events will not be published
-      return;
-    }
+  protected void handleEvent(SiteFile file) {
+    Path path = file.path;
 
     SiteFileEventImpl siteFileEvent = new SiteFileEventImpl();
-    siteFileEvent.fileType = SiteFileType.of(path);
+    siteFileEvent.fileType = SiteFileType.of(file.path);
     siteFileEvent.path = path;
-    siteFileEvent.timestamp = timestamp;
-    siteFileEvent.type = fileEventType;
+    siteFileEvent.timestamp = file.lastModifiedTime;
 
-    for (SiteFileEventListener eventListener : eventListeners) {
-      try {
-        eventListener.onEvent(siteFileEvent);
-      } catch (Exception e) {
-        logger.error("Site file event could not be handled", e);
-      }
+    if (path.startsWith(site.getSourcePath())) {
+      siteFileEvent.isSource = true;
+    } else if (!path.equals(siteModelPath)) {
+      siteFileEvent.isPublic = true;
+    }
+
+    if (createdOnly) {
+      siteFileEvent.type = SiteFileEventType.CREATE;
+    } else if (file.deleted) {
+      siteFileEvent.type = SiteFileEventType.DELETE;
+    } else {
+      siteFileEvent.type = SiteFileEventType.MODIFY;
+    }
+
+    try {
+      fileEventListener.onEvent(siteFileEvent);
+    } catch (Exception e) {
+      LOGGER.error("Site file event could not be handled", e);
     }
   }
 
-  protected SiteFileEventType mapFileEventType(WatchEvent<?> event) {
-    if (event.kind() == ENTRY_CREATE) {
-      return SiteFileEventType.CREATE;
-    } else if (event.kind() == ENTRY_MODIFY) {
-      return SiteFileEventType.MODIFY;
-    } else if (event.kind() == ENTRY_DELETE) {
-      return SiteFileEventType.DELETE;
-    } else {
-      return null;
-    }
+  protected boolean isStarted() {
+    return executorService != null;
+  }
+
+  @Override
+  public Thread newThread(Runnable r) {
+    return new Thread(r, THREAD_NAME);
   }
 
   @Override
   public void run() {
+    changeSet.clear();
+
+    // poll source directory
     try {
-      WatchKey key;
-      while ((key = watchService.take()) != null) {
-        // sleep between take() and pollEvents() to eliminate duplicates
-        TimeUnit.MILLISECONDS.sleep(TIMEOUT);
-
-        long timestamp = Instant.now().toEpochMilli();
-        for (WatchEvent<?> event : key.pollEvents()) {
-          handleEvent(event, key, timestamp);
-        }
-
-        if (!key.isValid()) {
-          key.cancel();
-
-          keys.remove(key);
-        } else {
-          key.reset();
-        }
-      }
-    } catch (ClosedWatchServiceException e) {
-      // ignore exception that occurs when watch service is closed
-      return;
-    } catch (InterruptedException e) {
-      // stop when the thread is interrupted
-      return;
+      sourceDirectory.poll(changeSet, createdOnly);
     } catch (IOException e) {
-      throw new RuntimeException("File watch event could not be processed", e);
-    } finally {
-      keys.clear();
+      throw new RuntimeException(String.format("Source directory '%s' could not be polled", Site.SOURCE), e);
+    }
 
-      IOUtils.closeQuietly(watchService);
+    // poll public directory
+    try {
+      publicDirectory.poll(changeSet, createdOnly);
+    } catch (IOException e) {
+      throw new RuntimeException(String.format("Public directory '%s' could not be polled", Site.PUBLIC), e);
+    }
 
-      watchService = null;
+    // poll site model file
+    try {
+      if (siteModel.poll()) {
+        changeSet.add(siteModel);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(String.format("File '%s' could not be polled", Site.MODEL_NAME), e);
+    }
+
+    // handle change set
+    changeSet.forEach(this::handleEvent);
+
+    createdOnly = !createdOnly;
+  }
+
+  /**
+   * Performans an inital run that fetches source directories and the last modified time of all
+   * currently existing source files and the site model file (site.yaml).
+   */
+  protected void runInitially() {
+    siteModel = new SiteFile(siteModelPath);
+    sourceDirectory = new SiteDirectory(site.getSourcePath(), false);
+    publicDirectory = new SiteDirectory(site.getPublicPath(), false);
+
+    try {
+      sourceDirectory.poll(changeSet, true);
+    } catch (IOException e) {
+      throw new RuntimeException(String.format("Source directory '%s' could not be polled", Site.SOURCE), e);
+    }
+
+    try {
+      publicDirectory.poll(changeSet, true);
+    } catch (IOException e) {
+      throw new RuntimeException(String.format("Public directory '%s' could not be polled", Site.PUBLIC), e);
+    }
+
+    try {
+      siteModel.poll();
+    } catch (IOException e) {
+      throw new RuntimeException(String.format("File '%s' could not be polled", Site.MODEL_NAME), e);
+    }
+
+    createdOnly = true;
+  }
+
+  @Override
+  public void start() {
+    if (isStarted()) {
+      return;
+    }
+
+    // initial run
+    runInitially();
+
+    try {
+      executorService = Executors.newScheduledThreadPool(1, this);
+      executorService.scheduleAtFixedRate(this, POLL_PERIOD, POLL_PERIOD, TimeUnit.MILLISECONDS);
+    } catch (RuntimeException e) {
+      executorService = null;
+    }
+
+    if (isStarted()) {
+      LOGGER.info("Started file watcher for site '{}'", site.getPath());
     }
   }
 
   @Override
-  protected boolean isStarted() {
-    return watchService != null;
-  }
-
-  private class DirectoryWalker extends SimpleFileVisitor<Path> {
-
-    /**
-     * Registers the directory and stores the watch key within a map. The related directory is required
-     * for resolving the path of a watch event.
-     */
-    @Override
-    public FileVisitResult preVisitDirectory(Path directory, BasicFileAttributes attrs) throws IOException {
-      WatchKey key = directory.register(watchService, EVENTS);
-      keys.put(key, directory);
-
-      return FileVisitResult.CONTINUE;
+  public void stop() {
+    if (!isStarted()) {
+      return;
     }
+
+
+    if (executorService == null) {
+      return;
+    }
+
+    try {
+      executorService.shutdown();
+      executorService.awaitTermination(POLL_PERIOD, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      // ignore exception
+    } finally {
+      executorService = null;
+    }
+
+    sourceDirectory.clear();
+    publicDirectory.clear();
+
+    LOGGER.info("Stopped file watcher for site '{}'", site.getPath());
   }
 }

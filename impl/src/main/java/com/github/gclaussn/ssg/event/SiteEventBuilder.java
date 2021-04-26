@@ -2,9 +2,9 @@ package com.github.gclaussn.ssg.event;
 
 import java.util.function.Consumer;
 
+import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;
-import com.github.gclaussn.ssg.error.SiteError;
 
 public interface SiteEventBuilder {
 

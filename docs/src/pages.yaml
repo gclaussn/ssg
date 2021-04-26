@@ -4,19 +4,43 @@ data:
     menus:
       - label: Getting Started
         items:
-          - introduction
+          - introduction1
           - configuration
           - type-script-support
       - label: Guides
         items:
+          - xxx
           - label: Docs
             items:
               - introduction
               - sidebar
               - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
+              - versioning
 dataSelectors:
-  - id: pages
+  pages:
     class: PageSetMapper
     model:
       pageSetId: pages
       key: _subId
+      includes:
+        - _url
+        - title

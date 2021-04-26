@@ -2,8 +2,8 @@ package com.github.gclaussn.ssg.event;
 
 import java.util.Optional;
 
+import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.Source;
-import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.impl.event.SiteEventBuilderImpl;
 
 public interface SiteEvent {

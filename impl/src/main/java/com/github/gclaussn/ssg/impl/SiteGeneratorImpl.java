@@ -19,13 +19,13 @@ import org.apache.commons.io.FileUtils;
 import com.github.gclaussn.ssg.Page;
 import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageSet;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteException;
 import com.github.gclaussn.ssg.SiteGenerator;
 import com.github.gclaussn.ssg.SiteGeneratorFn;
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataBuilder;
 import com.github.gclaussn.ssg.data.PageDataSelectorBean;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventBuilder;
 import com.github.gclaussn.ssg.event.SiteEventType;
@@ -231,8 +231,10 @@ class SiteGeneratorImpl implements SiteGenerator {
     }
 
     if (error != null) {
-      eventBuilder.error(error).buildAndPublish(this::publish);
+      eventBuilder.error(error);
     }
+
+    eventBuilder.buildAndPublish(this::publish);
 
     return Optional.ofNullable(error);
   }

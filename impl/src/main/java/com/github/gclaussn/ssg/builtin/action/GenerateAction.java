@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.error.SiteError;
+import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.plugin.SitePluginException;
 import com.github.gclaussn.ssg.plugin.SitePluginAction;
 

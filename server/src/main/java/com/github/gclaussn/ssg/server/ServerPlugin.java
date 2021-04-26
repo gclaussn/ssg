@@ -14,8 +14,9 @@ public class ServerPlugin implements SitePlugin {
 
   @Override
   public void preBuild(SiteBuilder builder) {
-    // register event WebSocket endpoint as event listener
+    // register (Websocket) event endpoint as listener
     builder.addEventListener(eventEndpoint);
+    builder.addFileEventListener(eventEndpoint);
 
     // make websocket endpoint availabe for the start action
     builder.setProperty(StartAction.SITE_EVENT_ENDPOINT, eventEndpoint);

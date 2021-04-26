@@ -1,4 +1,5 @@
 site.yaml
+src/index.jade
 src/index.yaml
 pub/index.css
 node_modules/test/styles.css

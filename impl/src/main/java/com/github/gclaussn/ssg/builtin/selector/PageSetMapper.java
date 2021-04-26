@@ -2,6 +2,7 @@ package com.github.gclaussn.ssg.builtin.selector;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.github.gclaussn.ssg.Page;
@@ -16,7 +17,10 @@ public class PageSetMapper implements PageDataSelector {
 
   protected String key;
 
-  private Site site;
+  protected Set<String> excludes;
+  protected Set<String> includes;
+
+  private transient Site site;
 
   @Override
   public void init(Site site) {
@@ -38,7 +42,7 @@ public class PageSetMapper implements PageDataSelector {
         .filter(p -> !p.isRejected())
         // get root map from page data
         .map(p -> p.getData().getRootMap())
-        // collect
+        // collect in map
         .collect(Collectors.toMap(this::mapKey, this::mapValue));
   }
 
@@ -47,6 +51,13 @@ public class PageSetMapper implements PageDataSelector {
   }
 
   protected Object mapValue(Map<String, Object> data) {
+    if (excludes != null) {
+      data.keySet().removeAll(excludes);
+    }
+    if (includes != null) {
+      data.keySet().removeIf(key -> !includes.contains(key));
+    }
+
     return data;
   }
 }

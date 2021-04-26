@@ -11,6 +11,8 @@ import com.github.gclaussn.ssg.SiteBuilder;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.file.SiteFileEvent;
+import com.github.gclaussn.ssg.file.SiteFileEventListener;
 
 /**
  * Configuration, used to load and generate the {@link Site}.<br>
@@ -56,6 +58,8 @@ public interface SiteConf {
 
   Set<Object> getExtensions();
 
+  List<SiteFileEventListener> getFileEventListeners();
+
   Set<Class<? extends PageDataSelector>> getPageDataSelectorTypes();
 
   Set<Class<? extends PageFilter>> getPageFilterTypes();
@@ -80,4 +84,6 @@ public interface SiteConf {
   <T> T inject(T instance, Map<String, Object> additionalProperties);
 
   void publish(SiteEvent event);
+
+  void publish(SiteFileEvent event);
 }

@@ -7,6 +7,7 @@ import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.plugin.SitePluginAction;
 
 /**
@@ -34,6 +35,16 @@ public interface SiteBuilder {
    * @return The builder.
    */
   SiteBuilder addExtension(Object extension);
+
+  /**
+   * Adds a file event listener that is notified when a file is created, modified or deleted within
+   * the site's source ({@code src/} or public ({@code pub/}) directory.
+   * 
+   * @param fileEventListener A file event listener to register.
+   * 
+   * @return The builder.
+   */
+  SiteBuilder addFileEventListener(SiteFileEventListener fileEventListener);
 
   SiteBuilder addPageDataSelector(Class<? extends PageDataSelector> pageDataSelectorType);
 

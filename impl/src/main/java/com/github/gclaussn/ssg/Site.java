@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.github.gclaussn.ssg.conf.SiteConf;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventStore;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;

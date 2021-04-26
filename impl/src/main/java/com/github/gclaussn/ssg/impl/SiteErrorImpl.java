@@ -1,12 +1,12 @@
-package com.github.gclaussn.ssg.impl.error;
+package com.github.gclaussn.ssg.impl;
 
 import java.util.Optional;
 
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteErrorLocation;
+import com.github.gclaussn.ssg.SiteErrorType;
+import com.github.gclaussn.ssg.SiteException;
 import com.github.gclaussn.ssg.Source;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteErrorLocation;
-import com.github.gclaussn.ssg.error.SiteErrorType;
-import com.github.gclaussn.ssg.error.SiteException;
 
 class SiteErrorImpl implements SiteError {
 

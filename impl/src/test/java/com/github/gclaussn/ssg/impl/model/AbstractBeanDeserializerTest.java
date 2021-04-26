@@ -1,18 +1,21 @@
 package com.github.gclaussn.ssg.impl.model;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -63,50 +66,26 @@ public class AbstractBeanDeserializerTest {
 
   @Test
   public void testDeserialize() throws JsonProcessingException {
-    ObjectNode jsonNode = JsonNodeFactory.instance.objectNode();
-    jsonNode.put(AbstractBeanDeserializer.FIELD_ID, "test");
-    jsonNode.put(AbstractBeanDeserializer.FIELD_CLASS, PageSetSelector.class.getSimpleName());
-    jsonNode.set(AbstractBeanDeserializer.FIELD_MODEL, JsonNodeFactory.instance.objectNode());
+    ObjectNode dataSelectors = JsonNodeFactory.instance.objectNode();
 
-    PageDataSelectorBeanImpl bean = objectMapper.treeToValue(jsonNode, PageDataSelectorBeanImpl.class);
-    assertThat(bean, notNullValue());
-    assertThat(bean.getId(), equalTo(jsonNode.get(AbstractBeanDeserializer.FIELD_ID).asText()));
+    ObjectNode dataSelector = dataSelectors.putObject("test");
+    dataSelector.put(AbstractBeanDeserializer.FIELD_CLASS, PageSetSelector.class.getSimpleName());
+    dataSelector.set(AbstractBeanDeserializer.FIELD_MODEL, JsonNodeFactory.instance.objectNode());
+
+    TypeReference<Map<String, PageDataSelectorBeanImpl>> typeRef = new TypeReference<Map<String, PageDataSelectorBeanImpl>>() {};
+    Map<String, PageDataSelectorBeanImpl> beans = objectMapper.readValue(dataSelectors.toString(), typeRef);
+    assertThat(beans, notNullValue());
+    assertThat(beans.size(), is(1));
+    assertThat(beans.get("test"), notNullValue());
+    assertThat(beans.get("test").getId(), equalTo("test"));
   }
 
   @Test(expected = RuntimeException.class)
   public void testDeserializeClassNotFound() throws JsonProcessingException {
     ObjectNode jsonNode = JsonNodeFactory.instance.objectNode();
-    jsonNode.put(AbstractBeanDeserializer.FIELD_ID, "test");
     jsonNode.put(AbstractBeanDeserializer.FIELD_CLASS, "org.example.Impl");
-    jsonNode.put(AbstractBeanDeserializer.FIELD_MODEL, Boolean.TRUE);
 
     objectMapper.treeToValue(jsonNode, PageDataSelectorBeanImpl.class);
-  }
-
-  @Test
-  public void testGetId() {
-    ObjectNode jsonNode = JsonNodeFactory.instance.objectNode();
-
-    try {
-      deserializer.getId(jsonNode);
-      fail("should throw RuntimeException");
-    } catch (RuntimeException e) {
-      assertThat(e.getMessage(), notNullValue());
-    }
-
-    jsonNode.put(AbstractBeanDeserializer.FIELD_ID, Boolean.TRUE);
-
-    try {
-      deserializer.getId(jsonNode);
-      fail("should throw RuntimeException");
-    } catch (RuntimeException e) {
-      assertThat(e.getMessage(), notNullValue());
-    }
-
-    jsonNode.put(AbstractBeanDeserializer.FIELD_ID, "beanA");
-
-    String id = deserializer.getId(jsonNode);
-    assertThat(id, equalTo(jsonNode.get(AbstractBeanDeserializer.FIELD_ID).asText()));
   }
 
   @Test

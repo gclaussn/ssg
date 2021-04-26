@@ -53,6 +53,10 @@
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-ext-admonition</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.vladsch.flexmark</groupId>
+      <artifactId>flexmark-ext-tables</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.jboss.resteasy</groupId>

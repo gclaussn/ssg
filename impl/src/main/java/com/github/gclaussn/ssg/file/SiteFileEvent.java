@@ -16,4 +16,8 @@ public interface SiteFileEvent {
   long getTimestamp();
 
   SiteFileEventType getType();
+
+  boolean isSource();
+
+  boolean isPublic();
 }

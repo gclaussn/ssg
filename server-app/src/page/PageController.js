@@ -33,6 +33,10 @@ export default class PageController extends React.Component {
   }
 
   _onPageEvent = (event) => {
+    if (event.path) {
+      return;
+    }
+
     if (event.hasError()) {
       // handle all errors
       this._handleError(event.error);
@@ -43,6 +47,10 @@ export default class PageController extends React.Component {
   }
 
   _onPageDataEvent = (event) => {
+    if (event.path) {
+      return;
+    }
+
     if (event.hasError() && event.type !== "GENERATE_PAGE") {
       // handle all but GENERATE_PAGE errors
       this._handleError(event.error);

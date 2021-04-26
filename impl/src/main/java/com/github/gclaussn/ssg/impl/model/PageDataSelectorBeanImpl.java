@@ -2,11 +2,11 @@ package com.github.gclaussn.ssg.impl.model;
 
 import com.github.gclaussn.ssg.Page;
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteException;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.data.PageDataSelectorBean;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventBuilder;
 import com.github.gclaussn.ssg.event.SiteEventType;

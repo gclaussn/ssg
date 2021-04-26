@@ -9,8 +9,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.SiteOutput;
-import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.npm.NodePackageManager;
 import com.github.gclaussn.ssg.npm.NodePackageSpec;
 

@@ -5,9 +5,9 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
+import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.conf.SiteConsole;
-import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
 import com.github.gclaussn.ssg.event.SiteEventType;

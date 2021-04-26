@@ -19,13 +19,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.SourceType;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteErrorType;
+import com.github.gclaussn.ssg.SiteException;
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataBuilder;
 import com.github.gclaussn.ssg.data.PageDataNodeType;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteErrorType;
-import com.github.gclaussn.ssg.error.SiteException;
 import com.github.gclaussn.ssg.file.SiteFileType;
 
 public class SiteModelRepositoryTest {
@@ -129,7 +128,7 @@ public class SiteModelRepositoryTest {
       assertThat(error.getMessage(), containsString("site"));
       assertThat(error.getSource().isPresent(), is(true));
       assertThat(error.getSource().get().getId(), nullValue());
-      assertThat(error.getSource().get().getType(), is(SourceType.SITE));
+      assertThat(error.getSource().get().getType(), nullValue());
       assertThat(error.getLocation().isPresent(), is(true));
       assertThat(error.getLocation().get().getPath(), equalTo(repository.site.getPath().resolve(Site.MODEL_NAME)));
       assertThat(error.getLocation().get().getLine(), is(1));

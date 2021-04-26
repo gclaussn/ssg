@@ -46,7 +46,7 @@ public class SourceImpl implements Source {
 
   @Override
   public String toString() {
-    if (type == SourceType.SITE) {
+    if (type == null) {
       return type.name();
     } else {
       return String.format("%s[id=%s]", getType(), id);

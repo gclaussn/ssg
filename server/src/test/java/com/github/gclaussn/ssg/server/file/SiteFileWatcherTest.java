@@ -21,7 +21,7 @@ import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.file.SiteFileEvent;
 import com.github.gclaussn.ssg.file.SiteFileEventListener;
 
-public class PollingFileWatcherTest implements SiteFileEventListener {
+public class SiteFileWatcherTest implements SiteFileEventListener {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder(Paths.get("./target").toFile());
@@ -49,19 +49,8 @@ public class PollingFileWatcherTest implements SiteFileEventListener {
   }
 
   @Test
-  public void testFactory() throws IOException {
-    SiteFileWatcher watcher = SiteFileWatcher.of(site, SiteFileWatcherType.POLLING);
-    assertThat(watcher.getType(), is(SiteFileWatcherType.POLLING));
-
-    watcher.start(this);
-    watcher.stop();
-  }
-
-  @Test
   public void testWatch() throws IOException {
-    PollingFileWatcher watcher = new PollingFileWatcher();
-    watcher.site = site;
-    watcher.eventListeners.add(this);
+    SiteFileWatcherImpl watcher = new SiteFileWatcherImpl(site, this);
 
     watcher.runInitially();
     watcher.run();

@@ -1,8 +1,8 @@
-package com.github.gclaussn.ssg.impl.error;
+package com.github.gclaussn.ssg.impl;
 
 import java.nio.file.Path;
 
-import com.github.gclaussn.ssg.error.SiteErrorLocation;
+import com.github.gclaussn.ssg.SiteErrorLocation;
 
 class SiteErrorLocationImpl implements SiteErrorLocation {
 

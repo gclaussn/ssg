@@ -24,7 +24,7 @@ export default class PagePreview extends React.Component {
   }
 
   _onEvent = (event) => {
-    if (event.hasError()) {
+    if (!event.path && event.hasError()) {
       return;
     }
 

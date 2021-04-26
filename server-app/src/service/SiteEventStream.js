@@ -28,6 +28,12 @@ class Subscription {
     this._callback(event);
   }
 
+  onFileEvent(event) {
+    if (event.public) {
+      this._callback(event);
+    }
+  }
+
   get id() {
     return this._id;
   }
@@ -52,9 +58,14 @@ class SiteEventStream {
     };
 
     client.onmessage = (message) => {
-      const event = new SiteEvent(JSON.parse(message.data));
+      const data = JSON.parse(message.data);
 
-      this._subscriptions.forEach(subscription => subscription.onEvent(event));
+      if (data.path) {
+        this._subscriptions.forEach(subscription => subscription.onFileEvent(data));
+      } else {
+        const event = new SiteEvent(data);
+        this._subscriptions.forEach(subscription => subscription.onEvent(event));
+      }
     };
   }
 

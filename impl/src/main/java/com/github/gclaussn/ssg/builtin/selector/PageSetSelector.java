@@ -18,7 +18,7 @@ public class PageSetSelector implements PageDataSelector {
   protected Set<String> excludes;
   protected Set<String> includes;
 
-  private Site site;
+  private transient Site site;
 
   @Override
   public void init(Site site) {

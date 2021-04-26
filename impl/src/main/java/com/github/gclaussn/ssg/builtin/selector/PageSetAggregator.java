@@ -1,8 +1,8 @@
 package com.github.gclaussn.ssg.builtin.selector;
 
 import java.util.Objects;
-import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import com.github.gclaussn.ssg.Page;
 import com.github.gclaussn.ssg.Site;
@@ -14,9 +14,10 @@ public class PageSetAggregator implements PageDataSelector {
 
   protected String pageSetId;
 
+  /** Location of the distinct values within the page data. */
   protected String distinct;
 
-  private Site site;
+  private transient Site site;
 
   @Override
   public void init(Site site) {
@@ -32,18 +33,14 @@ public class PageSetAggregator implements PageDataSelector {
 
   @Override
   public Object select(Page page) {
-    Set<Object> set = new TreeSet<>();
-
-    site.getPageSet(pageSetId).getPages().stream()
+    return site.getPageSet(pageSetId).getPages().stream()
         // filter not rejected pages
         .filter(p -> !p.isRejected())
         // get value from page data
         .map(p -> p.getData().get(distinct).as(Object.class))
         // filter not null values
         .filter(Objects::nonNull)
-        // add value to set
-        .forEach(set::add);
-
-    return set;
+        // collect in sorted set
+        .collect(Collectors.toCollection(TreeSet::new));
   }
 }

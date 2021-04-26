@@ -11,6 +11,7 @@ import com.github.gclaussn.ssg.SiteBuilder;
 import com.github.gclaussn.ssg.conf.SiteConsole;
 import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.event.SiteEventListener;
+import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.impl.conf.SiteConfImpl;
 import com.github.gclaussn.ssg.impl.event.SiteEventStoreImpl;
 import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
@@ -43,6 +44,14 @@ public class SiteBuilderImpl implements SiteBuilder {
     Objects.requireNonNull(extension, "extension is null");
 
     conf.getExtensions().add(extension);
+    return this;
+  }
+
+  @Override
+  public SiteBuilder addFileEventListener(SiteFileEventListener fileEventListener) {
+    Objects.requireNonNull(fileEventListener, "file event listener is null");
+
+    conf.getFileEventListeners().add(fileEventListener);
     return this;
   }
 
@@ -83,6 +92,7 @@ public class SiteBuilderImpl implements SiteBuilder {
     Objects.requireNonNull(sitePath, "site path is null");
 
     conf.getEventListeners().add(eventStore);
+    conf.getFileEventListeners().add(eventStore);
 
     // load plugins
     pluginManager.preBuild(this);

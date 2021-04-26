@@ -15,7 +15,14 @@ class SiteDirectory {
   private final Map<Path, SiteFile> siteFiles;
   private final Map<Path, SiteDirectory> siteDirectories;
 
+  /** Flag that indicates if the directory exists or not. */
+  private boolean exists;
+
   SiteDirectory(Path path) {
+    this(path, true);
+  }
+
+  SiteDirectory(Path path, boolean exists) {
     this.path = path;
 
     siteFiles = new HashMap<>();
@@ -47,6 +54,14 @@ class SiteDirectory {
 
       if (Files.isDirectory(directory.path)) {
         directory.poll(changeSet, true);
+      }
+    }
+
+    if (!exists) {
+      if (Files.isDirectory(path)) {
+        exists = true;
+      } else {
+        return;
       }
     }
 

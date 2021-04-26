@@ -1,7 +1,6 @@
 FROM openjdk:14.0.2-slim
 
 ENV SSG_HOME="/opt/ssg"
-ENV SSG_FILE_WATCHER="POLLING"
 
 ENV PATH="${PATH}:${SSG_HOME}/bin"
 

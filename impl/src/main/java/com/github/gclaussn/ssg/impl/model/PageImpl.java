@@ -11,11 +11,11 @@ import com.github.gclaussn.ssg.Page;
 import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageSet;
 import com.github.gclaussn.ssg.Site;
+import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataSelectorBean;
-import com.github.gclaussn.ssg.error.SiteError;
 
 class PageImpl extends AbstractSource implements Page {
 

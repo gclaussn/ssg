@@ -1,9 +1,6 @@
-package com.github.gclaussn.ssg.error;
+package com.github.gclaussn.ssg;
 
 import java.io.IOException;
-
-import com.github.gclaussn.ssg.Source;
-import com.github.gclaussn.ssg.SourceType;
 
 import de.neuland.jade4j.exceptions.JadeException;
 

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.github.gclaussn.ssg.data.PageData;
-import com.github.gclaussn.ssg.error.SiteError;
 
 public interface SiteGenerator {
 

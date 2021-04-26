@@ -7,8 +7,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.Source;
-import com.github.gclaussn.ssg.error.SiteError;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventListener;
 import com.github.gclaussn.ssg.event.SiteEventType;
@@ -35,11 +35,6 @@ public class SiteEventLogger implements SiteEventListener {
       includedEventTypes.add(SiteEventType.LOAD_PAGE_INCLUDE);
       includedEventTypes.add(SiteEventType.LOAD_PAGE_SET);
       includedEventTypes.add(SiteEventType.LOAD_SITE);
-
-      // when running a file watcher
-      includedEventTypes.add(SiteEventType.CREATE_FILE);
-      includedEventTypes.add(SiteEventType.MODIFY_FILE);
-      includedEventTypes.add(SiteEventType.DELETE_FILE);
     }
   }
 

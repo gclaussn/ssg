@@ -1,4 +1,4 @@
-package com.github.gclaussn.ssg.impl.error;
+package com.github.gclaussn.ssg.impl;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -12,8 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.error.SiteError;
-import com.github.gclaussn.ssg.error.SiteErrorType;
+import com.github.gclaussn.ssg.SiteError;
+import com.github.gclaussn.ssg.SiteErrorType;
 
 public class SiteErrorBuilderImplTest {
 

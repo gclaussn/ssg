@@ -1,6 +1,12 @@
+//- global menu counter
+- var counter = 0
+
 mixin sidebarMenu(menu)
-  a #{menu.label}
-  ul(class="sidebar-menu")
+  - counter = counter + 1
+  
+  a(data-menu-id="sidebar-menu-" + counter) #{menu.label}
+
+  ul(class="sidebar-menu d-none", id="sidebar-menu-" + counter)
     each item in menu.items
       if item.label == null
         - var page = pages[item]
@@ -8,14 +14,15 @@ mixin sidebarMenu(menu)
         li
           if item == _subId
             //- current page
-            a(class="active") #{title}
+            a(class="active", id="active-item") #{title}
           else if page != null
-            //- item found
+            //- page found
             a(href=page["_url"]) #{page["title"]}
           else
-            //- item not found in pages map
+            //- page not found in map
             a #{item}
       else
+        //- recursion
         +sidebarMenu(item)
 
 doctype html
@@ -29,18 +36,67 @@ html(lang=en)
     link(rel="icon", href="data:,")
 
     link(rel="stylesheet", href="/node_modules/bootstrap/dist/css/bootstrap.min.css")
-    link(rel="stylesheet", href="/style.css")
+    link(rel="stylesheet", href="/node_modules/prismjs/themes/prism-tomorrow.css")
+    link(rel="stylesheet", href="/styles.css")
 
   body
-    div(class="h-100")
+    div
       div(class="sidebar")
         div(class="sidebar-content")
-          div(class="sidebar-menu-container")
-            each menu in sidebar.menus
+          div(class="sidebar-menu-container", id="sidebar-menu-container")
+            for menu in sidebar.menus
               +sidebarMenu(menu)
+      div(class="main-container")
+        div(class="main")
+          div(class="row")
+            div(class="col-md-9")
+              div(class="content")
+                h1(class="content-title") #{title}
+                div(class="md", id="md")
+                  !{_fn.renderMarkdown(_md)}
+            div(class="col-md-3")
+              div(class="toc-container")
+                ul(class="toc", id="toc")
 
     script(type="text/javascript", src="/node_modules/jquery/dist/jquery.min.js")
+    script(type="text/javascript", src="/node_modules/prismjs/prism.js")
+    script(type="text/javascript", src="/node_modules/prismjs/components/prism-pug.min.js")
+    script(type="text/javascript", src="/node_modules/prismjs/components/prism-yaml.min.js")
     script.
-      $("xxx");
+      //- expand parent menus of active item
+      $("#active-item").parentsUntil("#sidebar-menu-container").filter("ul").each((index, parent) => {
+        $(parent).toggleClass("d-none");
+      });
 
-      const x = "";
+      function slug(text) {
+        return text.replace(/\s+/g, "-").toLowerCase();
+      }
+
+      //- build table of contents
+      $("#md").find("h1,h2,h3,h4,h5,h6").each((index, h) => {
+        const nodeName = $(h)[0].nodeName.toLowerCase();
+        const text = $(h).text();
+ 
+        const sluggedText = slug(text); 
+
+        //- append item
+        $("#toc").append(`<li class="toc-${nodeName}"><a href="#${sluggedText}">${text}</a></li>`);
+
+        //- append anchor to heading
+        $(h).append(`<a name="${sluggedText}" />`);
+      });
+
+      $("#md").find("table").each((index, table) => {
+        $(table).addClass("md-table");
+      });
+
+      $("#sidebar-menu-container").find("a").each((index, a) => {
+        const menuId = $(a).data("menu-id");
+        if (!menuId) {
+          return;
+        }
+
+        $(a).on("click", {menuId: menuId}, (e) => {
+          $(`#${e.data.menuId}`).toggleClass("d-none");
+        });
+      });

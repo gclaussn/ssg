@@ -9,6 +9,8 @@ import com.github.gclaussn.ssg.file.SiteFileType;
 class SiteFileEventImpl implements SiteFileEvent {
 
   protected SiteFileType fileType;
+  protected boolean isPublic;
+  protected boolean isSource;
   protected Path path;
   protected long timestamp;
   protected SiteFileEventType type;
@@ -31,5 +33,15 @@ class SiteFileEventImpl implements SiteFileEvent {
   @Override
   public SiteFileEventType getType() {
     return type;
+  }
+
+  @Override
+  public boolean isSource() {
+    return isSource;
+  }
+
+  @Override
+  public boolean isPublic() {
+    return isPublic;
   }
 }

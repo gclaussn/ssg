@@ -6,6 +6,11 @@ node:
   packages:
     bootstrap: 5.0.0-alpha1
     jquery: 3.6.0
+    prismjs: 1.23.0
   includes:
     - "**/bootstrap/dist/css/bootstrap.min.css"
     - "**/jquery/dist/jquery.min.js"
+    - "**/prismjs/prism.js"
+    - "**/prismjs/components/prism-pug.min.js"
+    - "**/prismjs/components/prism-yaml.min.js"
+    - "**/prismjs/themes/prism-tomorrow.css"

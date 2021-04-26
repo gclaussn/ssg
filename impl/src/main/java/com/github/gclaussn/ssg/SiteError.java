@@ -1,10 +1,8 @@
-package com.github.gclaussn.ssg.error;
+package com.github.gclaussn.ssg;
 
 import java.util.Optional;
 
-import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.Source;
-import com.github.gclaussn.ssg.impl.error.SiteErrorBuilderImpl;
+import com.github.gclaussn.ssg.impl.SiteErrorBuilderImpl;
 
 public interface SiteError {
 
