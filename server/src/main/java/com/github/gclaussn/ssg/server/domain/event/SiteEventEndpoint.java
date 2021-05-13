@@ -46,14 +46,55 @@ public class SiteEventEndpoint implements SiteEventListener, SiteFileEventListen
     }
   }
 
+  @OnOpen
+  public void onOpen(Session session) {
+    sessions.put(session.getId(), session);
+  }
+
+  @OnClose
+  public void onClose(Session session) {
+    sessions.remove(session.getId());
+  }
+
+  @Override
+  public void onEvent(SiteEvent event) {
+    if (sessions.isEmpty()) {
+      return;
+    }
+
+    SiteEventDTO data = SiteEventDTO.of(event);
+
+    SiteErrorDTO error = data.getError();
+    if (error != null && error.getLocation() != null) {
+      // read source code from error location
+      SourceCodeDTO sourceCode = readSourceCode(error.getLocation());
+
+      // enrich error
+      error.setSourceCode(sourceCode);
+    }
+
+    sessions.values().stream().filter(Session::isOpen).forEach(session -> session.getAsyncRemote().sendObject(data));
+  }
+
+  @Override
+  public void onEvent(SiteFileEvent event) {
+    if (sessions.isEmpty()) {
+      return;
+    }
+
+    SiteFileEventDTO data = SiteFileEventDTO.of(event);
+
+    sessions.values().stream().filter(Session::isOpen).forEach(session -> session.getAsyncRemote().sendObject(data));
+  }
+
   /**
-   * Extracts the source code, which caused the error.
+   * Reads the source code from the file, that caused the error.
    * 
-   * @param location The error location, that provides the file path and the line number.
+   * @param location The error location, providing the file path and the line number.
    * 
-   * @return The extracted source code, including the related code snippet.
+   * @return The read source code, including the related code snippet.
    */
-  protected SourceCodeDTO extractSourceCode(SiteErrorLocationDTO location) {
+  protected SourceCodeDTO readSourceCode(SiteErrorLocationDTO location) {
     SourceCodeDTO sourceCode = new SourceCodeDTO();
     sourceCode.setFileType(SiteFileType.of(location.getPath()));
 
@@ -90,38 +131,5 @@ public class SiteEventEndpoint implements SiteEventListener, SiteFileEventListen
     sourceCode.setTo(to);
 
     return sourceCode;
-  }
-
-  @OnOpen
-  public void onOpen(Session session) {
-    sessions.put(session.getId(), session);
-  }
-
-  @OnClose
-  public void onClose(Session session) {
-    sessions.remove(session.getId());
-  }
-
-  @Override
-  public void onEvent(SiteEvent event) {
-    SiteEventDTO data = SiteEventDTO.of(event);
-
-    SiteErrorDTO error = data.getError();
-    if (error != null && error.getLocation() != null) {
-      // extract source code from location
-      SourceCodeDTO sourceCode = extractSourceCode(error.getLocation());
-
-      // enrich error
-      error.setSourceCode(sourceCode);
-    }
-
-    sessions.values().stream().filter(Session::isOpen).forEach(session -> session.getAsyncRemote().sendObject(data));
-  }
-
-  @Override
-  public void onEvent(SiteFileEvent event) {
-    SiteFileEventDTO data = SiteFileEventDTO.of(event);
-
-    sessions.values().stream().filter(Session::isOpen).forEach(session -> session.getAsyncRemote().sendObject(data));
   }
 }

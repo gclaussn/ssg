@@ -1,6 +1,7 @@
 package com.github.gclaussn.ssg;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import de.neuland.jade4j.exceptions.JadeException;
 
@@ -18,7 +19,7 @@ public interface SiteErrorBuilder {
 
   SiteError errorPageNotGenerated(IOException e);
 
-  SiteError errorPageNotGenerated(JadeException e);
+  SiteError errorPageNotGenerated(JadeException e, Path templatePath);
 
   SiteError errorPageOutputDirectoryNotCreated(IOException e);
 

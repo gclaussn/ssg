@@ -149,10 +149,6 @@ class SiteGeneratorImpl implements SiteGenerator {
 
     List<SiteError> errors = new LinkedList<>();
 
-    if (!site.isLoaded()) {
-      return errors;
-    }
-
     // generate pages, that are not part of a page set
     site.getPages().stream()
         // filter pages, that has no page set
@@ -220,14 +216,14 @@ class SiteGeneratorImpl implements SiteGenerator {
       JadeTemplate template = configuration.getTemplate(page.getTemplateName());
       configuration.renderTemplate(template, data.getRootMap(), writer);
     } catch (JadeException e) {
-      error = SiteError.builder(site).source(page).errorPageNotGenerated(e);
+      error = SiteError.builder(site).source(page).errorPageNotGenerated(e, page.getTemplatePath());
     } catch (IOException e) {
       error = SiteError.builder(site).source(page).errorPageNotGenerated(e);
     } catch (Exception e) {
       // rare case - e.g. script without any content "script."
       String message = String.format("Unexpected Jade lexer/parser error: %s", e.getMessage());
       JadeException exception = new JadeParserException(page.getTemplateName(), -1, configuration.getTemplateLoader(), message);
-      error = SiteError.builder(site).source(page).errorPageNotGenerated(exception);
+      error = SiteError.builder(site).source(page).errorPageNotGenerated(exception, null);
     }
 
     if (error != null) {

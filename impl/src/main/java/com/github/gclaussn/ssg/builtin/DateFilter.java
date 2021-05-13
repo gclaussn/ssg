@@ -7,9 +7,13 @@ import com.github.gclaussn.ssg.PageFilter;
 import com.github.gclaussn.ssg.data.PageDataNode;
 import com.github.gclaussn.ssg.data.PageDataNodeType;
 
+/**
+ * Filters a page by comparing the date, proccesed by the {@link DateProcessor}, with the current
+ * date. A page is rejected if the date is in the past.
+ */
 public class DateFilter implements PageFilter {
 
-  /** ID of {@link DateProcessor}, that has provided the data. */
+  /** ID of {@link DateProcessor}, that has processed the data. */
   protected String processorId;
 
   @Override

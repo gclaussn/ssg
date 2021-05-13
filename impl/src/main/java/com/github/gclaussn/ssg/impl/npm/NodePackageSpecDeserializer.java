@@ -12,13 +12,21 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.npm.NodePackage;
+import com.github.gclaussn.ssg.npm.NodePackageManager;
 import com.github.gclaussn.ssg.npm.NodePackageSpec;
 
 public class NodePackageSpecDeserializer extends JsonDeserializer<NodePackageSpec> {
 
   protected static final String FIELD_INCLUDES = "includes";
   protected static final String FIELD_PACKAGES = "packages";
+
+  private final Site site;
+  
+  public NodePackageSpecDeserializer(Site site) {
+    this.site = site;
+  }
 
   @Override
   public NodePackageSpec deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
@@ -27,6 +35,7 @@ public class NodePackageSpecDeserializer extends JsonDeserializer<NodePackageSpe
     JsonNode jsonNode = oc.readTree(p);
 
     NodePackageSpecImpl nodePackageSpec = new NodePackageSpecImpl();
+    nodePackageSpec.path = site.getPath().resolve(NodePackageManager.NODE_MODULES);
     nodePackageSpec.includes = getIncludes(jsonNode);
     nodePackageSpec.packages = getPackages(jsonNode);
 

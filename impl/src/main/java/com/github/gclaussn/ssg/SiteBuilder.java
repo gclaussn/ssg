@@ -71,6 +71,16 @@ public interface SiteBuilder {
   Site build(Path sitePath);
 
   /**
+   * Sets the site's base path, used if the site is served under a specific path. Default value is
+   * {@code /}.
+   * 
+   * @param basePath The base path, which starts with a slash, but does not end with a slash.
+   * 
+   * @return The builder.
+   */
+  SiteBuilder setBasePath(String basePath);
+
+  /**
    * Sets the console to be used, e.g. by {@link SitePluginAction}s.
    * 
    * @param console A console.

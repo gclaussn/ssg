@@ -4,37 +4,13 @@ data:
     menus:
       - label: Getting Started
         items:
-          - introduction1
+          - introduction
           - configuration
-          - type-script-support
-      - label: Guides
+      - label: Markdown
         items:
-          - xxx
-          - label: Docs
-            items:
-              - introduction
-              - sidebar
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
-              - versioning
+          - markdown/xxx
+          - markdown/admonitions
+          - markdown/yyy
 dataSelectors:
   pages:
     class: PageSetMapper

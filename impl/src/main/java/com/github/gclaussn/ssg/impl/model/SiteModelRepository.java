@@ -76,7 +76,7 @@ public class SiteModelRepository implements AutoCloseable {
 
     // configure YAML object mapper
     SimpleModule module = new SimpleModule();
-    module.addDeserializer(NodePackageSpec.class, new NodePackageSpecDeserializer());
+    module.addDeserializer(NodePackageSpec.class, new NodePackageSpecDeserializer(site));
     module.addDeserializer(PageDataSelectorBeanImpl.class, new PageDataSelectorDeserializer(site));
     module.addDeserializer(PageFilterBeanImpl.class, new PageFilterDeserializer(site));
     module.addDeserializer(PageProcessorBeanImpl.class, new PageProcessorDeserializer(site));
@@ -126,7 +126,7 @@ public class SiteModelRepository implements AutoCloseable {
 
     return new StringBuilder(pageSet.basePath.length() + subId.length() + 6)
         .append(pageSet.basePath)
-        .append(pageSet.basePath.isBlank() ? "" : "/")
+        .append(pageSet.basePath.isBlank() ? StringUtils.EMPTY : "/")
         .append(HTML.appendTo(subId))
         .toString();
   }
@@ -140,8 +140,14 @@ public class SiteModelRepository implements AutoCloseable {
     } else {
       resourceName = outputName;
     }
+    
+    String basePath = site.getConfiguration().getBasePath();
 
-    return new StringBuilder(resourceName.length() + 1).append('/').append(resourceName).toString();
+    return new StringBuilder(basePath.length() + resourceName.length() + 2)
+        .append(basePath)
+        .append(basePath.length() != 1 ? "/" : StringUtils.EMPTY)
+        .append(resourceName)
+        .toString();
   }
 
   @Override
@@ -239,6 +245,10 @@ public class SiteModelRepository implements AutoCloseable {
    * @return The ID of the page set or an empty optional.
    */
   public Optional<String> findPageSetId(String pageId) {
+    if (model == null) {
+      return Optional.empty();
+    }
+
     // use page ID as intial value
     String pageSetId = pageId;
 
@@ -255,12 +265,11 @@ public class SiteModelRepository implements AutoCloseable {
   }
 
   public Optional<NodePackageSpec> getNodePackageSpec() {
-    if (isLoaded()) {
+    if (model != null) {
       return Optional.ofNullable(model.nodePackageSpec);
     }
 
-    // special case for installing node packages or serving site output
-    // without loading the whole site
+    // special case for installing node packages or serving site output without loading
     SiteModel model = loadSiteModel();
 
     return Optional.ofNullable(model.nodePackageSpec);
@@ -315,7 +324,9 @@ public class SiteModelRepository implements AutoCloseable {
       return PAGE_SET;
     }
 
-    if (model.pages.contains(id)) {
+    if (model == null) {
+      return UNKNOWN;
+    } else if (model.pages.contains(id)) {
       return PAGE;
     } else if (model.pageSets.contains(id)) {
       return PAGE_SET;
@@ -324,10 +335,6 @@ public class SiteModelRepository implements AutoCloseable {
     } else {
       return UNKNOWN;
     }
-  }
-
-  public boolean isLoaded() {
-    return model != null;
   }
 
   /**
@@ -737,6 +744,24 @@ public class SiteModelRepository implements AutoCloseable {
     PageSetImpl pageSet = pageSets.remove(pageSetId);
 
     pageSet.pages.forEach(this.pages::remove);
+  }
+
+  public void removeSource(Source source) {
+    String sourceId = source.getId();
+
+    switch (source.getType()) {
+      case PAGE:
+        pages.remove(sourceId);
+        break;
+      case PAGE_INCLUDE:
+        pageIncludes.remove(sourceId);
+        break;
+      case PAGE_SET:
+        removePageSet(sourceId);
+        break;
+      case UNKNOWN:
+        // nothing to do remove
+    }
   }
 
   protected void reset() {

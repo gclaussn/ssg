@@ -15,6 +15,9 @@ import com.beust.jcommander.converters.PathConverter;
  */
 public class Main {
 
+  @Parameter(names = {"--base-path", "-b"}, description = "Base path")
+  protected String basePath;
+
   @Parameter(names = {"--help"}, description = "Display this help", help = true)
   protected boolean help = false;
 
@@ -27,14 +30,18 @@ public class Main {
   @Parameter(names = {"--verbose"}, description = "Show stacktraces")
   protected boolean verbose;
 
-  private final PrintStream ps;
+  private final PrintStream out;
 
-  public Main(PrintStream ps) {
-    this.ps = ps;
+  public Main(PrintStream out) {
+    this.out = out;
   }
 
-  public PrintStream getPrintStream() {
-    return ps;
+  public String getBasePath() {
+    return basePath;
+  }
+
+  public PrintStream getOut() {
+    return out;
   }
 
   public Map<String, Object> getProperties() {

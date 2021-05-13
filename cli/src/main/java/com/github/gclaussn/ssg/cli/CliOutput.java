@@ -14,7 +14,7 @@ import com.github.gclaussn.ssg.event.SiteEventType;
 
 public class CliOutput implements SiteConsole, SiteEventListener {
 
-  private final PrintStream ps;
+  private final PrintStream out;
 
   private final boolean verbose;
 
@@ -24,8 +24,8 @@ public class CliOutput implements SiteConsole, SiteEventListener {
     this(System.out, verbose);
   }
 
-  public CliOutput(PrintStream ps, boolean verbose) {
-    this.ps = ps;
+  public CliOutput(PrintStream out, boolean verbose) {
+    this.out = out;
     this.verbose = verbose;
 
     if (verbose) {
@@ -44,19 +44,19 @@ public class CliOutput implements SiteConsole, SiteEventListener {
 
   @Override
   public void log(String message) {
-    ps.println(message);
+    out.println(message);
   }
 
   @Override
   public void log(String format, Object... args) {
-    ps.println(String.format(format, args));
+    out.println(String.format(format, args));
   }
 
   protected void logError(SiteError error) {
     log(error.toMessage(verbose));
 
     if (verbose) {
-      error.getCause().printStackTrace(ps);
+      error.getCause().printStackTrace(out);
     }
   }
 

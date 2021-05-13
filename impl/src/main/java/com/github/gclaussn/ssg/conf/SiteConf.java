@@ -41,6 +41,14 @@ public interface SiteConf {
   TypeDesc describe(String typeName);
 
   /**
+   * Gets the site's base path, used if the site is served under a specific path. Default value is
+   * {@code /}.
+   * 
+   * @return The base path.
+   */
+  String getBasePath();
+
+  /**
    * Provides a console to output messages to {@code stdout} or other print streams.
    * 
    * @return The site's console.

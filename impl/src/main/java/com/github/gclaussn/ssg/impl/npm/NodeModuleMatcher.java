@@ -9,18 +9,25 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import com.github.gclaussn.ssg.npm.NodePackageSpec;
-
 class NodeModuleMatcher implements Predicate<Path> {
 
   private final List<PathMatcher> includeMatchers;
 
-  NodeModuleMatcher(NodePackageSpec nodePackageSpec) {
+  NodeModuleMatcher(NodePackageSpecImpl nodePackageSpec) {
+    String path = nodePackageSpec.path.toAbsolutePath().toString();
+
+    // ensure unix file separator
+    int index = path.indexOf('\\');
+    if (index >= 0) {
+      path = path.replace('\\', '/');
+    }
+
     includeMatchers = new LinkedList<>();
 
-    List<String> includes = orElse(nodePackageSpec.getIncludes(), Collections::emptyList);
+    List<String> includes = orElse(nodePackageSpec.includes, Collections::emptyList);
     for (String include : includes) {
-      String pattern = String.format("glob:%s", include);
+      // e.g. "glob:C:/site/node_modules/jquery/dist/jquery.min.js"
+      String pattern = String.format("glob:%s/%s", path, include);
       includeMatchers.add(FileSystems.getDefault().getPathMatcher(pattern));
     }
   }

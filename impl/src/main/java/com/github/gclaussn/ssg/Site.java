@@ -211,13 +211,6 @@ public interface Site extends SiteFileEventListener, AutoCloseable {
   boolean hasPageSet(String pageSetId);
 
   /**
-   * Determines if the site is loaded or not.
-   * 
-   * @return {@code true}, if the site is loaded. Otherwise {@code false}.
-   */
-  boolean isLoaded();
-
-  /**
    * Loads the site, based on its {@code site.yaml} file.<br>
    * This method can also be called to reload the site at any given time.
    * 

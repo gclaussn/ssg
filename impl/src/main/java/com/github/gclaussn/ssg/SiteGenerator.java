@@ -8,7 +8,7 @@ import com.github.gclaussn.ssg.data.PageData;
 public interface SiteGenerator {
 
   /** Name of the template model, providing builtin functions. */
-  static final String FUNCTIONS = "_fn";
+  static final String FUNCTIONS = "_";
 
   /** Name of the template model, providing generator extensions. */
   static final String EXTENSIONS = "_ext";

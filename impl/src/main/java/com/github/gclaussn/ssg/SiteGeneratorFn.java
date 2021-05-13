@@ -2,6 +2,9 @@ package com.github.gclaussn.ssg;
 
 import java.net.URLEncoder;
 
+/**
+ * Builtin generator functions.
+ */
 public interface SiteGeneratorFn {
 
   /**
@@ -15,7 +18,11 @@ public interface SiteGeneratorFn {
    */
   String encodeUriComponent(String component);
 
-  String getPageUrl(String pageId);
+  String linkNodeModule(String relativePath);
+
+  String linkPage(String pageId);
+
+  String linkPublic(String relativePath);
 
   /**
    * Renders the given value as JSON string.

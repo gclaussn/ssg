@@ -32,6 +32,9 @@ class PageImpl extends AbstractSource implements Page {
   protected String templateName;
   protected String url;
 
+  /** Combined list of page and optional page set data selectors. */
+  private List<PageDataSelectorBean> combinedDataSelectors;
+
   PageImpl(Site site) {
     super(site);
   }
@@ -39,6 +42,12 @@ class PageImpl extends AbstractSource implements Page {
   @Override
   protected void init() {
     dataSelectors.forEach(AbstractBean::init);
+
+    combinedDataSelectors = new LinkedList<>(dataSelectors);
+    if (setId != null) {
+      // add data selectors of page set
+      combinedDataSelectors.addAll(site.getPageSet(setId).getDataSelectors());
+    }
   }
 
   @Override
@@ -47,11 +56,13 @@ class PageImpl extends AbstractSource implements Page {
 
     dataSelectors.forEach(AbstractBean::destroy);
     dataSelectors.clear();
+
+    combinedDataSelectors.clear();
   }
 
   @Override
   public boolean dependsOn(Source source) {
-    return dataSelectors.stream().anyMatch(dataSelector -> dataSelector.dependsOn(source));
+    return combinedDataSelectors.stream().anyMatch(dataSelector -> dataSelector.dependsOn(source));
   }
 
   @Override
@@ -66,14 +77,7 @@ class PageImpl extends AbstractSource implements Page {
 
   @Override
   public List<PageDataSelectorBean> getDataSelectors() {
-    List<PageDataSelectorBean> list = new LinkedList<>(dataSelectors);
-
-    if (setId != null) {
-      // add data selectors of page set
-      list.addAll(site.getPageSet(setId).getDataSelectors());
-    }
-
-    return list;
+    return combinedDataSelectors;
   }
 
   @Override

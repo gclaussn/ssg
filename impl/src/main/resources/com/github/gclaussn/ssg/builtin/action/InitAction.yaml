@@ -1,4 +1,4 @@
-name: Init action
+name: Init
 documentation:
   Initializes a new site from a predefined template.
 properties:

@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 
 import javax.ws.rs.NotFoundException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +32,11 @@ public class NodePackageManagerImplTest {
   @Before
   public void setUp() {
     manager = new NodePackageManagerImpl(NodePackageManager.DEFAULT_REGISTRY_URL);
+  }
+
+  @After
+  public void tearDown() {
+    manager.close();
   }
 
   @Test

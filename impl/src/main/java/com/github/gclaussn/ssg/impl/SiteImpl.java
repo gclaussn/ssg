@@ -52,16 +52,16 @@ class SiteImpl implements Site {
     this.eventStore = builder.eventStore;
     this.pluginManager = builder.pluginManager;
 
-    // initialize repository
-    repository = new SiteModelRepository(this);
-    // initialize generator
-    generator = new SiteGeneratorImpl(this);
-
     path = sitePath;
 
     publicPath = sitePath.resolve(PUBLIC);
     sourcePath = sitePath.resolve(SOURCE);
     outputPath = sitePath.resolve(OUTPUT);
+
+    // initialize repository
+    repository = new SiteModelRepository(this);
+    // initialize generator
+    generator = new SiteGeneratorImpl(this);
   }
 
   @Override
@@ -291,6 +291,11 @@ class SiteImpl implements Site {
     // try to determine, what source (site, page, page include, page set) is affected
     Source source = repository.getSource(event.getPath());
 
+    if (event.getType() == SiteFileEventType.DELETE) {
+      repository.removeSource(source);
+      return;
+    }
+
     String sourceId = source.getId();
 
     switch (source.getType()) {
@@ -304,7 +309,7 @@ class SiteImpl implements Site {
         handlePageSet(sourceId);
         break;
       case UNKNOWN:
-        // if found, load and generate page set instead
+        // if page set is found, load and generate it instead
         Optional<String> pageSetId = repository.findPageSetId(sourceId);
         if (pageSetId.isPresent()) {
           handlePageSet(pageSetId.get());
@@ -328,11 +333,6 @@ class SiteImpl implements Site {
   }
 
   @Override
-  public boolean isLoaded() {
-    return repository.isLoaded();
-  }
-
-  @Override
   public List<SiteError> load() {
     // clear stored events
     eventStore.clear();
@@ -349,7 +349,7 @@ class SiteImpl implements Site {
 
     if (event.isPublic()) {
       // do not handle public files any further
-      // since loading and generating does not depend on public files
+      // since public files does not affect loading and generating
       return;
     }
 

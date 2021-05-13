@@ -14,10 +14,11 @@ public class SiteOutputManager extends FileResourceManager {
     super(site.getPath().toFile());
     this.site = site;
   }
-  
+
   @Override
   public Resource getResource(String path) {
-    if (path.length() == 1) {
+    if (path.isEmpty() || path.length() == 1) {
+      // if index is requested: http://<host>:<port> or http://<host>:<port>/
       return super.getResource(path);
     }
 

@@ -1,4 +1,4 @@
-name: Copy action
+name: Copy
 documentation:
   Copies the site's output to a given target directory
 properties:

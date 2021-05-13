@@ -109,6 +109,24 @@ public class SiteBuilderImpl implements SiteBuilder {
   }
 
   @Override
+  public SiteBuilder setBasePath(String basePath) {
+    Objects.requireNonNull(basePath, "base path is null");
+
+    if (basePath.isEmpty()) {
+      throw new IllegalArgumentException("base path must not be empty");
+    }
+    if (basePath.charAt(0) != '/') {
+      throw new IllegalArgumentException("base path must start with a slash");
+    }
+    if (basePath.length() > 1 && basePath.charAt(basePath.length() - 1) == '/') {
+      throw new IllegalArgumentException("base path must not end with a slash");
+    }
+
+    conf.setBasePath(basePath);
+    return null;
+  }
+
+  @Override
   public SiteBuilder setConsole(SiteConsole console) {
     Objects.requireNonNull(console, "console is null");
 

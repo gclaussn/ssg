@@ -44,8 +44,8 @@ public class Cli {
     this(System.out);
   }
 
-  protected Cli(PrintStream ps) {
-    main = new Main(ps);
+  protected Cli(PrintStream out) {
+    main = new Main(out);
 
     commands = new LinkedList<>();
     commands.add(new Cp());
@@ -58,7 +58,7 @@ public class Cli {
     commands.add(new Plugins());
     commands.add(new Server());
 
-    JCommander.Builder builder = JCommander.newBuilder().console(new DefaultConsole(ps)).addObject(main);
+    JCommander.Builder builder = JCommander.newBuilder().console(new DefaultConsole(out)).addObject(main);
 
     commands.forEach(builder::addCommand);
 
@@ -70,6 +70,10 @@ public class Cli {
 
     // call preBuild hook
     command.preBuild(builder, main);
+
+    if (main.getBasePath() != null) {
+      builder.setBasePath(main.getBasePath());
+    }
 
     return builder.setPropertyMap(main.getProperties()).build(main.getSitePath());
   }
@@ -107,10 +111,16 @@ public class Cli {
   protected void log(SitePluginException e) {
     if (main.isVerbose()) {
       e.printStackTrace();
-    } else if (e.getCause() != null) {
-      jc.getConsole().println(e.getCause().getMessage());
-    } else {
+      return;
+    }
+    
+    Throwable cause = e.getCause();
+    if (cause == null) {
       jc.getConsole().println(e.getMessage());
+    } else if (cause.getMessage() != null) {
+      jc.getConsole().println(cause.getMessage());
+    } else {
+      cause.printStackTrace();
     }
   }
 

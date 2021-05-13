@@ -1,29 +1,70 @@
 //- global menu counter
 - var counter = 0
+//- active item within the sidebar menus
+- var activeItem = null
+//- for pagination
+- var prevItem = null
+- var nextItem = null
 
-mixin sidebarMenu(menu)
+mixin menu(menu)
   - counter = counter + 1
   
-  a(data-menu-id="sidebar-menu-" + counter) #{menu.label}
+  div(data-menu-id=counter)
+    label(id="menu-" + counter + "-label")
+      span #{menu.label}
+      svg(class="arrow" id="menu-" + counter + "-arrow", xmlns="http://www.w3.org/2000/svg", version="1.1", viewBox="0 0 24 24", x="0", y="0", aria-hidden="true")
+        polygon(points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 ")
 
-  ul(class="sidebar-menu d-none", id="sidebar-menu-" + counter)
-    each item in menu.items
-      if item.label == null
-        - var page = pages[item]
+    ul(class="menu d-none", id="menu-" + counter)
+      each item, index in menu.items
+        if item.label == null
+          - var page = pages[item]
 
-        li
-          if item == _subId
-            //- current page
-            a(class="active", id="active-item") #{title}
-          else if page != null
-            //- page found
-            a(href=page["_url"]) #{page["title"]}
-          else
-            //- page not found in map
-            a #{item}
-      else
-        //- recursion
-        +sidebarMenu(item)
+          //- for pagination: remember next item 
+          if activeItem != null && nextItem == null
+            - nextItem = item
+
+          li
+            if item == _subId
+              //- current page
+              a(class="active", id="active-item") #{title}
+
+              //- used to determine previous and next item
+              - activeItem = item
+            else if page != null
+              //- page found
+              a(href=page["_url"]) #{page["title"]}
+            else
+              //- page not found in map
+              a #{item}
+
+          //- for pagination: remember previous item 
+          if activeItem == null
+            - prevItem = item
+        else
+          //- recursion
+          +menu(item)
+
+mixin pagination()
+  - var prev = pages[prevItem]
+  - var next = pages[nextItem]
+
+  div(class="row mt-5")
+    div(class="col-md-6")
+      if prev != null
+        div(class="content-pagination prev")
+          a(href=prev["_url"])
+            span(class="d-block") Previous
+            span(class="d-block")
+              b #{prev["title"]}
+    
+    div(class="col-md-6")
+      if next != null
+        div(class="content-pagination next")
+          a(href=next["_url"])
+            span(class="d-block") Next
+            span(class="d-block")
+              b #{next["title"]}
 
 doctype html
 html(lang=en)
@@ -35,68 +76,75 @@ html(lang=en)
 
     link(rel="icon", href="data:,")
 
-    link(rel="stylesheet", href="/node_modules/bootstrap/dist/css/bootstrap.min.css")
-    link(rel="stylesheet", href="/node_modules/prismjs/themes/prism-tomorrow.css")
-    link(rel="stylesheet", href="/styles.css")
+    link(rel="stylesheet", href=_.linkNodeModule("bootstrap/dist/css/bootstrap.min.css"))
+    link(rel="stylesheet", href=_.linkNodeModule("prismjs/themes/prism-tomorrow.css"))
+    link(rel="stylesheet", href=_.linkPublic("docs.css"))
 
   body
     div
       div(class="sidebar")
         div(class="sidebar-content")
-          div(class="sidebar-menu-container", id="sidebar-menu-container")
+          div(class="menu-container", id="menu-container")
             for menu in sidebar.menus
-              +sidebarMenu(menu)
+              +menu(menu)
       div(class="main-container")
         div(class="main")
           div(class="row")
             div(class="col-md-9")
               div(class="content")
                 h1(class="content-title") #{title}
+                
                 div(class="md", id="md")
-                  !{_fn.renderMarkdown(_md)}
+                  !{_.renderMarkdown(_md)}
+
+                if activeItem != null
+                  +pagination()
             div(class="col-md-3")
               div(class="toc-container")
                 ul(class="toc", id="toc")
 
-    script(type="text/javascript", src="/node_modules/jquery/dist/jquery.min.js")
-    script(type="text/javascript", src="/node_modules/prismjs/prism.js")
-    script(type="text/javascript", src="/node_modules/prismjs/components/prism-pug.min.js")
-    script(type="text/javascript", src="/node_modules/prismjs/components/prism-yaml.min.js")
+    script(type="text/javascript", src=_.linkNodeModule("jquery/dist/jquery.min.js"))
+    script(type="text/javascript", src=_.linkNodeModule("prismjs/prism.js"))
+    script(type="text/javascript", src=_.linkNodeModule("prismjs/components/prism-pug.min.js"))
+    script(type="text/javascript", src=_.linkNodeModule("prismjs/components/prism-yaml.min.js"))
     script.
-      //- expand parent menus of active item
-      $("#active-item").parentsUntil("#sidebar-menu-container").filter("ul").each((index, parent) => {
-        $(parent).toggleClass("d-none");
+      // expand parent menus of active item
+      $("#active-item").parentsUntil("#menu-container").filter("div").each((index, div) => {
+        const menuId = $(div).data("menu-id");
+
+        $(`#menu-${menuId}`).toggleClass("d-none");
+        $(`#menu-${menuId}-arrow`).toggleClass("arrow-down");
       });
 
-      function slug(text) {
-        return text.replace(/\s+/g, "-").toLowerCase();
-      }
+      const slug = (text) => { text.replace(/\s+/g, "-").toLowerCase() }
 
-      //- build table of contents
+      // build table of contents
       $("#md").find("h1,h2,h3,h4,h5,h6").each((index, h) => {
         const nodeName = $(h)[0].nodeName.toLowerCase();
         const text = $(h).text();
  
         const sluggedText = slug(text); 
 
-        //- append item
+        // append item
         $("#toc").append(`<li class="toc-${nodeName}"><a href="#${sluggedText}">${text}</a></li>`);
 
-        //- append anchor to heading
-        $(h).append(`<a name="${sluggedText}" />`);
+        // prepend anchor to heading
+        $(h).prepend(`<a class="anchor" name="${sluggedText}" href="#${sluggedText}" />`);
       });
 
       $("#md").find("table").each((index, table) => {
         $(table).addClass("md-table");
       });
 
-      $("#sidebar-menu-container").find("a").each((index, a) => {
-        const menuId = $(a).data("menu-id");
+      // register menu label click handler
+      $("#menu-container").find("div").each((index, div) => {
+        const menuId = $(div).data("menu-id");
         if (!menuId) {
           return;
         }
 
-        $(a).on("click", {menuId: menuId}, (e) => {
-          $(`#${e.data.menuId}`).toggleClass("d-none");
+        $(`#menu-${menuId}-label`).on("click", {menuId: menuId}, (e) => {
+          $(`#menu-${e.data.menuId}`).toggleClass("d-none");
+          $(`#menu-${e.data.menuId}-arrow`).toggleClass("arrow-down");
         });
       });

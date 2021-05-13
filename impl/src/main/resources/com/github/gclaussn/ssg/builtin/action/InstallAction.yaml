@@ -1,0 +1,5 @@
+name: Install
+documentation:
+   Installs the specified node packages, using a specific NPM registry.
+properties:
+  ssg.install.registryUrl: NPM registry URL to use

@@ -14,7 +14,7 @@ public abstract class AbstractCommand {
   }
 
   public void preBuild(SiteBuilder builder, Main main) {
-    CliOutput output = new CliOutput(main.getPrintStream(), main.isVerbose());
+    CliOutput output = new CliOutput(main.getOut(), main.isVerbose());
 
     builder.addEventListener(output);
     builder.setConsole(output);

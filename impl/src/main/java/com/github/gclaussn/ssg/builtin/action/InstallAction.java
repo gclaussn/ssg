@@ -62,14 +62,18 @@ public class InstallAction implements SitePluginAction {
 
   @Override
   public void execute(Site site) {
+    try (NodePackageManager nodePackageManager = NodePackageManager.of(registryUrl)) {
+      execute(site, nodePackageManager);
+    }
+  }
+
+  protected void execute(Site site, NodePackageManager nodePackageManager) {
     Optional<NodePackageSpec> spec = site.getNodePackages();
     if (spec.isEmpty()) {
       throw new SitePluginException("No node packages specified");
     }
 
     List<NodePackage> nodePackages = spec.get().getPackages();
-
-    NodePackageManager nodePackageManager = NodePackageManager.of(registryUrl);
 
     Path path = site.getPath().resolve(NodePackageManager.NODE_MODULES);
     Path downloadPath = path.resolve(".dl");

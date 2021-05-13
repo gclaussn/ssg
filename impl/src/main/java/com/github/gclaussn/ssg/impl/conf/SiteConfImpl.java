@@ -36,6 +36,8 @@ import com.github.gclaussn.ssg.file.SiteFileEventListener;
 
 public class SiteConfImpl implements SiteConf {
 
+  private static final String DEFAULT_BASE_PATH = "/";
+
   protected final SiteConfInjector injector;
 
   protected final List<SiteEventListener> eventListeners;
@@ -50,6 +52,7 @@ public class SiteConfImpl implements SiteConf {
   /** YAML object mapper, used to read source models and type descriptions. */
   protected final ObjectMapper objectMapper;
 
+  protected String basePath;
   protected SiteConsole console;
 
   public SiteConfImpl() {
@@ -70,7 +73,8 @@ public class SiteConfImpl implements SiteConf {
     objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
-    // default console
+    // defaults
+    basePath = DEFAULT_BASE_PATH;
     console = new SiteConsoleImpl();
   }
 
@@ -120,6 +124,11 @@ public class SiteConfImpl implements SiteConf {
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(String.format("Type '%s' could not be found", typeName), e);
     }
+  }
+
+  @Override
+  public String getBasePath() {
+    return basePath;
   }
 
   @Override
@@ -203,6 +212,10 @@ public class SiteConfImpl implements SiteConf {
     } catch (IOException e) {
       throw new RuntimeException(String.format("Type description '%s' could not be read", typeName), e);
     }
+  }
+
+  public void setBasePath(String basePath) {
+    this.basePath = basePath;
   }
 
   public void setConsole(SiteConsole console) {

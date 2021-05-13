@@ -1,8 +1,5 @@
 package com.github.gclaussn.ssg.server;
 
-import java.util.Arrays;
-
-import javax.websocket.server.ServerEndpointConfig;
 import javax.ws.rs.core.Application;
 
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
@@ -20,8 +17,7 @@ import com.github.gclaussn.ssg.server.domain.event.SiteEventResource;
 import com.github.gclaussn.ssg.server.domain.plugin.SitePluginResource;
 import com.github.gclaussn.ssg.server.domain.plugin.action.SitePluginActionTaskEndpoint;
 import com.github.gclaussn.ssg.server.file.SiteFileWatcher;
-import com.github.gclaussn.ssg.server.provider.GenericEncoder;
-import com.github.gclaussn.ssg.server.provider.GenericEndpointConfigurator;
+import com.github.gclaussn.ssg.server.provider.GenericEndpoint;
 
 import io.undertow.Undertow;
 import io.undertow.server.DefaultByteBufferPool;
@@ -31,11 +27,9 @@ import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 
 /**
  * Action, which starts a development server.<br />
- * The server maps following urls:
- * - REST API: /api
- * - Websocket API: /wsa
- * - Server application: /app
- * - Site: /
+ * The server maps the REST API under {@code /api}, the Websocket API under {@code /wsa}, the server
+ * application under {@code /app} and the site itself under its base path (default value {@code /},
+ * if no explicit base path was specified).
  */
 public class StartAction implements SitePluginAction {
 
@@ -78,18 +72,9 @@ public class StartAction implements SitePluginAction {
   }
 
   protected DeploymentInfo createWebSocketApiDeployment() {
-    ServerEndpointConfig eventsConfig = ServerEndpointConfig.Builder.create(SiteEventEndpoint.class, "/events")
-        .configurator(new GenericEndpointConfigurator(eventEndpoint))
-        .encoders(Arrays.asList(GenericEncoder.class))
-        .build();
-
-    ServerEndpointConfig tasksConfig = ServerEndpointConfig.Builder.create(SitePluginActionTaskEndpoint.class, "/tasks")
-        .configurator(new GenericEndpointConfigurator(taskEndpoint))
-        .build();
-
     WebSocketDeploymentInfo webSocketDeployment = new WebSocketDeploymentInfo();
-    webSocketDeployment.addEndpoint(eventsConfig);
-    webSocketDeployment.addEndpoint(tasksConfig);
+    webSocketDeployment.addEndpoint(GenericEndpoint.of(eventEndpoint, "/events"));
+    webSocketDeployment.addEndpoint(GenericEndpoint.of(taskEndpoint, "/tasks"));
     webSocketDeployment.setBuffers(new DefaultByteBufferPool(false, 1024));
 
     DeploymentInfo deployment = new DeploymentInfo();
@@ -111,14 +96,16 @@ public class StartAction implements SitePluginAction {
     server.deploy(createServerApi(site, siteFileWatcher), "/api");
     server.deploy(createWebSocketApiDeployment());
 
+    String basePath = site.getConfiguration().getBasePath();
+
     server.addResourcePrefixPath("/app", new ResourceHandler(new ServerAppManager()));
-    server.addResourcePrefixPath("/", new ResourceHandler(new SiteOutputManager(site)));
+    server.addResourcePrefixPath(basePath, new ResourceHandler(new SiteOutputManager(site)));
 
     // start server
     server.start(Undertow.builder().addHttpListener(port, host));
 
     String uri = String.format("http://%s:%d", host, port);
-    LOGGER.info("Serving site: {}", uri);
+    LOGGER.info("Serving site: {}{}", uri, basePath);
     LOGGER.info("Serving app:  {}/app", uri);
     LOGGER.info("Serving api:  {}/api", uri);
 

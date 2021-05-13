@@ -1,16 +1,21 @@
 package com.github.gclaussn.ssg.builtin;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import com.github.gclaussn.ssg.Page;
 import com.github.gclaussn.ssg.PageProcessor;
 import com.github.gclaussn.ssg.Site;
 
+/**
+ * Processor, which extracts the date from the model (YAML or Markdown) file name.
+ */
 public class DateProcessor implements PageProcessor {
 
   /** Key of the date value e.g. "2020-05-31". */
@@ -35,7 +40,12 @@ public class DateProcessor implements PageProcessor {
 
   @Override
   public Object process(Page page) {
-    String fileName = page.getModelPath().get().getFileName().toString();
+    Optional<Path> modelPath = page.getModelPath();
+    if (modelPath.isEmpty()) {
+      return null;
+    }
+
+    String fileName = modelPath.get().getFileName().toString();
 
     LocalDate date = LocalDate.parse(fileName.substring(0, 10));
 

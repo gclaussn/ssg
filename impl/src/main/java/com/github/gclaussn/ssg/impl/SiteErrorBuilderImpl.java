@@ -119,9 +119,11 @@ public class SiteErrorBuilderImpl implements SiteErrorBuilder {
   }
 
   @Override
-  public SiteError errorPageNotGenerated(JadeException e) {
+  public SiteError errorPageNotGenerated(JadeException e, Path templatePath) {
     SiteErrorLocationImpl location = new SiteErrorLocationImpl();
-    location.path = Paths.get(e.getFilename());
+    // e.getFilename() can sometimes be null
+    // in that case use the given template path
+    location.path = e.getFilename() != null ? Paths.get(e.getFilename()) : templatePath;
     location.line = e.getLineNumber();
 
     error.cause = e;

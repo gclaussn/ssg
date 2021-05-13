@@ -9,7 +9,7 @@ import javax.websocket.EndpointConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class GenericEncoder implements Encoder.TextStream<Object> {
+class GenericEncoder implements Encoder.TextStream<Object> {
 
   private ObjectMapper objectMapper;
 
