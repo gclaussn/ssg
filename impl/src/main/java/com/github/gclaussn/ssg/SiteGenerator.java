@@ -5,6 +5,9 @@ import java.util.Optional;
 
 import com.github.gclaussn.ssg.data.PageData;
 
+/**
+ * Site generator that generates the page's HTML output under {@code out/}.
+ */
 public interface SiteGenerator {
 
   /** Name of the template model, providing builtin functions. */

@@ -1,14 +1,14 @@
 includes:
-- common/header
+  - common/header
 processors:
-- id: date
-  class: DateProcessor
-  model:
-    dateFormat: yyyy-MM-dd
-    dateFormatLocale: en
-    timeZoneId: UTC
+  date:
+    class: DateProcessor
+    model:
+      dateFormat: yyyy-MM-dd
+      dateFormatLocale: en
+      timeZoneId: UTC
 filters:
-- id: date
-  class: DateFilter
-  model:
-    source: date
+  date:
+    class: DateFilter
+    model:
+      processorId: date

@@ -23,7 +23,6 @@ public class DefaultPlugin implements SitePlugin {
     builder.addPageDataSelector(PageSetMapper.class);
     builder.addPageDataSelector(PageSetSelector.class);
     builder.addPageFilter(DateFilter.class);
-    builder.addPageFilter(PublishedFilter.class);
     builder.addPageProcessor(DateProcessor.class);
 
     // register actions

@@ -117,7 +117,7 @@ class SiteOutputServer {
     
     Stream<Path> stream = Files.walk(path).filter(Files::isRegularFile);
 
-    Optional<NodePackageSpec> spec = site.getNodePackages();
+    Optional<NodePackageSpec> spec = site.getNodePackageSpec();
     if (spec.isPresent()) {
       stream = stream.filter(spec.get().getMatcher());
     }

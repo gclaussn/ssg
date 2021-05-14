@@ -7,8 +7,8 @@ import java.util.Set;
 import com.github.gclaussn.ssg.data.PageData;
 
 /**
- * A reusable source, providing data and/or template code via JADE {@code include} or
- * {@code extends} syntax.
+ * A reusable source, providing data and/or template code. A page include can be used via JADE
+ * {@code include} or {@code extends} syntax.
  */
 public interface PageInclude extends Source {
 

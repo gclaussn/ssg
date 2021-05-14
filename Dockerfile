@@ -1,6 +1,7 @@
 FROM openjdk:14.0.2-slim
 
 ENV SSG_HOME="/opt/ssg"
+ENV SSG_SERVER_HOST="0.0.0.0"
 
 ENV PATH="${PATH}:${SSG_HOME}/bin"
 

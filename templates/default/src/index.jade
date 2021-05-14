@@ -25,7 +25,7 @@ html(lang=en)
             div(class="card-body")
               p Gets the URL of the page with the given ID or null, if the site has no such page.
 
-              pre(class="p-3 bg-light") \!{_fn.getPageUrl("my-page-id")}
+              pre(class="p-3 bg-light") \!{_.linkPage("my-page-id")}
 
               p Example: Iterate a list of pages and render a link to each page
               
@@ -41,7 +41,7 @@ html(lang=en)
               p JADE:
               pre(class="p-3 bg-light").
                 each page in pages
-                  a(href=_fn.getPageUrl(page.id))= page.name
+                  a(href=_.linkPage(page.id))= page.name
 
         div(class="col-6 mb-4")
           div(class="card h-100 shadow-sm")
@@ -50,10 +50,10 @@ html(lang=en)
             div(class="card-body")
               p Renders the given page data node as JSON string.
 
-              pre(class="p-3 bg-light") \!{_fn.renderJson(value)}
+              pre(class="p-3 bg-light") \!{_.renderJson(value)}
 
               p
-                a(href=_fn.getPageUrl("example-render-json"), target="_blank") Example
+                a(href=_.linkPage("example-render-json"), target="_blank") Example
                 span : Render list of numbers as JSON array and process the list
               
               p YAML:
@@ -68,7 +68,7 @@ html(lang=en)
               p JADE:
               pre(class="p-3 bg-light").
                 script.
-                  const numbers = \!{_fn.renderJson(numbers)};
+                  const numbers = \!{_.renderJson(numbers)};
 
                   numbers.forEach(number => {
                     const odd = number % 2 == 1;
@@ -82,13 +82,13 @@ html(lang=en)
             div(class="card-body")
               p Renders the given page data node as Markdown, which converts the source into HTML.
 
-              pre(class="p-3 bg-light") \!{_fn.renderMarkdown(source)}
+              pre(class="p-3 bg-light") \!{_.renderMarkdown(source)}
 
               p
                 span Example: Render a textual page data node as Markdown (see 
-                a(href=_fn.getPageUrl("page-set1/2030-11-01-page1"), target="_blank") Page 1
+                a(href=_.linkPage("page-set1/2030-11-01-page1"), target="_blank") Page 1
                 span  or 
-                a(href=_fn.getPageUrl("page-set1/2030-11-02-page2"), target="_blank") Page 2
+                a(href=_.linkPage("page-set1/2030-11-02-page2"), target="_blank") Page 2
                 span  )
               
               p YAML:
@@ -105,7 +105,7 @@ html(lang=en)
 
               p JADE:
               pre(class="p-3 bg-light").
-                div \!{_fn.renderMarkdown(content)}
+                div \!{_.renderMarkdown(content)}
 
         div(class="col-6 mb-4")
           div(class="card h-100 shadow-sm")
@@ -143,9 +143,9 @@ html(lang=en)
               p Use metadata of the page itself or the metadata of selected pages (see PageSetSelector example).
 
               pre(class="p-3 bg-light").
-                span= _meta.id
-                span= _meta.subId
-                span= _meta.url
+                span= _id
+                span= _subId
+                span= _url
 
         div(class="col-6 mb-4")
           div(class="card h-100 shadow-sm")
@@ -155,7 +155,7 @@ html(lang=en)
               p Selects the data of all pages, that are part of a specified page set and not rejected (by a PageFilter) nor skipped.
 
               p
-                a(href=_fn.getPageUrl("example-page-set-selector"), target="_blank") Example
+                a(href=_.linkPage("example-page-set-selector"), target="_blank") Example
                 span : Select pages of page-set1
               
               p YAML:
@@ -170,7 +170,7 @@ html(lang=en)
               pre(class="p-3 bg-light").
                 each page in selected
                   div
-                    a(href= page._meta.url) \#{page.title}
+                    a(href= page._url) \#{page.title}
 
         div(class="col-6 mb-4")
           div(class="card h-100 shadow-sm")
@@ -186,9 +186,9 @@ html(lang=en)
 
               p
                 span Example: Process date (last segment of the page ID) and filter pages that are after or equal to the current date (see 
-                a(href=_fn.getPageUrl("page-set1/2030-11-01-page1"), target="_blank") Page 1
+                a(href=_.linkPage("page-set1/2030-11-01-page1"), target="_blank") Page 1
                 span  or 
-                a(href=_fn.getPageUrl("page-set1/2030-11-02-page2"), target="_blank") Page 2
+                a(href=_.linkPage("page-set1/2030-11-02-page2"), target="_blank") Page 2
                 span  )
               
               p YAML:
@@ -208,4 +208,4 @@ html(lang=en)
 
               p JADE:
               pre(class="p-3 bg-light").
-                div \!{_fn.renderJson(date)}
+                div \!{_.renderJson(date)}

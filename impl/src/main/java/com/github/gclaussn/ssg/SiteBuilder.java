@@ -11,7 +11,7 @@ import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.plugin.SitePluginAction;
 
 /**
- * Builder for {@link Site} and {@link EventDrivenSite} instances.
+ * Builder for {@link Site} instances.
  */
 public interface SiteBuilder {
 

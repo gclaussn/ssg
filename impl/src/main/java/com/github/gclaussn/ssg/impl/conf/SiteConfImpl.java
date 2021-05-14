@@ -189,12 +189,12 @@ public class SiteConfImpl implements SiteConf {
   }
 
   @Override
-  public void publish(SiteEvent event) {
+  public void onEvent(SiteEvent event) {
     eventListeners.forEach(l -> l.onEvent(event));
   }
 
   @Override
-  public void publish(SiteFileEvent event) {
+  public void onEvent(SiteFileEvent event) {
     fileEventListeners.forEach(l -> l.onEvent(event));
   }
 

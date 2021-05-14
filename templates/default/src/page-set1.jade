@@ -16,10 +16,10 @@ html(lang=en)
       h1(class="display-6")= title
       div
         p YAML string is rendered as Markdown
-        pre \!{_fn.renderMarkdown(content)}
-      div !{_fn.renderMarkdown(content)}
+        pre \!{_.renderMarkdown(content)}
+      div !{_.renderMarkdown(content)}
 
       div(class="pt-md-5")
         p Data processed by DataProcessor
-        pre \!{_fn.renderJson(date)}
-      div !{_fn.renderJson(date)}
+        pre \!{_.renderJson(date)}
+      div !{_.renderJson(date)}

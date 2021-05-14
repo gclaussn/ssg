@@ -20,7 +20,7 @@ import com.github.gclaussn.ssg.file.SiteFileEventListener;
  * @see SiteBuilder
  * @see Site#getConf()
  */
-public interface SiteConf {
+public interface SiteConf extends SiteEventListener, SiteFileEventListener {
 
   /**
    * Describes the given type and its site properties.
@@ -91,7 +91,12 @@ public interface SiteConf {
 
   <T> T inject(T instance, Map<String, Object> additionalProperties);
 
-  void publish(SiteEvent event);
+  @Override
+  void onEvent(SiteEvent event);
 
-  void publish(SiteFileEvent event);
+  /**
+   * 
+   */
+  @Override
+  void onEvent(SiteFileEvent event);
 }

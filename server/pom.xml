@@ -78,7 +78,7 @@
         </executions>
         <configuration>
           <resourceBundles>
-            <resourceBundle>${project.groupId}:${project.artifactId}-app:${project.version}</resourceBundle>
+            <resourceBundle>${project.groupId}:server-app:${project.version}</resourceBundle>
           </resourceBundles>
           <outputDirectory>${project.build.outputDirectory}/app</outputDirectory>
         </configuration>

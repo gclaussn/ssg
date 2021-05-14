@@ -3,7 +3,8 @@ package com.github.gclaussn.ssg;
 import java.nio.file.Path;
 
 /**
- * Output file of a static site.
+ * Output of a static site, which can be a {@link Page}, a public file under {@code pub/} or a
+ * {@code node_modules} file.
  */
 public interface SiteOutput {
 

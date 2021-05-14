@@ -68,7 +68,7 @@ public class InstallAction implements SitePluginAction {
   }
 
   protected void execute(Site site, NodePackageManager nodePackageManager) {
-    Optional<NodePackageSpec> spec = site.getNodePackages();
+    Optional<NodePackageSpec> spec = site.getNodePackageSpec();
     if (spec.isEmpty()) {
       throw new SitePluginException("No node packages specified");
     }

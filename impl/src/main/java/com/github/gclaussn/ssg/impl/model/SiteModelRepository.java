@@ -670,7 +670,7 @@ public class SiteModelRepository implements AutoCloseable {
   }
 
   private void publish(SiteEvent event) {
-    site.getConfiguration().publish(event);
+    site.getConfiguration().onEvent(event);
   }
 
   protected PageModel readPageModel(String pageId) throws IOException {

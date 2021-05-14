@@ -3,7 +3,7 @@ package com.github.gclaussn.ssg;
 import java.net.URLEncoder;
 
 /**
- * Builtin generator functions.
+ * Builtin generator functions, accessible via {@link SiteGenerator#FUNCTIONS}.
  */
 public interface SiteGeneratorFn {
 

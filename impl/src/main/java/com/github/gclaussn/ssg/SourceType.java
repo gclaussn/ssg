@@ -1,5 +1,8 @@
 package com.github.gclaussn.ssg;
 
+/**
+ * Possible source types.
+ */
 public enum SourceType {
 
   PAGE,

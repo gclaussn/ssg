@@ -9,8 +9,7 @@ import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataSelectorBean;
 
 /**
- * A page set, provides default data and a template for contained pages that are part of the page
- * set.
+ * A page set, provides default data and a template for pages that are part of the page set.
  */
 public interface PageSet extends Source {
 

@@ -18,15 +18,18 @@ import com.github.gclaussn.ssg.npm.NodePackageSpec;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
 /**
- * Static site representation, which loades pages and page sets that are defined in its
- * {@code site.yaml} file.<br>
+ * A site is loaded from a {@code site.yaml} file. It defines {@link Page}s, {@link PageSet}s and
+ * {@link PageInclude}s. A site can be generated via {@link #generate()}<br>
  * <br>
  * A site can also be driven by file events (create, modify, delete) - see
  * {@link SiteFileEventListener}. It handles events regarding the {@code site.yaml} file and all
  * source files ({@code src/}) of type {@link SiteFileType#YAML}, {@link SiteFileType#JADE} and
- * {@link SiteFileType#MD}.
+ * {@link SiteFileType#MD} - see {@link SiteConf#onEvent(SiteEvent)}
+ * 
+ * @see {@link SiteConf}
+ * @see {@link SiteGenerator}
  */
-public interface Site extends SiteFileEventListener, AutoCloseable {
+public interface Site extends AutoCloseable {
 
   /** Name of the site model (YAML) file. */
   static final String MODEL_NAME = YAML.appendTo("site");
@@ -122,7 +125,7 @@ public interface Site extends SiteFileEventListener, AutoCloseable {
    * 
    * @return The specified node packages. Otherwise an empty optional.
    */
-  Optional<NodePackageSpec> getNodePackages();
+  Optional<NodePackageSpec> getNodePackageSpec();
 
   /**
    * Provides the path to the directory, where the generator output is written to.

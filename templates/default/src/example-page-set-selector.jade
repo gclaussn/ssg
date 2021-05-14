@@ -16,11 +16,11 @@ html(lang=en)
       h1(class="display-6")= title
       div
         p Selected pages are part of the page data
-        pre \!{_fn.renderJson(selected)}
-      div(class="p-3") !{_fn.renderJson(selected)}
+        pre \!{_.renderJson(selected)}
+      div(class="p-3") !{_.renderJson(selected)}
       
       div(class="pt-md-5")
         p Selected pages:
         each page in selected
           div
-            a(href= page._meta.url) #{page.title}
+            a(href= page._url) #{page.title}

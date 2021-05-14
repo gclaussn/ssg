@@ -23,6 +23,7 @@ import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.conf.SiteConf;
 import com.github.gclaussn.ssg.event.SiteEventStore;
 import com.github.gclaussn.ssg.file.SiteFileEvent;
+import com.github.gclaussn.ssg.file.SiteFileEventListener;
 import com.github.gclaussn.ssg.file.SiteFileEventType;
 import com.github.gclaussn.ssg.impl.conf.SiteConfImpl;
 import com.github.gclaussn.ssg.impl.event.SiteEventStoreImpl;
@@ -31,7 +32,7 @@ import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
 import com.github.gclaussn.ssg.npm.NodePackageSpec;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
-class SiteImpl implements Site {
+class SiteImpl implements Site, SiteFileEventListener {
 
   protected final SiteConfImpl conf;
   protected final SiteEventStoreImpl eventStore;
@@ -129,7 +130,7 @@ class SiteImpl implements Site {
   }
 
   @Override
-  public Optional<NodePackageSpec> getNodePackages() {
+  public Optional<NodePackageSpec> getNodePackageSpec() {
     return repository.getNodePackageSpec();
   }
 
@@ -345,8 +346,6 @@ class SiteImpl implements Site {
    */
   @Override
   public void onEvent(SiteFileEvent event) {
-    conf.publish(event);
-
     if (event.isPublic()) {
       // do not handle public files any further
       // since public files does not affect loading and generating

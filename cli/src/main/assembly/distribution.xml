@@ -11,6 +11,7 @@
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <excludes>
+        <!-- already packaged within ssg-server module -->
         <exclude>com.github.gclaussn:ssg-server-app</exclude>
       </excludes>
     </dependencySet>

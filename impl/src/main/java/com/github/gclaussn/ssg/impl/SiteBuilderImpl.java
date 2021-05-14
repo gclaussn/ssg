@@ -91,13 +91,14 @@ public class SiteBuilderImpl implements SiteBuilder {
   public Site build(Path sitePath) {
     Objects.requireNonNull(sitePath, "site path is null");
 
-    conf.getEventListeners().add(eventStore);
-    conf.getFileEventListeners().add(eventStore);
-
     // load plugins
     pluginManager.preBuild(this);
 
-    Site site = new SiteImpl(this, sitePath);
+    SiteImpl site = new SiteImpl(this, sitePath);
+
+    conf.getEventListeners().add(0, eventStore);
+    conf.getFileEventListeners().add(0, eventStore);
+    conf.getFileEventListeners().add(0, site);
 
     // call postBuild hook
     pluginManager.postBuild(site);

@@ -42,7 +42,7 @@ class SiteGeneratorImpl implements SiteGenerator {
 
   private final SiteImpl site;
 
-  /** Builtin functions, that are accessible in the JADE model via "_fn". */
+  /** Builtin functions, that are accessible in the JADE model via "_". */
   private final SiteGeneratorFn fn;
 
   private final JadeConfiguration configuration;
@@ -273,26 +273,6 @@ class SiteGeneratorImpl implements SiteGenerator {
     return fn;
   }
 
-  protected Set<PageInclude> resolvePageIncludes(Page page) {
-    Queue<PageInclude> queue = new LinkedList<>();
-    for (PageInclude pageInclude : page.getPageIncludes()) {
-      queue.add(pageInclude);
-    }
-
-    Set<PageInclude> pageIncludes = new HashSet<>();
-    while (!queue.isEmpty()) {
-      PageInclude pageInclude = queue.poll();
-      if (pageIncludes.contains(pageInclude)) {
-        continue;
-      }
-
-      pageIncludes.add(pageInclude);
-      pageInclude.getPageIncludes().stream().forEach(queue::add);
-    }
-
-    return pageIncludes;
-  }
-
   protected String normalizeId(String id) {
     StringBuilder sb = new StringBuilder(id.length());
 
@@ -314,6 +294,26 @@ class SiteGeneratorImpl implements SiteGenerator {
   }
 
   private void publish(SiteEvent event) {
-    site.getConfiguration().publish(event);
+    site.getConfiguration().onEvent(event);
+  }
+
+  protected Set<PageInclude> resolvePageIncludes(Page page) {
+    Queue<PageInclude> queue = new LinkedList<>();
+    for (PageInclude pageInclude : page.getPageIncludes()) {
+      queue.add(pageInclude);
+    }
+
+    Set<PageInclude> pageIncludes = new HashSet<>();
+    while (!queue.isEmpty()) {
+      PageInclude pageInclude = queue.poll();
+      if (pageIncludes.contains(pageInclude)) {
+        continue;
+      }
+
+      pageIncludes.add(pageInclude);
+      pageInclude.getPageIncludes().stream().forEach(queue::add);
+    }
+
+    return pageIncludes;
   }
 }

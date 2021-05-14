@@ -42,7 +42,7 @@ class SiteFileWatcherImpl implements SiteFileWatcher, Runnable, ThreadFactory {
   private boolean createdOnly;
 
   SiteFileWatcherImpl(Site site) {
-    this(site, site);
+    this(site, site.getConfiguration());
   }
 
   protected SiteFileWatcherImpl(Site site, SiteFileEventListener fileEventListener) {

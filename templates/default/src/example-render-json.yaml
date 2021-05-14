@@ -1,9 +1,9 @@
 includes:
-- common/header
+  - common/header
 data:
   title: "Example: Render JSON"
   numbers:
-  - 45
-  - 64
-  - 73
-  - 82
+    - 45
+    - 64
+    - 73
+    - 82
