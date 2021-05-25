@@ -54,7 +54,20 @@ public class NodePackageManagerImpl implements NodePackageManager {
 
   @Override
   public InputStream download(String packageName, String version) {
-    return registry.download(packageName, version);
+    String shortName = packageName;
+
+    // handle scoped package names: @fortawesome/fontawesome-free
+    int index = shortName.lastIndexOf('/');
+    if (index != -1) {
+      shortName = shortName.substring(index + 1);
+    }
+
+    return download(packageName, shortName, version);
+  }
+
+  @Override
+  public InputStream download(String packageName, String shortName, String version) {
+    return registry.download(packageName, shortName, version);
   }
 
   @Override

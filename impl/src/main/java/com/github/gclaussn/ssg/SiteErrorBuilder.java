@@ -13,6 +13,8 @@ public interface SiteErrorBuilder {
 
   SiteError errorModelNotRead(IOException e);
 
+  SiteError errorModelNotWritten(IOException e, Path modelPath);
+
   SiteError errorOutputDirectoryNotCreated(IOException e);
 
   SiteError errorOutputDirectoryNotDeleted(IOException e);
@@ -22,6 +24,8 @@ public interface SiteErrorBuilder {
   SiteError errorPageNotGenerated(JadeException e, Path templatePath);
 
   SiteError errorPageOutputDirectoryNotCreated(IOException e);
+
+  SiteError errorPageSourceDirectoryNotCreated(IOException e);
 
   SiteError errorPageSetNotTraversed(IOException e);
 

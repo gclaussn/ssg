@@ -13,7 +13,9 @@ import static com.github.gclaussn.ssg.file.SiteFileType.JADE;
 import static com.github.gclaussn.ssg.file.SiteFileType.MD;
 import static com.github.gclaussn.ssg.file.SiteFileType.YAML;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -32,12 +34,15 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.github.gclaussn.ssg.Page;
+import com.github.gclaussn.ssg.PageBuilder;
 import com.github.gclaussn.ssg.PageFilterBean;
 import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageProcessorBean;
@@ -81,10 +86,14 @@ public class SiteModelRepository implements AutoCloseable {
     module.addDeserializer(PageFilterBeanImpl.class, new PageFilterDeserializer(site));
     module.addDeserializer(PageProcessorBeanImpl.class, new PageProcessorDeserializer(site));
 
-    objectMapper = new ObjectMapper(new YAMLFactory());
+    YAMLFactory yamlFactory = new YAMLFactory();
+    yamlFactory.disable(Feature.WRITE_DOC_START_MARKER);
+
+    objectMapper = new ObjectMapper(yamlFactory);
     objectMapper.configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true);
     objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
     objectMapper.registerModule(module);
+    objectMapper.setSerializationInclusion(Include.NON_NULL);
     objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
   }
@@ -181,6 +190,10 @@ public class SiteModelRepository implements AutoCloseable {
     return new ConcurrentHashMap<>(32);
   }
 
+  public PageBuilder createPageBuilder(String pageId) {
+    return new PageBuilderImpl(this, pageId);
+  }
+
   /**
    * Extracts the ID of a page, a page set or a page include from a given path within the source
    * folder - e.g. "/site/src/events/2020-04-25.yaml" -> events/2020-04-25<br>
@@ -269,9 +282,8 @@ public class SiteModelRepository implements AutoCloseable {
       return Optional.ofNullable(model.nodePackageSpec);
     }
 
-    // special case for installing node packages or serving site output without loading
+    // installing node packages or serving site output without loading
     SiteModel model = loadSiteModel();
-
     return Optional.ofNullable(model.nodePackageSpec);
   }
 
@@ -774,6 +786,32 @@ public class SiteModelRepository implements AutoCloseable {
     pages.clear();
     pageIncludes.clear();
     pageSets.clear();
+  }
+
+  protected Optional<SiteError> savePage(PageBuilderImpl pageBuilder) {
+    PageModel model = new PageModel();
+    model.data = pageBuilder.data;
+    model.filePath = site.getSourcePath().resolve(YAML.appendTo(pageBuilder.pageId));
+    
+    // create parent directories
+    try {
+      Files.createDirectories(model.filePath.getParent());
+    } catch (IOException e) {
+      SiteError error = SiteError.builder(site).source(PAGE, pageBuilder.pageId).errorPageSourceDirectoryNotCreated(e);
+
+      return Optional.of(error);
+    }
+
+    // write page model
+    try (BufferedWriter w = Files.newBufferedWriter(model.filePath, StandardCharsets.UTF_8)) {
+      objectMapper.writeValue(w, model);
+    } catch (IOException e) {
+      SiteError error = SiteError.builder(site).source(PAGE, pageBuilder.pageId).errorModelNotWritten(e, model.filePath);
+
+      return Optional.of(error);
+    }
+
+    return Optional.empty();
   }
 
   private <T> List<T> toList(Map<String, T> map) {

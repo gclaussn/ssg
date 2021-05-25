@@ -14,9 +14,9 @@ import javax.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 public interface NodePackageRegistry {
 
-  @Path("/{packageName}/-/{packageName}-{version}.tgz")
+  @Path("/{packageName}/-/{shortName}-{version}.tgz")
   @GET
-  InputStream download(@PathParam("packageName") String packageName, @PathParam("version") String version);
+  InputStream download(@PathParam("packageName") String packageName, @PathParam("shortName") String shortName, @PathParam("version") String version);
 
   @Path("/{packageName}/{version}")
   @GET

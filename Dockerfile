@@ -2,10 +2,9 @@ FROM openjdk:14.0.2-slim
 
 ENV SSG_HOME="/opt/ssg"
 ENV SSG_SERVER_HOST="0.0.0.0"
+ENV SSG_SERVER_PORT="8080"
 
 ENV PATH="${PATH}:${SSG_HOME}/bin"
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
 
 RUN apt-get update && \
     apt-get install -y unzip
@@ -21,3 +20,7 @@ RUN unzip -d /opt/ssg /tmp/ssg.zip && \
     chmod 750 /opt/ssg/bin/ssg
 
 WORKDIR /site
+
+EXPOSE 8080
+
+ENTRYPOINT ["/docker-entrypoint.sh"]

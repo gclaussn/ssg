@@ -38,14 +38,12 @@ public class StartAction implements SitePluginAction {
   public static final String HOST = "ssg.server.host";
   public static final String PORT = "ssg.server.port";
 
-  public static final String SITE_EVENT_ENDPOINT = "ssg.server.siteEventEndpoint";
-
   @SiteProperty(name = HOST, required = false, defaultValue = "localhost")
   protected String host;
   @SiteProperty(name = PORT, required = false, defaultValue = "8080")
   protected Integer port;
 
-  @SiteProperty(name = SITE_EVENT_ENDPOINT, required = true, documented = false)
+  @SiteProperty(name = ServerPlugin.SITE_EVENT_ENDPOINT, required = true, documented = false)
   protected SiteEventEndpoint eventEndpoint;
 
   /** Websocket endpoint for the execution of plugin actions. */

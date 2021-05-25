@@ -90,6 +90,8 @@ public interface Site extends AutoCloseable {
   @Override
   void close();
 
+  PageBuilder createPageBuilder(String pageId);
+
   /**
    * Generates the output of all known pages.
    * 

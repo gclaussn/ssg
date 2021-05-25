@@ -2,6 +2,8 @@
 
 set -e
 
+cd "$(dirname "$0")/.."
+
 if [ -z "$1" ]; then
   echo "release version must be provided" && exit 1
 fi
@@ -9,8 +11,6 @@ fi
 VERSION=$1
 
 git checkout -b release/${VERSION}
-
-cd ..
 
 # set release version
 npm --prefix server-app/ version ${VERSION} --force

@@ -24,10 +24,10 @@ public class Main {
   @DynamicParameter(names = "-P", description = "Site properties")
   protected Map<String, String> properties = new HashMap<>();
 
-  @Parameter(names = {"--site-path", "-s"}, description = "Site path", converter = PathConverter.class)
+  @Parameter(names = {"--site-path", "-s"}, description = "Path to the site", converter = PathConverter.class)
   protected Path sitePath;
 
-  @Parameter(names = {"--verbose"}, description = "Show stacktraces")
+  @Parameter(names = {"--verbose"}, description = "Show stacktrace")
   protected boolean verbose;
 
   private final PrintStream out;

@@ -83,7 +83,7 @@ public class InstallAction implements SitePluginAction {
     createDirectory(path);
     createDirectory(downloadPath);
 
-    console.log("Installing..");
+    console.log("Installing...");
     for (NodePackage nodePackage : nodePackages) {
       console.log(nodePackage.toString());
 

@@ -67,6 +67,8 @@ public class Desc extends AbstractCommand {
     append("Default value", desc.getDefaultValue());
     append("Variable", desc.getVariableName());
     append("Variable value", desc.getVariable());
+
+    builder.dec();
   }
 
   protected void append(String key, String value) {

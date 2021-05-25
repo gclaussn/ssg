@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.github.gclaussn.ssg.data.PageData;
+import com.github.gclaussn.ssg.data.PageDataSelector;
 import com.github.gclaussn.ssg.data.PageDataSelectorBean;
 
 /**
@@ -40,7 +41,7 @@ public interface Page extends Source {
 
   /**
    * Provides the specified data selectors, which are executed when the page is generated.<br>
-   * If the page is part of a page set, the page set's data selectors are also applied.
+   * If the page is part of a page set, the page set's data selectors are also included and applied.
    * 
    * @return A list of {@link PageDataSelectorBean}s.
    * 
@@ -64,15 +65,15 @@ public interface Page extends Source {
 
   /**
    * Returns the output name of the generated page HTML file, relative to the site's base path - e.g.
-   * "news/2020-07-23-xyz.html". If not specified diffently within the model (via "out" field), the
-   * output name will be the page ID plus HTML file extension.
+   * "news/2020-07-23-xyz.html". If not specified diffently within the model (via "out"), the output
+   * name will be the page ID plus HTML file extension (".html").
    * 
    * @return The page's output path.
    */
   String getOutputName();
 
   /**
-   * Returns the output path of the generated page HTM file.
+   * Returns the output path of the generated page HTML file.
    * 
    * @return The absolute output path.
    * 
@@ -81,16 +82,16 @@ public interface Page extends Source {
   Path getOutputPath();
 
   /**
-   * Provides all includes, that are used by the page and that are loaded.
+   * Provides all (loaded) includes, that are used by the page.
    * 
    * @return A set, containing all used and successfully loaded {@link PageInclude}s.
    */
   Set<PageInclude> getPageIncludes();
 
   /**
-   * Provides all includes, that are used by the page.
+   * Provides all include IDs, that are used by the page.
    * 
-   * @return A set, containing all used {@link PageInclude}s.
+   * @return A set, containing the IDs of all used {@link PageInclude}s.
    */
   Set<String> getPageIncludeIds();
 
@@ -141,7 +142,8 @@ public interface Page extends Source {
   String getUrl();
 
   /**
-   * Determines if the page is generated or if it is ignored during generation.
+   * Determines if the page is generated (not rejected and not skipped) or if it is ignored during
+   * site generation.
    * 
    * @return {@code true}, if the page is generated. Otherwise {@code false}.
    */
@@ -155,10 +157,10 @@ public interface Page extends Source {
   boolean isRejected();
 
   /**
-   * Determines if the page is skipped during site generation. A skipped page can still provides its
-   * data.
+   * Determines if the page is skipped during site generation. A skipped page will still provide its
+   * data when selected by a {@link PageDataSelector}.
    * 
-   * @return {@code true}, if the page is skipped during generation. Otherwise {@code false}.
+   * @return {@code true}, if the page is skipped during site generation. Otherwise {@code false}.
    */
   boolean isSkipped();
 }

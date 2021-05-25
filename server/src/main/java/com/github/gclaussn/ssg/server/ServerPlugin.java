@@ -6,6 +6,8 @@ import com.github.gclaussn.ssg.server.domain.event.SiteEventEndpoint;
 
 public class ServerPlugin implements SitePlugin {
 
+  public static final String SITE_EVENT_ENDPOINT = "ssg.server.siteEventEndpoint";
+
   protected final SiteEventEndpoint eventEndpoint;
 
   public ServerPlugin() {
@@ -19,7 +21,7 @@ public class ServerPlugin implements SitePlugin {
     builder.addFileEventListener(eventEndpoint);
 
     // make websocket endpoint availabe for the start action
-    builder.setProperty(StartAction.SITE_EVENT_ENDPOINT, eventEndpoint);
+    builder.setProperty(SITE_EVENT_ENDPOINT, eventEndpoint);
 
     // register actions
     builder.addPluginAction(StartAction.class);

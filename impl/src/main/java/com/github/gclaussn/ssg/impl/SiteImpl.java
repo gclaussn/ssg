@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.gclaussn.ssg.Page;
+import com.github.gclaussn.ssg.PageBuilder;
 import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageSet;
 import com.github.gclaussn.ssg.Site;
@@ -107,6 +108,17 @@ class SiteImpl implements Site, SiteFileEventListener {
     pluginManager.preDestroy(this);
 
     repository.close();
+  }
+
+  @Override
+  public PageBuilder createPageBuilder(String pageId) {
+    Objects.requireNonNull(pageId, "page ID is null");
+
+    if (pageId.isBlank()) {
+      throw new IllegalArgumentException("page ID is empty or blank");
+    }
+
+    return repository.createPageBuilder(pageId);
   }
 
   @Override

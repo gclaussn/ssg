@@ -72,13 +72,11 @@ public class CliOutput implements SiteConsole, SiteEventListener {
     }
 
     Optional<Source> source = event.getSource();
+    Optional<String> reference = event.getReference();
+
     if (source.isEmpty()) {
       log(type.name());
-      return;
-    }
-
-    Optional<String> reference = event.getReference();
-    if (reference.isEmpty() || type == SiteEventType.LOAD_PAGE) {
+    } else if (reference.isEmpty() || type == SiteEventType.LOAD_PAGE) {
       log(String.format("%s: %s", type, source.get().getId()));
     } else {
       log(String.format("%s: %s:%s", type, source.get().getId(), reference.get()));

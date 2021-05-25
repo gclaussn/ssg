@@ -1,5 +1,5 @@
 # Static Site Generator (SSG)
-SSG is a flexible and extensible static site generator, that processes user-defined [YAML](https://yaml.org/) models, [Markdown](https://daringfireball.net/projects/markdown/) files with YAML front matter and [JADE](https://jade-lang.com/) templates to generate HTML pages.
+SSG is a flexible and extensible static site generator, that processes user-defined [YAML](https://yaml.org/) models, [Markdown](https://spec.commonmark.org/0.28/) files with YAML front matter and [JADE](https://jade-lang.com/) templates to generate HTML pages.
 
 Implementation based on / made possible by:
 - [OpenJDK 14](https://openjdk.java.net/projects/jdk/14/)
@@ -55,7 +55,7 @@ Unix:
 9. Open [application](http://localhost:8080/app) in browser
 
 ## Docker
-SSG is available as pre-built Docker image in a [Docker Hub repository](https://hub.docker.com/r/gclaussn/ssg). Simply run:
+SSG is available as pre-built Docker image on [Docker Hub](https://hub.docker.com/r/gclaussn/ssg). Simply run:
 
     docker pull gclaussn/ssg
     docker run --rm -v $(pwd):/site gclaussn/ssg init

@@ -50,6 +50,8 @@ public interface NodePackageManager extends NodePackageRegistry, AutoCloseable {
    */
   InputStream download(NodePackage nodePackage);
 
+  InputStream download(String packageName, String version);
+
   /**
    * Gets the information about the given Node.js package from a NPM registry.
    * 

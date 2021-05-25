@@ -14,7 +14,7 @@ fi
 
 classpath="${SSG_HOME}/lib/*${classpath_separator}${SSG_HOME}/lib/ext/*"
 
-# find path to site, if specified as argument (--site-path or -s)
+# try to find path to site, if specified as argument (--site-path or -s)
 site_path_found=false
 for arg in "$@"
 do
@@ -32,13 +32,11 @@ if [ "${site_path_found}" = true ]; then
     classpath="${classpath}${classpath_separator}${site_path}/ext/*"
   fi
 else
-  # append classpath, if working direcotry has a ext/ directory 
+  # append classpath, if working direcotry has a ext/ directory
   if [ -d "$(pwd)/ext" ]; then
     classpath="${classpath}${classpath_separator}$(pwd)/ext/*"
   fi
 fi
-
-echo $classpath
 
 exec "java" \
   "-Dlogback.configurationFile=${SSG_HOME}/conf/logback.xml" \

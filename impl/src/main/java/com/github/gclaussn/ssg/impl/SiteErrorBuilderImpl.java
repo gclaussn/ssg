@@ -92,6 +92,24 @@ public class SiteErrorBuilderImpl implements SiteErrorBuilder {
   }
 
   @Override
+  public SiteError errorModelNotWritten(IOException e, Path modelPath) {
+    SiteErrorLocationImpl location = new SiteErrorLocationImpl();
+    location.path = modelPath;
+
+    error.cause = e;
+    error.message = format(getModelName(), modelPath);
+    error.location = location;
+
+    if (e instanceof JsonProcessingException) {
+      error.type = SiteErrorType.MODEL;
+    } else {
+      error.type = SiteErrorType.IO;
+    }
+
+    return error;
+  }
+
+  @Override
   public SiteError errorOutputDirectoryNotCreated(IOException e) {
     error.cause = e;
     error.message = format(site.getOutputPath());
@@ -136,6 +154,15 @@ public class SiteErrorBuilderImpl implements SiteErrorBuilder {
 
   @Override
   public SiteError errorPageOutputDirectoryNotCreated(IOException e) {
+    error.cause = e;
+    error.message = format(error.source.getId());
+    error.type = SiteErrorType.IO;
+
+    return error;
+  }
+
+  @Override
+  public SiteError errorPageSourceDirectoryNotCreated(IOException e) {
     error.cause = e;
     error.message = format(error.source.getId());
     error.type = SiteErrorType.IO;

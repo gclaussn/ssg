@@ -50,6 +50,17 @@ public class NodePackageManagerImplTest {
   }
 
   @Test
+  public void testDownloadScoped() throws IOException {
+    InputStream in = manager.download("@fortawesome/fontawesome-free", "5.13.0");
+    assertThat(in, notNullValue());
+
+    Path target = temporaryFolder.getRoot().toPath().resolve("@fortawesome/fontawesome-free-5.13.0.tgz");
+    Files.createDirectories(target.getParent());
+    Files.copy(in, target);
+    assertThat(target, isFile());
+  }
+
+  @Test
   public void testGetPackageVersion() {
     NodePackageInfo nodePackage = manager.getPackage("jquery", "3.6.0");
     assertThat(nodePackage, notNullValue());

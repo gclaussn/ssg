@@ -1,6 +1,7 @@
 package com.github.gclaussn.ssg.impl.conf;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,50 +32,47 @@ class SiteConfInjector extends StrLookup<String> {
     variableReplacer = new StrSubstitutor(this);
   }
 
-  protected String buildErrorMessageRequired(Object instance, Field field, SitePropertyDesc desc) {
-    return new StringBuilder()
-        .append(instance.getClass())
-        .append('#')
-        .append(field.getName())
-        .append(": Property '")
-        .append(desc.getName())
-        .append("' is required, but no value has been provided")
-        .toString();
-  }
-
   @SuppressWarnings({"rawtypes", "unchecked"})
   protected Object convert(Object value, Class<?> targetType, SitePropertyDesc desc) {
-    if (value != null && value.getClass() == String.class) {
-      // replace environment variables e.g. ${SSG_HOME}
-      value = replaceVariables((String) value);
-    }
-
-    if (value == null || value.getClass() == targetType) {
+    if (value == null) {
       return value;
     }
 
-    if (value.getClass() != String.class) {
-      throw new RuntimeException(String.format("Unsupported type for converation: %s", value.getClass()));
+    if (value.getClass() == String.class) {
+      // replace environment variables e.g. ${SSG_HOME}
+      String s = replaceVariables((String) value);
+
+      switch (desc.getType()) {
+        case BOOLEAN:
+          return Boolean.valueOf(s);
+        case DOUBLE:
+          return Double.valueOf(s);
+        case ENUM:
+          return Enum.valueOf((Class<Enum>) targetType, s);
+        case INTEGER:
+          return Integer.valueOf(s);
+        case LONG:
+          return Long.valueOf(s);
+        case STRING:
+          return s.isEmpty() ? null : s;
+        default:
+          // will result in an unsupported type conversion
+      }
     }
 
-    String valueAsString = (String) value;
-
-    switch (desc.getType()) {
-      case BOOLEAN:
-        return Boolean.valueOf(valueAsString);
-      case DOUBLE:
-        return Double.valueOf(valueAsString);
-      case ENUM:
-        return Enum.valueOf((Class<Enum>) targetType, valueAsString);
-      case INTEGER:
-        return Integer.valueOf(valueAsString);
-      case LONG:
-        return Long.valueOf(valueAsString);
-      case STRING:
-        return valueAsString.isEmpty() ? null : valueAsString;
-      default:
-        return value;
+    if (value.getClass() == targetType) {
+      return value;
     }
+
+    if (targetType.isAssignableFrom(value.getClass())) {
+      return value;
+    }
+
+    throw new RuntimeException(String.format("Unsupported type for conversion: %s", value.getClass()));
+  }
+
+  protected <T> T inject(T instance) {
+    return inject(instance, Collections.emptyMap());
   }
 
   protected <T> T inject(T instance, Map<String, Object> additionalProperties) {
@@ -125,7 +123,15 @@ class SiteConfInjector extends StrLookup<String> {
     Object converted = convert(value, field.getType(), desc);
 
     if (value == null && property.required()) {
-      String message = buildErrorMessageRequired(instance, field, desc);
+      String message = new StringBuilder()
+          .append(instance.getClass())
+          .append('#')
+          .append(field.getName())
+          .append(": Property '")
+          .append(desc.getName())
+          .append("' is required, but no value has been provided")
+          .toString();
+
       throw new RuntimeException(message);
     }
 
