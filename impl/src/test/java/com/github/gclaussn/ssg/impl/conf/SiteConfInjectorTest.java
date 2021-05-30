@@ -7,6 +7,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -77,6 +79,16 @@ public class SiteConfInjectorTest {
   }
 
   @Test
+  public void shouldInjectGeneric() {
+    List<String> list = new LinkedList<>();
+
+    conf.getProperties().put("list", list);
+
+    TargetGeneric target = injector.inject(new TargetGeneric());
+    assertThat(target.list, is(list));
+  }
+
+  @Test
   public void shouldInjectConsole() {
     conf.setConsole(Mockito.mock(SiteConsole.class));
 
@@ -128,6 +140,12 @@ public class SiteConfInjectorTest {
 
     @SiteProperty(name = "ssg.init.template", defaultValue = "${SSG_HOME}/templates/default")
     private String template;
+  }
+
+  private static class TargetGeneric {
+
+    @SiteProperty(name = "list")
+    private List<String> list;
   }
 
   private static class TargetConsole {

@@ -33,8 +33,7 @@ public class SiteModelRepositoryTest {
 
   @Before
   public void setUp() {
-    String packageName = SiteModelRepositoryTest.class.getPackage().getName().replace('.', '/');
-    Path sitePath = Paths.get("./src/test/resources").resolve(packageName);
+    Path sitePath = Paths.get("./src/test/resources/" + this.getClass().getName().replace('.', '/'));
 
     repository = new SiteModelRepository(Site.from(sitePath));
   }

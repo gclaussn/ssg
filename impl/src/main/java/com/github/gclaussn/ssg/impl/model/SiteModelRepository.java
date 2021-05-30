@@ -792,6 +792,7 @@ public class SiteModelRepository implements AutoCloseable {
     PageModel model = new PageModel();
     model.data = pageBuilder.data;
     model.filePath = site.getSourcePath().resolve(YAML.appendTo(pageBuilder.pageId));
+    model.skip = pageBuilder.skip ? Boolean.TRUE : null;
     
     // create parent directories
     try {

@@ -5,7 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SiteOutput;
@@ -15,7 +17,29 @@ import com.github.gclaussn.ssg.plugin.SitePluginAction;
 
 public class CpAction implements SitePluginAction {
 
-  public static final String TARGET = "ssg.cp.target";
+  private static final String TARGET = "ssg.cp.target";
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+
+    private final Map<String, Object> properties;
+
+    private Builder() {
+      properties = new HashMap<>();
+    }
+
+    public void execute(Site site) {
+      site.getPluginManager().execute(new CpAction(), properties);
+    }
+
+    public Builder target(String target) {
+      properties.put(TARGET, target);
+      return this;
+    }
+  }
 
   protected SiteConsole console;
 

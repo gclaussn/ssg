@@ -76,6 +76,8 @@ class SiteFileWatcherImpl implements SiteFileWatcher, Runnable, ThreadFactory {
       siteFileEvent.type = SiteFileEventType.MODIFY;
     }
 
+    LOGGER.info("{}: {}", siteFileEvent.getType(), siteFileEvent.getPath());
+
     try {
       fileEventListener.onEvent(siteFileEvent);
     } catch (Exception e) {

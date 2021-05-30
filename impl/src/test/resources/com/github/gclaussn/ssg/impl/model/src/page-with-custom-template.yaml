@@ -1,5 +1,0 @@
-includes:
-- common/include-a
-- common/include-b
-- common/include-c
-out: x.html

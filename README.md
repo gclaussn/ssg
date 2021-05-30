@@ -25,6 +25,9 @@ and many more!
   - Generator extensions (custom functions that be used within JADE templates)
   - Plugin actions to execute custom tasks
 
+## Documentation
+A documentation can be found [here](https://gclaussn.github.io/ssg/).
+
 ## Quickstart
 1. Ensure that Java 14 is installed (`java -version`)
 2. [Download](https://github.com/gclaussn/ssg/releases/latest/download/ssg.zip) latest release
@@ -64,9 +67,6 @@ SSG is available as pre-built Docker image on [Docker Hub](https://hub.docker.co
 Prepand `MSYS_NO_PATHCONV=1` for Git Bash (MinGW)
 
 The container's working directory is `/site`.
-
-## Documentation
-A documentation can be found [here](https://gclaussn.github.io/ssg/).
 
 ## License
 The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).

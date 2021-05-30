@@ -80,6 +80,8 @@ public class SiteConfImpl implements SiteConf {
 
   @Override
   public TypeDesc describe(Class<?> type) {
+    Objects.requireNonNull(type, "type is null");
+
     TypeDescModel model = readTypeDescModel(type.getName());
     if (model.properties == null) {
       model.properties = Collections.emptyMap();
@@ -119,6 +121,8 @@ public class SiteConfImpl implements SiteConf {
 
   @Override
   public TypeDesc describe(String typeName) {
+    Objects.requireNonNull(typeName, "type name is null");
+
     try {
       return describe(Class.forName(typeName));
     } catch (ClassNotFoundException e) {
@@ -180,21 +184,31 @@ public class SiteConfImpl implements SiteConf {
 
   @Override
   public <T> T inject(T instance) {
+    Objects.requireNonNull(instance, "instance is null");
+
     return inject(instance, Collections.emptyMap());
   }
 
   @Override
   public <T> T inject(T instance, Map<String, Object> additionalProperties) {
+    Objects.requireNonNull(instance, "instance is null");
+    Objects.requireNonNull(additionalProperties, "additional properties are null");
+
     return injector.inject(instance, additionalProperties);
   }
 
   @Override
   public void onEvent(SiteEvent event) {
+    Objects.requireNonNull(event, "event is null");
+
     eventListeners.forEach(l -> l.onEvent(event));
   }
 
   @Override
   public void onEvent(SiteFileEvent event) {
+    Objects.requireNonNull(event, "event is null");
+    Objects.requireNonNull(event.getPath(), "event path is null");
+
     fileEventListeners.forEach(l -> l.onEvent(event));
   }
 

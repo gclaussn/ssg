@@ -6,18 +6,16 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
 import com.github.gclaussn.ssg.Page;
-import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageSet;
 import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.SiteException;
@@ -25,7 +23,6 @@ import com.github.gclaussn.ssg.SiteGenerator;
 import com.github.gclaussn.ssg.SiteGeneratorFn;
 import com.github.gclaussn.ssg.data.PageData;
 import com.github.gclaussn.ssg.data.PageDataBuilder;
-import com.github.gclaussn.ssg.data.PageDataSelectorBean;
 import com.github.gclaussn.ssg.event.SiteEvent;
 import com.github.gclaussn.ssg.event.SiteEventBuilder;
 import com.github.gclaussn.ssg.event.SiteEventType;
@@ -47,6 +44,9 @@ class SiteGeneratorImpl implements SiteGenerator {
 
   private final JadeConfiguration configuration;
 
+  /** The default page data compiler */
+  private final Function<Page, PageData> pageDataCompiler;
+
   SiteGeneratorImpl(SiteImpl site) {
     this.site = site;
 
@@ -66,6 +66,8 @@ class SiteGeneratorImpl implements SiteGenerator {
 
     configuration.getFilters().put("markdown", markdownFilter);
     configuration.getFilters().put("md", markdownFilter);
+
+    pageDataCompiler = new PageDataCompiler();
   }
 
   protected PageData compileExtensions(Set<Object> extensions) {
@@ -81,28 +83,7 @@ class SiteGeneratorImpl implements SiteGenerator {
 
   @Override
   public PageData compilePageData(String pageId) {
-    return compilePageData(site.getPage(pageId));
-  }
-
-  protected PageData compilePageData(Page page) {
-    PageDataBuilder builder = PageData.builder();
-
-    // put page data
-    builder.putRoot(page.getData());
-
-    // put data from page includes
-    for (PageInclude pageInclude : resolvePageIncludes(page)) {
-      String id = normalizeId(pageInclude.getId());
-      builder.put(id, pageInclude.getData().getRootMap());
-    }
-
-    // put data from selectors
-    for (PageDataSelectorBean dataSelector : page.getDataSelectors()) {
-      String id = normalizeId(dataSelector.getId());
-      builder.putIfAbsent(id, dataSelector.select(page));
-    }
-
-    return builder.build();
+    return pageDataCompiler.apply(site.getPage(pageId));
   }
 
   protected void createOutputDirectory() {
@@ -188,7 +169,37 @@ class SiteGeneratorImpl implements SiteGenerator {
     return generatePage(page);
   }
 
+  /**
+   * Generates the given page, using the default page data compiler to compile its data.
+   * 
+   * @param page A specific page.
+   * 
+   * @return An error, if the compilation or the generation failed. Otherwise an empty optional.
+   */
   protected Optional<SiteError> generatePage(Page page) {
+    // compile data
+    PageData data;
+    try {
+      data = pageDataCompiler.apply(page);
+    } catch (SiteException e) {
+      return Optional.of(e.getError());
+    }
+
+    return generatePage(page, data);
+  }
+
+  /**
+   * Generates the given page with the given page data.<br>
+   * The method is overloaded to be able to generate a page with data, compiled by a different
+   * compiler than the default {@link #pageDataCompiler}.
+   * 
+   * @param page A specific page.
+   * 
+   * @param data The compiled data, used for the generation.
+   * 
+   * @return An error, if the generation failed. Otherwise an empty optional.
+   */
+  protected Optional<SiteError> generatePage(Page page, PageData data) {
     SiteEventBuilder eventBuilder = SiteEvent.builder().type(SiteEventType.GENERATE_PAGE).source(page);
 
     Path path = page.getOutputPath();
@@ -200,14 +211,6 @@ class SiteGeneratorImpl implements SiteGenerator {
       SiteError error = SiteError.builder(site).source(page).errorPageOutputDirectoryNotCreated(e);
       eventBuilder.error(error).buildAndPublish(this::publish);
       return Optional.of(error);
-    }
-
-    // compile data
-    PageData data;
-    try {
-      data = compilePageData(page);
-    } catch (SiteException e) {
-      return Optional.of(e.getError());
     }
 
     // render page
@@ -273,47 +276,7 @@ class SiteGeneratorImpl implements SiteGenerator {
     return fn;
   }
 
-  protected String normalizeId(String id) {
-    StringBuilder sb = new StringBuilder(id.length());
-
-    boolean toUpper = false;
-    for (int i = 0; i < id.length(); i++) {
-      char c = id.charAt(i);
-
-      if (c == '-' || c == '_') {
-        toUpper = true;
-      } else if (toUpper) {
-        sb.append(Character.toUpperCase(c));
-        toUpper = false;
-      } else {
-        sb.append(c);
-      }
-    }
-
-    return sb.toString();
-  }
-
   private void publish(SiteEvent event) {
     site.getConfiguration().onEvent(event);
-  }
-
-  protected Set<PageInclude> resolvePageIncludes(Page page) {
-    Queue<PageInclude> queue = new LinkedList<>();
-    for (PageInclude pageInclude : page.getPageIncludes()) {
-      queue.add(pageInclude);
-    }
-
-    Set<PageInclude> pageIncludes = new HashSet<>();
-    while (!queue.isEmpty()) {
-      PageInclude pageInclude = queue.poll();
-      if (pageIncludes.contains(pageInclude)) {
-        continue;
-      }
-
-      pageIncludes.add(pageInclude);
-      pageInclude.getPageIncludes().stream().forEach(queue::add);
-    }
-
-    return pageIncludes;
   }
 }

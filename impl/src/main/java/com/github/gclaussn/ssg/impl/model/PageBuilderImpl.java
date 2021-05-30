@@ -15,6 +15,7 @@ class PageBuilderImpl implements PageBuilder {
   protected final String pageId;
 
   protected Map<String, Object> data;
+  protected boolean skip;
 
   PageBuilderImpl(SiteModelRepository repository, String pageId) {
     this.repository = repository;
@@ -47,5 +48,11 @@ class PageBuilderImpl implements PageBuilder {
     } else {
       return repository.loadPage(pageId);
     }
+  }
+
+  @Override
+  public PageBuilder skip(boolean skip) {
+    this.skip = skip;
+    return this;
   }
 }

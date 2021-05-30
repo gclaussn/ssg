@@ -11,7 +11,6 @@ import com.github.gclaussn.ssg.cli.AbstractCommand;
 import com.github.gclaussn.ssg.cli.Main;
 import com.github.gclaussn.ssg.server.StartAction;
 import com.github.gclaussn.ssg.server.domain.event.SiteEventLogger;
-import com.github.gclaussn.ssg.server.domain.file.SiteFileEventLogger;
 
 @Parameters(commandNames = "server", commandDescription = "Run a developer server")
 public class Server extends AbstractCommand {
@@ -24,7 +23,6 @@ public class Server extends AbstractCommand {
   @Override
   public void preBuild(SiteBuilder builder, Main main) {
     builder.addEventListener(new SiteEventLogger(main.isVerbose()));
-    builder.addFileEventListener(new SiteFileEventLogger());
   }
 
   @Override

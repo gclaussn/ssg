@@ -2,11 +2,9 @@ package com.github.gclaussn.ssg.impl;
 
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,9 +21,6 @@ import com.github.gclaussn.ssg.SiteOutput;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.conf.SiteConf;
 import com.github.gclaussn.ssg.event.SiteEventStore;
-import com.github.gclaussn.ssg.file.SiteFileEvent;
-import com.github.gclaussn.ssg.file.SiteFileEventListener;
-import com.github.gclaussn.ssg.file.SiteFileEventType;
 import com.github.gclaussn.ssg.impl.conf.SiteConfImpl;
 import com.github.gclaussn.ssg.impl.event.SiteEventStoreImpl;
 import com.github.gclaussn.ssg.impl.model.SiteModelRepository;
@@ -33,14 +28,14 @@ import com.github.gclaussn.ssg.impl.plugin.SitePluginManagerImpl;
 import com.github.gclaussn.ssg.npm.NodePackageSpec;
 import com.github.gclaussn.ssg.plugin.SitePluginManager;
 
-class SiteImpl implements Site, SiteFileEventListener {
+class SiteImpl implements Site {
 
   protected final SiteConfImpl conf;
   protected final SiteEventStoreImpl eventStore;
   protected final SitePluginManagerImpl pluginManager;
 
   protected final SiteModelRepository repository;
-  protected final SiteGenerator generator;
+  protected final SiteGeneratorImpl generator;
 
   /** Base path of the site. */
   private final Path path;
@@ -218,118 +213,6 @@ class SiteImpl implements Site, SiteFileEventListener {
     return sourcePath;
   }
 
-  protected void handlePage(String pageId) {
-    Optional<SiteError> error;
-    Optional<PageSet> pageSet;
-
-    // load
-    pageSet = hasPage(pageId) ? getPage(pageId).getPageSet() : Optional.empty();
-    if (pageSet.isPresent()) {
-      error = repository.loadPage(pageId, pageSet.get().getId());
-    } else {
-      error = repository.loadPage(pageId);
-    }
-    if (error.isPresent()) {
-      return;
-    }
-
-    // get loaded page
-    Page page = getPage(pageId);
-    if (page.isRejected()) {
-      return;
-    }
-
-    // generate
-    if (!page.isSkipped()) {
-      error = page.generate();
-    }
-    if (!page.isSkipped() && error.isPresent()) {
-      return;
-    }
-
-    pageSet = page.getPageSet();
-    if (!pageSet.isPresent()) {
-      // no other page is affected
-      return;
-    }
-
-    String pageSetId = pageSet.get().getId();
-
-    analyzePageSetUsage(pageSetId).stream().filter(Page::isGenerated).forEach(Page::generate);
-  }
-
-  protected void handlePageInclude(String pageIncludeId) {
-    Queue<String> queue = new LinkedList<>(Collections.singletonList(pageIncludeId));
-
-    List<SiteError> errors = repository.loadPageIncludes(queue);
-    if (!errors.isEmpty()) {
-      return;
-    }
-
-    analyzePageIncludeUsage(pageIncludeId).stream().filter(Page::isGenerated).forEach(Page::generate);
-  }
-
-  protected void handlePageSet(String pageSetId) {
-    List<SiteError> errors;
-
-    // load
-    errors = repository.loadPageSet(pageSetId);
-    if (!errors.isEmpty()) {
-      return;
-    }
-
-    PageSet pageSet = getPageSet(pageSetId);
-
-    // generate
-    if (!pageSet.isSkipped()) {
-      errors = pageSet.generate();
-    }
-    if (!pageSet.isSkipped() && !errors.isEmpty()) {
-      return;
-    }
-
-    analyzePageSetUsage(pageSetId).stream().filter(Page::isGenerated).forEach(Page::generate);
-  }
-
-  protected void handleSite(SiteFileEvent event) {
-    if (event.getType() == SiteFileEventType.DELETE) {
-      // ignore deletion of site.yaml
-      return;
-    }
-
-    load();
-  }
-
-  protected void handleSource(SiteFileEvent event) {
-    // try to determine, what source (site, page, page include, page set) is affected
-    Source source = repository.getSource(event.getPath());
-
-    if (event.getType() == SiteFileEventType.DELETE) {
-      repository.removeSource(source);
-      return;
-    }
-
-    String sourceId = source.getId();
-
-    switch (source.getType()) {
-      case PAGE:
-        handlePage(sourceId);
-        break;
-      case PAGE_INCLUDE:
-        handlePageInclude(sourceId);
-        break;
-      case PAGE_SET:
-        handlePageSet(sourceId);
-        break;
-      case UNKNOWN:
-        // if page set is found, load and generate it instead
-        Optional<String> pageSetId = repository.findPageSetId(sourceId);
-        if (pageSetId.isPresent()) {
-          handlePageSet(pageSetId.get());
-        }
-    }
-  }
-
   @Override
   public boolean hasPage(String pageId) {
     return pageId != null && repository.getPage(pageId) != null;
@@ -351,24 +234,6 @@ class SiteImpl implements Site, SiteFileEventListener {
     eventStore.clear();
 
     return repository.load();
-  }
-
-  /**
-   * Handles the modification of source files.
-   */
-  @Override
-  public void onEvent(SiteFileEvent event) {
-    if (event.isPublic()) {
-      // do not handle public files any further
-      // since public files does not affect loading and generating
-      return;
-    }
-
-    if (event.isSource()) {
-      handleSource(event);
-    } else {
-      handleSite(event);
-    }
   }
 
   @Override

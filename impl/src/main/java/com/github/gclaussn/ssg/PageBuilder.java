@@ -11,4 +11,6 @@ public interface PageBuilder {
   Optional<SiteError> save();
 
   Optional<SiteError> saveAndLoad();
+
+  PageBuilder skip(boolean skip);
 }

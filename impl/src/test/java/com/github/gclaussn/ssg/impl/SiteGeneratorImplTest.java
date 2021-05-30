@@ -1,6 +1,5 @@
 package com.github.gclaussn.ssg.impl;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,13 +42,5 @@ public class SiteGeneratorImplTest {
     assertThat(node, notNullValue());
     assertThat(node.getType(), is(PageDataNodeType.OTHER));
     assertThat(node.isNull(), is(false));
-  }
-
-  @Test
-  public void testNormalizeId() {
-    assertThat(generator.normalizeId(""), equalTo(""));
-    assertThat(generator.normalizeId("page-a"), equalTo("pageA"));
-    assertThat(generator.normalizeId("page_b"), equalTo("pageB"));
-    assertThat(generator.normalizeId("page-set1/sub/x_y_z"), equalTo("pageSet1/sub/xYZ"));
   }
 }

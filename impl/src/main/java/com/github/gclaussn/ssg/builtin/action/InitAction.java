@@ -6,7 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -21,13 +23,37 @@ import com.github.gclaussn.ssg.plugin.SitePluginAction;
  */
 public class InitAction implements SitePluginAction {
 
+  private static final String TEMPLATE = "ssg.init.template";
+
   /** Locator for templates coming from classpath. */
-  public static final String CLASSPATH_LOCATOR = "classpath:";
+  private static final String CLASSPATH_LOCATOR = "classpath:";
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+
+    private final Map<String, Object> properties;
+
+    private Builder() {
+      properties = new HashMap<>();
+    }
+
+    public void execute(Site site) {
+      site.getPluginManager().execute(new InitAction(), properties);
+    }
+
+    public Builder template(String template) {
+      properties.put(TEMPLATE, template);
+      return this;
+    }
+  }
 
   protected SiteConsole console;
 
   /** Location of the template, used during initialization. */
-  @SiteProperty(name = "ssg.init.template", defaultValue = "${SSG_HOME}/templates/default")
+  @SiteProperty(name = TEMPLATE)
   protected String template;
 
   private final ClassLoader classLoader;

@@ -1,8 +1,5 @@
 package com.github.gclaussn.ssg.cli.cmd;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.github.gclaussn.ssg.Site;
@@ -17,9 +14,6 @@ public class Cp extends AbstractCommand {
 
   @Override
   public void run(Site site) {
-    Map<String, Object> properties = new HashMap<String, Object>();
-    properties.put(CpAction.TARGET, target);
-
-    site.getPluginManager().execute(new CpAction(), properties);
+    CpAction.builder().target(target).execute(site);
   }
 }

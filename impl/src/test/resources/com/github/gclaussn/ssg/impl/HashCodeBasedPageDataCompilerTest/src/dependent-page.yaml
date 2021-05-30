@@ -1,0 +1,6 @@
+dataSelectors:
+  types:
+    class: PageSetAggregator
+    model:
+      pageSetId: page-set1
+      distinct: type

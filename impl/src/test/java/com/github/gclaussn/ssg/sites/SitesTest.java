@@ -53,12 +53,6 @@ public class SitesTest {
   }
 
   @Test
-  public void testTemplateErrors() {
-    List<SiteError> errors = Site.from(sitePath).load();
-    assertThat(errors.size(), is(1));
-  }
-
-  @Test
   public void testWithoutSiteModel() {
     List<SiteError> errors = Site.from(sitePath).load();
     assertThat(errors.size(), is(1));

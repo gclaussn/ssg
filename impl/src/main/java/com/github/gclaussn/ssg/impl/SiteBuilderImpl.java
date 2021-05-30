@@ -98,7 +98,7 @@ public class SiteBuilderImpl implements SiteBuilder {
 
     conf.getEventListeners().add(0, eventStore);
     conf.getFileEventListeners().add(0, eventStore);
-    conf.getFileEventListeners().add(0, site);
+    conf.getFileEventListeners().add(0, new SiteFileEventListenerImpl(site));
 
     // call postBuild hook
     pluginManager.postBuild(site);

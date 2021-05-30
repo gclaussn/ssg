@@ -17,6 +17,8 @@ import java.nio.file.Paths;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.github.gclaussn.ssg.impl.model.SiteModelRepositoryTest;
+
 public class MarkdownFileTest {
 
   private MarkdownFile support;
@@ -73,7 +75,9 @@ public class MarkdownFileTest {
 
   @Test
   public void testFrom() throws IOException {
-    Path filePath = Paths.get("./src/test/resources/com/github/gclaussn/ssg/impl/model/src/page-with-markdown-front-matter.md");
+    String testResource = SiteModelRepositoryTest.class.getName().replace('.', '/');
+
+    Path filePath = Paths.get("./src/test/resources/" + testResource + "/src/page-with-markdown-front-matter.md");
 
     MarkdownFile markdownFile = MarkdownFile.from(filePath);
     assertThat(markdownFile, notNullValue());
