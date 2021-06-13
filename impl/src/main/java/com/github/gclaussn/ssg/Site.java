@@ -90,8 +90,6 @@ public interface Site extends AutoCloseable {
   @Override
   void close();
 
-  PageBuilder createPageBuilder(String pageId);
-
   /**
    * Generates the output of all known pages.
    * 
@@ -121,6 +119,8 @@ public interface Site extends AutoCloseable {
    * @return The site generator.
    */
   SiteGenerator getGenerator();
+
+  SiteModelApi getModelApi();
 
   /**
    * Gets the node package specification, if defined in {@code site.yaml} under property "node".

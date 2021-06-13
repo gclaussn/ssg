@@ -5,7 +5,7 @@ import java.io.InputStream;
 import com.github.gclaussn.ssg.impl.npm.NodePackageManagerImpl;
 
 /**
- * Node.js package manager that communicates with a NPM registry via HTTP.
+ * Node package manager that communicates with a NPM registry via HTTP.
  */
 public interface NodePackageManager extends NodePackageRegistry, AutoCloseable {
 
@@ -42,7 +42,7 @@ public interface NodePackageManager extends NodePackageRegistry, AutoCloseable {
   void close();
 
   /**
-   * Downloads the tarball of the given Node.js package from a NPM registry.
+   * Downloads the tarball of the given Node package from a NPM registry.
    * 
    * @param nodePackage A specific node package, providing package name and version.
    * 
@@ -53,7 +53,7 @@ public interface NodePackageManager extends NodePackageRegistry, AutoCloseable {
   InputStream download(String packageName, String version);
 
   /**
-   * Gets the information about the given Node.js package from a NPM registry.
+   * Gets the information about the given Node package from a NPM registry.
    * 
    * @param nodePackage A specific node package, providing package name and version.
    * 

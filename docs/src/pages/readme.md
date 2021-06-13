@@ -1,11 +1,4 @@
-### Site structure
 
-    <site>
-    ├── site.yaml     # Site model, that lists pages and page sets to load
-    ├── src/          # YAML and JADE source files
-    ├── public/       # Public assets like scripts, style sheets and images
-    ├── node_modules/ # Node modules, used within the site
-    ├── out/          # Target location for generated HTML output
 
 ### site.yaml
 | Name                   | Type   | Description                                    |

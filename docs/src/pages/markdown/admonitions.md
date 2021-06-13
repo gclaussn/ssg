@@ -3,7 +3,18 @@ data:
   title: Admonitions
 ---
 
+Admonition support is provided by a Flexmark-Java extension called [flexmark-ext-admonition](https://github.com/vsch/flexmark-java/tree/master/flexmark-ext-admonition).
+
+# Usage
+
+``` md
+!!! note
+    a note...
+```
+
 # Qualifiers
+
+Following qualifiers are possible:
 
 !!! abstract
     Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
@@ -40,6 +51,8 @@ data:
 
 # Styling
 
+Admonitions are styled using following CSS classes:
+
 ``` css
 .adm-hidden {
   display: none;
@@ -51,6 +64,8 @@ data:
 .adm-body {}
 .adm-body p {}
 ```
+
+Each qualifier has to be styled separately.
 
 ``` css
 .adm-<qualifier> {

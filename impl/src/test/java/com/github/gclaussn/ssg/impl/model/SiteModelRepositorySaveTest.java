@@ -37,7 +37,7 @@ public class SiteModelRepositorySaveTest {
   public void shouldSavePage() {
     PageData data = PageData.builder().put("a", "x").put("b", 1).put("c", true).build();
 
-    Optional<SiteError> error = repository.createPageBuilder("index").data(data).saveAndLoad();
+    Optional<SiteError> error = repository.createModelApi().createPageBuilder("index").data(data).saveAndLoad();
     assertThat(error.isEmpty(), is(true));
 
     Page page = repository.pages.get("index");

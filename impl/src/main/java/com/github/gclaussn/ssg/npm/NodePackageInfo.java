@@ -1,8 +1,7 @@
 package com.github.gclaussn.ssg.npm;
 
 /**
- * Information about a Node.js package of a specific version, which was retrieved from a NPM
- * registry.
+ * Information about a Node package of a specific version, which was retrieved from a NPM registry.
  */
 public interface NodePackageInfo extends NodePackage {
 

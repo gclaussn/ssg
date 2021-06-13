@@ -33,10 +33,10 @@ html(lang=en)
               pre(class="p-3 bg-light").
                 data:
                   pages:
-                  - id: page1
-                    name: Page 1
-                  - id: page2
-                    name: Page 2
+                    - id: page1
+                      name: Page 1
+                    - id: page2
+                      name: Page 2
 
               p JADE:
               pre(class="p-3 bg-light").
@@ -60,10 +60,10 @@ html(lang=en)
               pre(class="p-3 bg-light").
                 data:
                   numbers:
-                  - 45
-                  - 64
-                  - 73
-                  - 82
+                    - 45
+                    - 64
+                    - 73
+                    - 82
 
               p JADE:
               pre(class="p-3 bg-light").
@@ -123,8 +123,8 @@ html(lang=en)
               p YAML:
               pre(class="p-3 bg-light").
                 includes:
-                - common/header
-                - common/footer
+                  - common/header
+                  - common/footer
 
               p JADE:
               pre(class="p-3 bg-light").
@@ -161,10 +161,10 @@ html(lang=en)
               p YAML:
               pre(class="p-3 bg-light").
                 dataSelectors:
-                - id: selected
-                  class: PageSetSelector
-                  model:
-                    pageSetId: page-set1
+                  selected
+                    class: PageSetSelector
+                    model:
+                      pageSetId: page-set1
 
               p JADE:
               pre(class="p-3 bg-light").
@@ -194,17 +194,17 @@ html(lang=en)
               p YAML:
               pre(class="p-3 bg-light").
                 processors:
-                - id: date
-                  class: DateProcessor
-                  model:
-                    dateFormat: yyyy-MM-dd
-                    dateFormatLocale: en
-                    timeZoneId: UTC
+                  date
+                    class: DateProcessor
+                    model:
+                      dateFormat: yyyy-MM-dd
+                      dateFormatLocale: en
+                      timeZoneId: UTC
                 filters:
-                - id: date
-                  class: DateFilter
-                  model:
-                    source: date
+                  date
+                    class: DateFilter
+                    model:
+                      processorId: date
 
               p JADE:
               pre(class="p-3 bg-light").

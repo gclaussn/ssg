@@ -116,14 +116,14 @@ html(lang=en)
         $(`#menu-${menuId}-arrow`).toggleClass("arrow-down");
       });
 
-      const slug = (text) => { text.replace(/\s+/g, "-").toLowerCase() }
+      const slug = (text) => { return text.replace(/\s+/g, "-").toLowerCase() }
 
       // build table of contents
       $("#md").find("h1,h2,h3,h4,h5,h6").each((index, h) => {
         const nodeName = $(h)[0].nodeName.toLowerCase();
         const text = $(h).text();
- 
-        const sluggedText = slug(text); 
+
+        const sluggedText = slug(text);
 
         // append item
         $("#toc").append(`<li class="toc-${nodeName}"><a href="#${sluggedText}">${text}</a></li>`);

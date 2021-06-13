@@ -1,10 +1,10 @@
 data:
   pages:
-  - id: page-set1/2030-11-01-page1
-    name: Page 1
-  - id: page-set1/2030-11-02-page2
-    name: Page 2
-  - id: example-render-json
-    name: "Example: Render JSON"
-  - id: example-page-set-selector
-    name: "Example: Page set selector"
+    - id: page-set1/2030-11-01-page1
+      name: Page 1
+    - id: page-set1/2030-11-02-page2
+      name: Page 2
+    - id: example-render-json
+      name: "Example: Render JSON"
+    - id: example-page-set-selector
+      name: "Example: Page set selector"

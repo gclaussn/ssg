@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Before;
@@ -18,9 +17,7 @@ public class SiteImplTest {
 
   @Before
   public void setUp() {
-    Path sitePath = Paths.get("./src/test/resources/sites/init/default");
-
-    site = new SiteImpl(new SiteBuilderImpl(), sitePath);
+    site = new SiteImpl(new SiteBuilderImpl(), Paths.get("./target"));
   }
 
   @Test

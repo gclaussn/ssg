@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.gclaussn.ssg.Page;
-import com.github.gclaussn.ssg.PageBuilder;
 import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageSet;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.SiteException;
 import com.github.gclaussn.ssg.SiteGenerator;
+import com.github.gclaussn.ssg.SiteModelApi;
 import com.github.gclaussn.ssg.SiteOutput;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.conf.SiteConf;
@@ -35,6 +35,7 @@ class SiteImpl implements Site {
   protected final SitePluginManagerImpl pluginManager;
 
   protected final SiteModelRepository repository;
+  protected final SiteModelApi modelApi;
   protected final SiteGeneratorImpl generator;
 
   /** Base path of the site. */
@@ -55,9 +56,9 @@ class SiteImpl implements Site {
     sourcePath = sitePath.resolve(SOURCE);
     outputPath = sitePath.resolve(OUTPUT);
 
-    // initialize repository
+    // initialize components
     repository = new SiteModelRepository(this);
-    // initialize generator
+    modelApi = repository.createModelApi();
     generator = new SiteGeneratorImpl(this);
   }
 
@@ -106,17 +107,6 @@ class SiteImpl implements Site {
   }
 
   @Override
-  public PageBuilder createPageBuilder(String pageId) {
-    Objects.requireNonNull(pageId, "page ID is null");
-
-    if (pageId.isBlank()) {
-      throw new IllegalArgumentException("page ID is empty or blank");
-    }
-
-    return repository.createPageBuilder(pageId);
-  }
-
-  @Override
   public List<SiteError> generate() {
     return generator.generate();
   }
@@ -134,6 +124,11 @@ class SiteImpl implements Site {
   @Override
   public SiteGenerator getGenerator() {
     return generator;
+  }
+
+  @Override
+  public SiteModelApi getModelApi() {
+    return modelApi;
   }
 
   @Override

@@ -83,9 +83,9 @@ class SiteGeneratorFnImpl implements SiteGeneratorFn {
   }
 
   @Override
-  public String renderMarkdown(String source) {
-    Objects.requireNonNull(source, "source is null");
+  public String renderMarkdown(String markdown) {
+    Objects.requireNonNull(markdown, "markdown is null");
 
-    return markdownFilter.convert(source, null, null);
+    return markdownFilter.convert(markdown, null, null);
   }
 }

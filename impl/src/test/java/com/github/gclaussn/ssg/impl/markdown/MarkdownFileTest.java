@@ -75,7 +75,7 @@ public class MarkdownFileTest {
 
   @Test
   public void testFrom() throws IOException {
-    String testResource = SiteModelRepositoryTest.class.getName().replace('.', '/');
+    String testResource = SiteModelRepositoryTest.class.getSimpleName();
 
     Path filePath = Paths.get("./src/test/resources/" + testResource + "/src/page-with-markdown-front-matter.md");
 

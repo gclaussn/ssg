@@ -1,6 +1,8 @@
 package com.github.gclaussn.ssg.impl.model;
 
-import java.util.Map;
+import static com.github.gclaussn.ssg.file.SiteFileType.YAML;
+
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -12,27 +14,56 @@ class PageBuilderImpl implements PageBuilder {
 
   private final SiteModelRepository repository;
 
-  protected final String pageId;
+  private final String pageId;
 
-  protected Map<String, Object> data;
-  protected boolean skip;
+  private final PageModel model;
 
   PageBuilderImpl(SiteModelRepository repository, String pageId) {
     this.repository = repository;
     this.pageId = pageId;
+
+    model = new PageModel();
+    model.filePath = repository.site.getSourcePath().resolve(YAML.appendTo(pageId));
+    model.includes = new HashSet<>();
+  }
+
+  @Override
+  public PageBuilder addPageInclude(String pageIncludeId) {
+    Objects.requireNonNull(pageIncludeId, "page include ID is null");
+
+    model.includes.add(pageIncludeId);
+    return this;
   }
 
   @Override
   public PageBuilder data(PageData data) {
     Objects.requireNonNull(data, "data is null");
 
-    this.data = data.getRootMap();
+    model.data = data.getRootMap();
+    return this;
+  }
+
+  @Override
+  public PageBuilder markdown(String markdown) {
+    model.markdown = markdown;
+    return this;
+  }
+
+  @Override
+  public PageBuilder outputName(String outputName) {
+    model.outputName = outputName;
+    return this;
+  }
+
+  @Override
+  public PageBuilder skip(boolean skip) {
+    model.skip = skip ? Boolean.TRUE : null;
     return this;
   }
 
   @Override
   public Optional<SiteError> save() {
-    return repository.savePage(this);
+    return repository.savePage(pageId, model);
   }
 
   @Override
@@ -48,11 +79,5 @@ class PageBuilderImpl implements PageBuilder {
     } else {
       return repository.loadPage(pageId);
     }
-  }
-
-  @Override
-  public PageBuilder skip(boolean skip) {
-    this.skip = skip;
-    return this;
   }
 }

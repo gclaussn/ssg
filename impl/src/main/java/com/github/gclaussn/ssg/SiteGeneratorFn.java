@@ -33,5 +33,5 @@ public interface SiteGeneratorFn {
    */
   String renderJson(Object value);
 
-  String renderMarkdown(String code);
+  String renderMarkdown(String markdown);
 }

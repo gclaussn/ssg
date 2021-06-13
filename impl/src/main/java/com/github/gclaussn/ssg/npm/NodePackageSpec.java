@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * Defines, which Node.js packages to install and which files of those packages to include in the
+ * Defines, which Node packages to install and which files of those packages to include in the
  * site.<br>
  * The specification is defined within the {@code site.yaml} file via property "node".
  */

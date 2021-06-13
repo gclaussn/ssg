@@ -5,12 +5,18 @@ data:
       - label: Getting Started
         items:
           - introduction
-          - configuration
+          - installation
+          - site-structure
+      - label: Models
+        items:
+          - models/site
+          - models/page
+          - models/page-set
+          - models/page-include
       - label: Markdown
         items:
-          - markdown/xxx
+          - markdown/overview
           - markdown/admonitions
-          - markdown/yyy
 dataSelectors:
   pages:
     class: PageSetMapper

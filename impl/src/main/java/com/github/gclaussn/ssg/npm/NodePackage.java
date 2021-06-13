@@ -1,7 +1,7 @@
 package com.github.gclaussn.ssg.npm;
 
 /**
- * Node.js package.
+ * Node package.
  */
 public interface NodePackage {
 

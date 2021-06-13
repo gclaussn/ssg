@@ -33,7 +33,7 @@ public class SiteModelRepositoryTest {
 
   @Before
   public void setUp() {
-    Path sitePath = Paths.get("./src/test/resources/" + this.getClass().getName().replace('.', '/'));
+    Path sitePath = Paths.get("./src/test/resources/" + this.getClass().getSimpleName());
 
     repository = new SiteModelRepository(Site.from(sitePath));
   }
@@ -146,6 +146,15 @@ public class SiteModelRepositoryTest {
 
       SiteError error = e.getError();
       assertThat(error, notNullValue());
+      assertThat(error.getCause(), notNullValue());
+      assertThat(error.getMessage(), notNullValue());
+      assertThat(error.getSource().isPresent(), is(true));
+      assertThat(error.getSource().get().getId(), nullValue());
+      assertThat(error.getSource().get().getType(), nullValue());
+      assertThat(error.getLocation().isPresent(), is(true));
+      assertThat(error.getLocation().get().getPath(), equalTo(repository.site.getPath().resolve(Site.MODEL_NAME)));
+      assertThat(error.getLocation().get().getLine(), is(-1));
+      assertThat(error.getLocation().get().getColumn(), is(-1));
       assertThat(error.getType(), is(SiteErrorType.IO));
     }
   }

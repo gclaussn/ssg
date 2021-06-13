@@ -84,7 +84,7 @@
   padding: 0 0.5rem;
 }
 .content-title {
-  font-size: 3rem;
+  font-size: 2.5rem;
 }
 
 .anchor {
@@ -108,20 +108,38 @@
   visibility: visible;
 }
 
+h1 {
+  font-size: 2rem;
+}
 h1:hover .anchor::before {
   visibility: visible;
+}
+h2 {
+  font-size: 1.75rem;
 }
 h2:hover .anchor::before {
   visibility: visible;
 }
+h3 {
+  font-size: 1.5rem;
+}
 h3:hover .anchor::before {
   visibility: visible;
+}
+h4 {
+  font-size: 1.25rem;
 }
 h4:hover .anchor::before {
   visibility: visible;
 }
+h5 {
+  font-size: 1rem;
+}
 h5:hover .anchor::before {
   visibility: visible;
+}
+h6 {
+  font-size: 0.85rem;
 }
 h6:hover .anchor::before {
   visibility: visible;
@@ -157,7 +175,7 @@ h6:hover .anchor::before {
   margin: 0;
   padding: 0.25rem 0.4rem;
   background-color: #eaedef;
-  border-radius: 6px;
+  border-radius: 5px;
   color: #212529;
   font-size: 85%;
 }
@@ -165,14 +183,17 @@ h6:hover .anchor::before {
   margin: 0;
   padding: 0.25rem 0.4rem;
   background-color: #eaedef;
-  border-radius: 6px;
+  border-radius: 5px;
   color: #212529;
   font-size: 85%;
+}
+.md pre {
+  margin: 0 0 1rem 0;
 }
 
 .md-table {
   width: 100%;
-  margin: 1rem 0;
+  margin: 0.75rem 0 1.5rem 0;
   display: block;
   overflow: auto;
   border-spacing: 0;

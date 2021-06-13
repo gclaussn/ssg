@@ -1,4 +1,4 @@
 ---
 data:
-  title: XXX
+  title: Page
 ---

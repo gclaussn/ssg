@@ -42,7 +42,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.github.gclaussn.ssg.Page;
-import com.github.gclaussn.ssg.PageBuilder;
 import com.github.gclaussn.ssg.PageFilterBean;
 import com.github.gclaussn.ssg.PageInclude;
 import com.github.gclaussn.ssg.PageProcessorBean;
@@ -50,6 +49,7 @@ import com.github.gclaussn.ssg.PageSet;
 import com.github.gclaussn.ssg.Site;
 import com.github.gclaussn.ssg.SiteError;
 import com.github.gclaussn.ssg.SiteException;
+import com.github.gclaussn.ssg.SiteModelApi;
 import com.github.gclaussn.ssg.Source;
 import com.github.gclaussn.ssg.SourceType;
 import com.github.gclaussn.ssg.data.PageData;
@@ -190,8 +190,8 @@ public class SiteModelRepository implements AutoCloseable {
     return new ConcurrentHashMap<>(32);
   }
 
-  public PageBuilder createPageBuilder(String pageId) {
-    return new PageBuilderImpl(this, pageId);
+  public SiteModelApi createModelApi() {
+    return new SiteModelApiImpl(this);
   }
 
   /**
@@ -788,17 +788,12 @@ public class SiteModelRepository implements AutoCloseable {
     pageSets.clear();
   }
 
-  protected Optional<SiteError> savePage(PageBuilderImpl pageBuilder) {
-    PageModel model = new PageModel();
-    model.data = pageBuilder.data;
-    model.filePath = site.getSourcePath().resolve(YAML.appendTo(pageBuilder.pageId));
-    model.skip = pageBuilder.skip ? Boolean.TRUE : null;
-    
+  protected Optional<SiteError> savePage(String pageId, PageModel model) {
     // create parent directories
     try {
       Files.createDirectories(model.filePath.getParent());
     } catch (IOException e) {
-      SiteError error = SiteError.builder(site).source(PAGE, pageBuilder.pageId).errorPageSourceDirectoryNotCreated(e);
+      SiteError error = SiteError.builder(site).source(PAGE, pageId).errorPageSourceDirectoryNotCreated(e);
 
       return Optional.of(error);
     }
@@ -807,7 +802,7 @@ public class SiteModelRepository implements AutoCloseable {
     try (BufferedWriter w = Files.newBufferedWriter(model.filePath, StandardCharsets.UTF_8)) {
       objectMapper.writeValue(w, model);
     } catch (IOException e) {
-      SiteError error = SiteError.builder(site).source(PAGE, pageBuilder.pageId).errorModelNotWritten(e, model.filePath);
+      SiteError error = SiteError.builder(site).source(PAGE, pageId).errorModelNotWritten(e, model.filePath);
 
       return Optional.of(error);
     }

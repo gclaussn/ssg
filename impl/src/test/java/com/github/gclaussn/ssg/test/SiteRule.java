@@ -27,7 +27,7 @@ public class SiteRule extends TemporaryFolder {
   }
 
   public String getResourceName(Class<?> testClassName) {
-    return testClassName.getName().replace('.', '/');
+    return testClassName.getSimpleName();
   }
 
   public Site init() {
