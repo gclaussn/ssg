@@ -41,7 +41,7 @@ class PageProcessorBeanImpl extends AbstractBean<PageProcessor> implements PageP
       eventBuilder.error(error);
       throw new SiteException(error);
     } finally {
-      publish(eventBuilder.build());
+      site.getConfiguration().onEvent(eventBuilder.build());
     }
   }
 

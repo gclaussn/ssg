@@ -13,10 +13,11 @@ data:
           - models/page
           - models/page-set
           - models/page-include
-      - label: Markdown
+      - label: Advanced topics
         items:
-          - markdown/overview
-          - markdown/admonitions
+          - advanced/markdown
+          - advanced/cli
+          - advanced/plugins
 dataSelectors:
   pages:
     class: PageSetMapper

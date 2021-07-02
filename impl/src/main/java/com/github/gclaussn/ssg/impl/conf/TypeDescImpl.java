@@ -1,7 +1,7 @@
 package com.github.gclaussn.ssg.impl.conf;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.github.gclaussn.ssg.conf.SitePropertyDesc;
 import com.github.gclaussn.ssg.conf.TypeDesc;
@@ -10,13 +10,12 @@ class TypeDescImpl implements TypeDesc {
 
   private final TypeDescModel model;
 
-  private final Set<SitePropertyDesc> properties;
+  private final List<SitePropertyDesc> properties;
 
   TypeDescImpl(TypeDescModel model) {
     this.model = model;
 
-    // use LinkedHashSet to preserve the property (field) order, used within the implementation
-    properties = new LinkedHashSet<>();
+    properties = new LinkedList<>();
   }
 
   protected void addProperty(SitePropertyDesc property) {
@@ -34,7 +33,7 @@ class TypeDescImpl implements TypeDesc {
   }
 
   @Override
-  public Set<SitePropertyDesc> getProperties() {
+  public List<SitePropertyDesc> getProperties() {
     return properties;
   }
 }

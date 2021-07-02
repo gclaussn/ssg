@@ -41,7 +41,7 @@ class PageFilterBeanImpl extends AbstractBean<PageFilter> implements PageFilterB
       eventBuilder.error(error);
       throw new SiteException(error);
     } finally {
-      publish(eventBuilder.build());
+      site.getConfiguration().onEvent(eventBuilder.build());
     }
   }
 

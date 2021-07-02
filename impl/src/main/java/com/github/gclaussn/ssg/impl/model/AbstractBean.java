@@ -2,12 +2,11 @@ package com.github.gclaussn.ssg.impl.model;
 
 import com.github.gclaussn.ssg.PageFilter;
 import com.github.gclaussn.ssg.Site;
-import com.github.gclaussn.ssg.event.SiteEvent;
 
 /**
  * Generic bean.
  *
- * @param <T> The implementation type (e.g. an implementation of {@link PageFilter}).
+ * @param <T> The bean type (e.g. {@link PageFilter}).
  */
 abstract class AbstractBean<T> {
 
@@ -31,8 +30,4 @@ abstract class AbstractBean<T> {
    * Destroys the bean, when the site is closed or reloaded.
    */
   protected abstract void destroy();
-
-  protected void publish(SiteEvent event) {
-    site.getConfiguration().getEventListeners().forEach(l -> l.onEvent(event));
-  }
 }

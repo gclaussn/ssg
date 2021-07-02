@@ -27,6 +27,8 @@ class SiteFileEventListenerImpl implements SiteFileEventListener {
   SiteFileEventListenerImpl(SiteImpl site) {
     this.site = site;
 
+    // use special page data compiler that makes use of hash code values
+    // to avoid unnecessary page generation
     pageDataCompiler = new HashCodeBasedPageDataCompiler();
   }
 
@@ -37,7 +39,7 @@ class SiteFileEventListenerImpl implements SiteFileEventListener {
   public void onEvent(SiteFileEvent event) {
     if (event.isPublic()) {
       // do not handle public files any further
-      // since public files does not affect loading and generating
+      // since public files do not affect source loading or page generating
       return;
     }
 
@@ -116,6 +118,7 @@ class SiteFileEventListenerImpl implements SiteFileEventListener {
 
     site.analyzePageSetUsage(pageSetId)
         .stream()
+        // filter pages that should be generated
         .filter(Page::isGenerated)
         // use special method to generate dependent pages
         .forEach(this::generateDependentPage);
@@ -156,7 +159,8 @@ class SiteFileEventListenerImpl implements SiteFileEventListener {
 
   protected void handleSite(SiteFileEvent event) {
     if (event.getType() == SiteFileEventType.DELETE) {
-      // ignore deletion of site.yaml
+      // ignore deletion of site.yaml, because the site cannot be closed
+      // otherwise file events will not be handled anymore
       return;
     }
 
@@ -164,7 +168,7 @@ class SiteFileEventListenerImpl implements SiteFileEventListener {
   }
 
   protected void handleSource(SiteFileEvent event) {
-    // try to determine, what source (site, page, page include, page set) is affected
+    // try to determine, what source (page, page set or page include) is affected
     Source source = site.repository.getSource(event.getPath());
 
     if (event.getType() == SiteFileEventType.DELETE) {

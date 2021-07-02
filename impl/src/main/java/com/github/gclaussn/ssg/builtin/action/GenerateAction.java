@@ -14,7 +14,7 @@ public class GenerateAction implements SitePluginAction {
   public void execute(Site site) {
     List<SiteError> errors;
 
-    errors = site.getPages().isEmpty() && site.getPageSets().isEmpty() ? site.load() : Collections.emptyList();
+    errors = isEmpty(site) ? site.load() : Collections.emptyList();
     if (!errors.isEmpty()) {
       throw new SitePluginException("Failed to load site");
     }
@@ -23,5 +23,9 @@ public class GenerateAction implements SitePluginAction {
     if (!errors.isEmpty()) {
       throw new SitePluginException("Failed to generate site");
     }
+  }
+
+  protected boolean isEmpty(Site site) {
+    return site.getPages().isEmpty() && site.getPageSets().isEmpty();
   }
 }

@@ -1,18 +1,18 @@
 ---
 data:
-  title: Admonitions
+  title: Markdown support
 ---
 
-Admonition support is provided by a Flexmark-Java extension called [flexmark-ext-admonition](https://github.com/vsch/flexmark-java/tree/master/flexmark-ext-admonition).
+# Admonitions
 
-# Usage
+Admonition support is provided by a Flexmark-Java extension called [flexmark-ext-admonition](https://github.com/vsch/flexmark-java/tree/master/flexmark-ext-admonition).
 
 ``` md
 !!! note
     a note...
 ```
 
-# Qualifiers
+## Qualifiers
 
 Following qualifiers are possible:
 
@@ -49,7 +49,7 @@ Following qualifiers are possible:
 !!! warning
     Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
 
-# Styling
+## Styling
 
 Admonitions are styled using following CSS classes:
 

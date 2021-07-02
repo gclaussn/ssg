@@ -47,7 +47,7 @@ class PageDataSelectorBeanImpl extends AbstractBean<PageDataSelector> implements
       eventBuilder.error(error);
       throw new SiteException(error);
     } finally {
-      publish(eventBuilder.build());
+      site.getConfiguration().onEvent(eventBuilder.build());
     }
   }
 

@@ -186,7 +186,7 @@ public class SiteModelRepository implements AutoCloseable {
     return pageIds;
   }
 
-  private <V> Map<String, V> createMap(Class<V> valueType) {
+  private <T> Map<String, T> createMap(Class<T> type) {
     return new ConcurrentHashMap<>(32);
   }
 
@@ -263,6 +263,7 @@ public class SiteModelRepository implements AutoCloseable {
     }
 
     // use page ID as intial value
+    // since a possible page set can only be a parent directory
     String pageSetId = pageId;
 
     int index;
@@ -282,7 +283,9 @@ public class SiteModelRepository implements AutoCloseable {
       return Optional.ofNullable(model.nodePackageSpec);
     }
 
-    // installing node packages or serving site output without loading
+    // just load the site's model
+    // when the site itself is not loaded or should not be loaded
+    // e.g. installing node packages or serving site output
     SiteModel model = loadSiteModel();
     return Optional.ofNullable(model.nodePackageSpec);
   }
@@ -487,7 +490,7 @@ public class SiteModelRepository implements AutoCloseable {
     page.url = buildUrl(outputName);
     
     if (!Files.exists(site.getSourcePath().resolve(page.templateName))) {
-      // if template does not exist, use template of page set
+      // if template does not exist, use template of page set instead
       page.templateName = pageSet.getTemplateName();
     }
     
@@ -772,7 +775,7 @@ public class SiteModelRepository implements AutoCloseable {
         removePageSet(sourceId);
         break;
       case UNKNOWN:
-        // nothing to do remove
+        // nothing to remove here
     }
   }
 
@@ -789,6 +792,10 @@ public class SiteModelRepository implements AutoCloseable {
   }
 
   protected Optional<SiteError> savePage(String pageId, PageModel model) {
+    if (model.includes.isEmpty()) {
+      model.includes = null;
+    }
+
     // create parent directories
     try {
       Files.createDirectories(model.filePath.getParent());

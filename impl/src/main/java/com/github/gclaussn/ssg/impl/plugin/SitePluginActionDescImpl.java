@@ -1,6 +1,6 @@
 package com.github.gclaussn.ssg.impl.plugin;
 
-import java.util.Set;
+import java.util.List;
 
 import com.github.gclaussn.ssg.conf.SitePropertyDesc;
 import com.github.gclaussn.ssg.plugin.SitePluginActionDesc;
@@ -10,7 +10,7 @@ class SitePluginActionDescImpl implements SitePluginActionDesc {
   protected String documentation;
   protected String id;
   protected String name;
-  protected Set<SitePropertyDesc> properties;
+  protected List<SitePropertyDesc> properties;
   protected String typeName;
 
   @Override
@@ -40,7 +40,7 @@ class SitePluginActionDescImpl implements SitePluginActionDesc {
   }
 
   @Override
-  public Set<SitePropertyDesc> getProperties() {
+  public List<SitePropertyDesc> getProperties() {
     return properties;
   }
 

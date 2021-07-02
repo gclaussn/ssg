@@ -56,7 +56,7 @@ class SiteImpl implements Site {
     sourcePath = sitePath.resolve(SOURCE);
     outputPath = sitePath.resolve(OUTPUT);
 
-    // initialize components
+    // initialize components, which depend on the site
     repository = new SiteModelRepository(this);
     modelApi = repository.createModelApi();
     generator = new SiteGeneratorImpl(this);
@@ -225,7 +225,7 @@ class SiteImpl implements Site {
 
   @Override
   public List<SiteError> load() {
-    // clear stored events
+    // clear all stored events
     eventStore.clear();
 
     return repository.load();

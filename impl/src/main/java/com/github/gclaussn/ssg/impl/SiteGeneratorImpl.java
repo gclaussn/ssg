@@ -223,7 +223,7 @@ class SiteGeneratorImpl implements SiteGenerator {
     } catch (IOException e) {
       error = SiteError.builder(site).source(page).errorPageNotGenerated(e);
     } catch (Exception e) {
-      // rare case - e.g. script without any content "script."
+      // rare case - e.g. script without any content: "script."
       String message = String.format("Unexpected Jade lexer/parser error: %s", e.getMessage());
       JadeException exception = new JadeParserException(page.getTemplateName(), -1, configuration.getTemplateLoader(), message);
       error = SiteError.builder(site).source(page).errorPageNotGenerated(exception, null);

@@ -1,5 +1,7 @@
 package com.github.gclaussn.ssg.impl.plugin;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -9,7 +11,7 @@ import com.github.gclaussn.ssg.plugin.SitePluginDesc;
 class SitePluginDescImpl implements SitePluginDesc {
 
   protected final Set<String> actions;
-  protected final Set<SitePropertyDesc> properties;
+  protected final List<SitePropertyDesc> properties;
 
   protected String documentation;
   protected String name;
@@ -17,7 +19,7 @@ class SitePluginDescImpl implements SitePluginDesc {
 
   SitePluginDescImpl() {
     actions = new TreeSet<>();
-    properties = new TreeSet<>();
+    properties = new LinkedList<>();
   }
 
   @Override
@@ -41,7 +43,7 @@ class SitePluginDescImpl implements SitePluginDesc {
   }
 
   @Override
-  public Set<SitePropertyDesc> getProperties() {
+  public List<SitePropertyDesc> getProperties() {
     return properties;
   }
 

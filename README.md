@@ -1,5 +1,5 @@
 # Static Site Generator (SSG)
-SSG is a flexible and extensible static site generator, that processes user-defined [YAML](https://yaml.org/) models, [Markdown](https://spec.commonmark.org/0.28/) files with YAML front matter and [JADE](https://jade-lang.com/) templates to generate HTML pages.
+SSG is a flexible and extensible static site generator, that processes user-defined [Yaml](https://yaml.org/) models, [Markdown](https://spec.commonmark.org/0.28/) files with Yaml front matter and [Jade](https://jade-lang.com/) templates to generate HTML pages.
 
 Implementation based on / made possible by:
 - [OpenJDK 14](https://openjdk.java.net/projects/jdk/14/)
@@ -16,8 +16,8 @@ and many more!
 - **Page sets** to utilize one template for multiple pages, each providing specific data
 - Reusable data via **page includes**
 - **Data selectors** to include dynamic data
-- Reusable template code via JADE `include` and `mixin`
-- Template inheritance via JADE `extends` and `block`
+- Reusable template code via **Jade** `include` and `mixin`
+- Template inheritance via **Jade** `extends` and `block`
 - CLI for automation
 - Integrated development server with file watcher and hot reload
 - Plugin mechanism to provide additional:
@@ -37,11 +37,11 @@ A documentation can be found [here](https://gclaussn.github.io/ssg/).
 
 Windows:
 
-    set PATH=%PATH%;%SSG_HOME%\bin
+`set PATH=%PATH%;%SSG_HOME%\bin`
 
 Unix:
 
-    export PATH=${PATH}:${SSG_HOME}/bin
+`export PATH=${PATH}:${SSG_HOME}/bin`
 
 6. To verify the installation run:
 
@@ -60,9 +60,11 @@ Unix:
 ## Docker
 SSG is available as pre-built Docker image on [Docker Hub](https://hub.docker.com/r/gclaussn/ssg). Simply run:
 
-    docker pull gclaussn/ssg
-    docker run --rm -v $(pwd):/site gclaussn/ssg init
-    docker run --rm -v $(pwd):/site -p 8080:8080 gclaussn/ssg server
+```
+docker pull gclaussn/ssg
+docker run --rm -v $(pwd):/site gclaussn/ssg init
+docker run --rm -v $(pwd):/site -p 8080:8080 gclaussn/ssg server
+```
 
 Prepand `MSYS_NO_PATHCONV=1` for Git Bash (MinGW)
 

@@ -16,15 +16,13 @@ import com.github.gclaussn.ssg.conf.TypeLookup;
 
 /**
  * Generic deserializer for beans.<br>
- * Each YAML object node must contain these three fields:
- * <ul>
- *   <li>"class": Class name of implementation type (fully or simple, if it is a default implementation)</li>
- *   <li>"model": Object node, used deserialize the implementation type</li>
- * </ul>
+ * Each bean definition node must contain these fields: "class": Class name (full or simple, if it
+ * is not ambiguous) of the implementation type and "model": Object node, used deserialize the
+ * implementation type.
  *
- * @param <T> The bean type (e.g. the {@link PageFilterBeanImpl}).
+ * @param <T> The bean implementation type (e.g. the {@link PageFilterBeanImpl}).
  * 
- * @param <I> The implementation type (e.g. an implementation of {@link PageFilter}).
+ * @param <I> The bean type (e.g. {@link PageFilter}).
  */
 abstract class AbstractBeanDeserializer<T, I> extends JsonDeserializer<T> {
 
@@ -33,6 +31,7 @@ abstract class AbstractBeanDeserializer<T, I> extends JsonDeserializer<T> {
 
   protected final Site site;
 
+  /** Data structure, used to lookup types by full or simple class name. */
   private final TypeLookup<I> typeLookup;
 
   AbstractBeanDeserializer(Site site, TypeLookup<I> typeLookup) {
@@ -49,7 +48,6 @@ abstract class AbstractBeanDeserializer<T, I> extends JsonDeserializer<T> {
     JsonNode jsonNode = oc.readTree(p);
 
     String implClassName = getImplClassName(jsonNode);
-
     Class<? extends I> implClass = lookup(implClassName);
 
     JsonNode modelNode = jsonNode.get(FIELD_MODEL);

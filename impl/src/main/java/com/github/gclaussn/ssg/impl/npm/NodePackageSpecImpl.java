@@ -9,6 +9,7 @@ import com.github.gclaussn.ssg.npm.NodePackageSpec;
 
 class NodePackageSpecImpl implements NodePackageSpec {
 
+  /** Path to the site's node_modules directory. */
   protected Path path;
 
   protected List<String> includes;

@@ -1,6 +1,6 @@
 package com.github.gclaussn.ssg.conf;
 
-import java.util.Set;
+import java.util.List;
 
 import com.github.gclaussn.ssg.plugin.SitePlugin;
 import com.github.gclaussn.ssg.plugin.SitePluginAction;
@@ -20,5 +20,5 @@ public interface TypeDesc {
 
   String getName();
 
-  Set<SitePropertyDesc> getProperties();
+  List<SitePropertyDesc> getProperties();
 }

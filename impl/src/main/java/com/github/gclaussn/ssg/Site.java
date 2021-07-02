@@ -91,7 +91,8 @@ public interface Site extends AutoCloseable {
   void close();
 
   /**
-   * Generates the output of all known pages.
+   * Generates the output for all loaded pages. {@link Page}s that are rejected or skipped are not
+   * generated.
    * 
    * @return A list with {@link SiteError}s that occurred during generation.
    * 

@@ -16,18 +16,6 @@ A page within a static site that can be generated.
 A page must provide a JADE template.
 The YAML file is optional.
 
-YAML layout:
-| Name                | Type    | Description                                            |
-|:--------------------|:--------|:-------------------------------------------------------|
-| data                | Dict    | Page specific data                                     |
-| dataSelectors       | List    | List of data selectors to execute during generation    |
-| dataSelectors.id    | String  | ID of the data selector (must be unique within a page) |
-| dataSelectors.class | String  | Simple or fully qualified name of the Java class       |
-| dataSelectors.model | String  | Data selector specific data                            |
-| includes            | List    | List of page includes, the page relies on              |
-| includes.*          | String  | ID of a page include, within the src/ folder           |
-| out                 | String  | Name of the generated HTML output file                 |
-| skip                | Boolean | Determines if the page is skipped during generation    |
 
 ### Page set
 A page set, provides default data and a template for contained pages that are part of the page set.
@@ -57,15 +45,6 @@ YAML layout:
 | processors.model    | String  | Page processor specific data                            |
 | skip                | Boolean | Determines if the page set is skipped during generation |
 
-### Page include
-A reusable source, providing data and/or template code via JADE `include` or `extends` syntax.
-
-YAML layout:
-| Name                | Type    | Description                                       |
-|:--------------------|:--------|:--------------------------------------------------|
-| data                | Dict    | Page include specific data                        |
-| includes            | List    | List of page includes, the page include relies on |
-| includes.*          | String  | ID of a page include, within the src/ folder      |
 
 ### Node modules
 SSG supports `node_modules` folder, installed by [npm](https://www.npmjs.com/) using a `package.json`.

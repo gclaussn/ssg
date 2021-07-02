@@ -18,14 +18,12 @@ public class DefaultPlugin implements SitePlugin {
 
   @Override
   public void preBuild(SiteBuilder builder) {
-    // register types
     builder.addPageDataSelector(PageSetAggregator.class);
     builder.addPageDataSelector(PageSetMapper.class);
     builder.addPageDataSelector(PageSetSelector.class);
     builder.addPageFilter(DateFilter.class);
     builder.addPageProcessor(DateProcessor.class);
 
-    // register actions
     builder.addPluginAction(CpAction.class);
     builder.addPluginAction(GenerateAction.class);
     builder.addPluginAction(InitAction.class);

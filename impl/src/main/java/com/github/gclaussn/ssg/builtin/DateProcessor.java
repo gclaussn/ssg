@@ -18,15 +18,18 @@ import com.github.gclaussn.ssg.Site;
  */
 public class DateProcessor implements PageProcessor {
 
-  /** Key of the date value e.g. "2020-05-31". */
+  /** Key of the processed date value e.g. "2020-05-31". */
   public static final String VALUE = "value";
 
   protected static final String START_TIME = "startTime";
   protected static final String END_TIME = "endTime";
   protected static final String FORMATTED = "formatted";
 
+  /** The date, used to format the extracted date e.g. "EEEE, dd.MM.yyyy". */
   protected String dateFormat;
+  /** The locale to use when formatting the date e.g. "de". */
   protected Locale dateFormatLocale;
+  /** ID of the timezone, used to the date's start and end time e.g. "CET". */
   protected String timeZoneId;
 
   private DateTimeFormatter dateTimeFormatter;

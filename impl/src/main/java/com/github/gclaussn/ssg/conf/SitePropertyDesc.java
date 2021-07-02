@@ -5,6 +5,11 @@ package com.github.gclaussn.ssg.conf;
  */
 public interface SitePropertyDesc extends Comparable<SitePropertyDesc> {
 
+  /**
+   * Returns the default value in a string representation.
+   * 
+   * @return The default value, if not empty or blank. Otherwise {@code null}.
+   */
   String getDefaultValue();
 
   String getDocumentation();
@@ -39,5 +44,12 @@ public interface SitePropertyDesc extends Comparable<SitePropertyDesc> {
 
   boolean isMasked();
 
+  /**
+   * Determines if the property is required or not. If the property specifies a default value, it will
+   * not be required.
+   * 
+   * @return {@code true}, if the property is required and therefore must be provided. Otherwise
+   *         {@code false}.
+   */
   boolean isRequired();
 }

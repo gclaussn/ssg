@@ -83,9 +83,8 @@ public class SiteConfImpl implements SiteConf {
     Objects.requireNonNull(type, "type is null");
 
     TypeDescModel model = readTypeDescModel(type.getName());
-    if (model.properties == null) {
-      model.properties = Collections.emptyMap();
-    }
+    model.name = orElse(model.name, type.getSimpleName());
+    model.properties = orElse(model.properties, Collections.emptyMap());
 
     TypeDescImpl desc = new TypeDescImpl(model);
     for (Field field : type.getDeclaredFields()) {
@@ -102,11 +101,11 @@ public class SiteConfImpl implements SiteConf {
       }
 
       SitePropertyDescImpl propertyDesc = new SitePropertyDescImpl();
-      propertyDesc.defaultValue = property.defaultValue();
+      propertyDesc.defaultValue = property.defaultValue().isBlank() ? null : property.defaultValue();
       propertyDesc.documentation = model.properties.get(property.name());
       propertyDesc.masked = property.masked();
       propertyDesc.name = property.name();
-      propertyDesc.required = property.required();
+      propertyDesc.required = property.required() && propertyDesc.defaultValue == null;
       propertyDesc.type = SitePropertyType.of(field.getType());
       propertyDesc.typeName = field.getType().getName();
 
@@ -210,6 +209,10 @@ public class SiteConfImpl implements SiteConf {
     Objects.requireNonNull(event.getPath(), "event path is null");
 
     fileEventListeners.forEach(l -> l.onEvent(event));
+  }
+
+  private <T> T orElse(T value, T defaultValue) {
+    return value != null ? value : defaultValue;
   }
 
   protected TypeDescModel readTypeDescModel(String typeName) {

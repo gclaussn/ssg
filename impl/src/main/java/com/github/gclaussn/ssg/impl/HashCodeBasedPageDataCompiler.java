@@ -39,7 +39,7 @@ class HashCodeBasedPageDataCompiler extends PageDataCompiler {
       HashCode newHashCode = new HashCode(page.getId(), dataSelector.getId(), result.hashCode());
       HashCode oldHashCode = hashCodes.get(newHashCode);
 
-      // if there is no old hash code or the value is different
+      // if there is no old hash code or the hash value is different
       // the dependent data must have changed
       if (oldHashCode == null || oldHashCode.getValue() != newHashCode.getValue()) {
         hashCodes.put(newHashCode, newHashCode);
