@@ -8,13 +8,13 @@ An optional model can be defined using a **Yaml** or a **Markdown** file with a 
 
 All keywords are optional.
 
-| Keyword                            | Description                                         |
-|------------------------------------|-----------------------------------------------------|
-| [`data`](#data)                    | Page specific data, accessible within the template  |
-| [`dataSelectors`](#data-selectors) | List of data selectors to execute during generation |
-| [`includes`](#includes)            | List of page includes, the page relies on           |
-| [`out`](#out)                      | Name of the generated HTML output file              |
-| [`skip`](#skip)                    | Determines if the page is skipped during generation |
+| Keyword                          | Description                                         |
+|----------------------------------|-----------------------------------------------------|
+| [data](#data)                    | Page specific data, accessible within the template  |
+| [dataSelectors](#data-selectors) | List of data selectors to execute during generation |
+| [includes](#includes)            | List of page includes, the page relies on           |
+| [out](#out)                      | Name of the generated HTML output file              |
+| [skip](#skip)                    | Determines if the page is skipped during generation |
 
 # Keywords
 

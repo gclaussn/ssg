@@ -8,4 +8,4 @@ MSYS_NO_PATHCONV=1 docker run \
 -p 8080:8080 \
 -m 512MB \
 ssg \
-server
+--base-path /ssg server

@@ -1,4 +1,4 @@
-FROM openjdk:14.0.2-slim
+FROM openjdk:11.0.11-slim
 
 ENV SSG_HOME="/opt/ssg"
 ENV SSG_SERVER_HOST="0.0.0.0"

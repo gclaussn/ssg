@@ -13,7 +13,7 @@ When building a site using SSG, the source code of the site must follow a given 
 
 **src/**
 
-Source directory, which contains **Yaml** models, **Markdown** files and **Jade** templates that are used to define [Pages](models/page), [Page Sets](models/page-set) and [Page Includes](models/page-include) - the elements of a site.
+Source directory, which contains **Yaml** models, **Markdown** files and **Jade** templates that are used to define [Pages](pages/models/page), [Page Sets](pages/models/page-set) and [Page Includes](pages/models/page-include) - the elements of a site.
 <br />
 <br />
 

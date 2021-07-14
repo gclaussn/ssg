@@ -20,17 +20,19 @@ import de.neuland.jade4j.parser.node.Attr;
  * 
  * <pre>
  * :markdown
- *   # h1
+ *   # Heading
  *   
- *   - x
- *   - y
- *   - z
+ *   **This is bold text**
+ *
+ *   __This is bold text__
+ *
+ *   *This is italic text*
  * </pre>
  * 
  * or
  * 
  * <pre>
- * !{_fn.renderMarkdown(_md)}
+ * !{_.renderMarkdown(_md)}
  * </pre>
  * 
  * Moreover the filter is able to resolve page links e.g.:

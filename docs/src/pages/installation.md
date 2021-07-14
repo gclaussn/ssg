@@ -3,11 +3,11 @@ data:
   title: Installation
 ---
 
-SSG requires at minimum a Java 14 runtime - see [OpenJDK archive](https://jdk.java.net/archive/).
+SSG requires at minimum a Java 11 runtime - see [OpenJDK archive](https://jdk.java.net/archive/).
 
 # Manual installation
 
-1. Ensure that Java 14 is installed (`java -version`)
+1. Ensure that Java 11 is installed (`java -version`)
 2. [Download](https://github.com/gclaussn/ssg/releases/latest/download/ssg.zip) latest release
 3. Unpackage ZIP file
 4. Add `SSG_HOME` environment variable, and point it to your SSG installation

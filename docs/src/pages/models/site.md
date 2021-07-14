@@ -5,18 +5,18 @@ data:
 
 A site is defined by a YAML file, using a list of keywords.
 
-| Keyword                  | Description                         |
-|--------------------------|-------------------------------------|
-| [`pages`](#pages)        | List of pages to load               |
-| [`pageSets`](#page-sets) | List of page sets to load           |
-| [`node`](#node)          | Optional Node package specification |
+| Keyword                | Description                         |
+|------------------------|-------------------------------------|
+| [pages](#pages)        | List of pages to load               |
+| [pageSets](#page-sets) | List of page sets to load           |
+| [node](#node)          | Optional Node package specification |
 
 # Keywords
 The following section explains how to define a site.
 
 ## Pages
 Use `pages` to list IDs of pages that should be loaded.
-A page ID is the relative path from the **src/** directory to a [page](models/page) definition (the page's template and/or model files).
+A page ID is the relative path from the **src/** directory to a [page](pages/models/page) definition (the page's template and/or model files).
 
 !!! example
 
@@ -29,7 +29,7 @@ pages:
 
 ## Page Sets
 Use `pageSets` to list IDs of page sets that should be loaded.
-A page set ID is the relative path from the **src/** directory to a [page set](models/page-set) definition.
+A page set ID is the relative path from the **src/** directory to a [page set](pages/models/page-set) definition.
 
 !!! example
 

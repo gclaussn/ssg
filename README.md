@@ -2,7 +2,7 @@
 SSG is a flexible and extensible static site generator, that processes user-defined [Yaml](https://yaml.org/) models, [Markdown](https://spec.commonmark.org/0.28/) files with Yaml front matter and [Jade](https://jade-lang.com/) templates to generate HTML pages.
 
 Implementation based on / made possible by:
-- [OpenJDK 14](https://openjdk.java.net/projects/jdk/14/)
+- [OpenJDK 11](https://openjdk.java.net/projects/jdk/11/)
 - [SnakeYAML](https://bitbucket.org/asomov/snakeyaml) via [Jackson](https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
 - [jade4j](https://github.com/neuland/jade4j)
 - [flexmark-java](https://github.com/vsch/flexmark-java)
@@ -29,7 +29,7 @@ and many more!
 A documentation can be found [here](https://gclaussn.github.io/ssg/).
 
 ## Quickstart
-1. Ensure that Java 14 is installed (`java -version`)
+1. Ensure that Java 11 is installed (`java -version`)
 2. [Download](https://github.com/gclaussn/ssg/releases/latest/download/ssg.zip) latest release
 3. Unpackage ZIP file
 4. Add `SSG_HOME` environment variable, and point it to your SSG installation

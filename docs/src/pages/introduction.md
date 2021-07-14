@@ -10,12 +10,12 @@ SSG can be used to generate any HTML output and any kind of static site, since p
 # Features
 
 - Separation of template code and data
-- [Page sets](models/page-set) to utilize one template for multiple pages, each providing specific data
-- Reusable data via [page includes](models/page-include)
+- [Page sets](pages/models/page-set) to utilize one template for multiple pages, each providing specific data
+- Reusable data via [page includes](pages/models/page-include)
 - **Data selectors** to include dynamic data
 - Reusable template code via **Jade** `include` and `mixin`
 - Template inheritance via **Jade** `extends` and `block`
-- [CLI](cli) for automation
+- [CLI](pages/advanced/cli) for automation
 - Integrated development server with file watcher and hot reload
 - Plugin mechanism to provide additional:
   - Page data selector, filter and/or processor implementations

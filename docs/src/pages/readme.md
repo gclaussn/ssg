@@ -46,19 +46,6 @@ YAML layout:
 | skip                | Boolean | Determines if the page set is skipped during generation |
 
 
-### Node modules
-SSG supports `node_modules` folder, installed by [npm](https://www.npmjs.com/) using a `package.json`.
-Resources can be referenced via `/node_modules/` - for example:
-
-    link(rel="stylesheet", href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css")
-
-in `site.yaml` includes can be specified based on the glob pattern syntax:
-
-    nodeModules:
-      includes:
-      - "**/@fortawesome/fontawesome-free/css/all.min.css"
-      - "**/@fortawesome/fontawesome-free/webfonts/*"
-
 ### Generate and output site
 
     ssg generate

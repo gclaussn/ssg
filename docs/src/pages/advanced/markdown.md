@@ -3,11 +3,57 @@ data:
   title: Markdown support
 ---
 
+SSG's Markdown support is built on [flexmark-java](https://github.com/vsch/flexmark-java) - a [CommonMark](https://spec.commonmark.org/0.28/) implementation that provides Markdown parsing and rendering, which can be customized using extensions.
+
+Currently used extensions:
+- [flexmark-ext-admonition](https://github.com/vsch/flexmark-java/tree/master/flexmark-ext-admonition)
+- [flexmark-ext-tables](https://github.com/vsch/flexmark-java/tree/master/flexmark-ext-tables)
+
+# Yaml Front Matter
+
+A [page](pages/models/page)
+
+!!! example
+
+``` markdown
+```
+
+!!! example
+
+``` pug
+!{_.renderMarkdown(_md)}
+```
+
+# Jade Filter
+
+`:md` or `:markdown`
+
+!!! example "Jade Markdown filter"
+
+``` pug
+:md
+  # Heading
+
+  **This is bold text**
+
+  __This is bold text__
+
+  *This is italic text*
+```
+
+# Page Links
+
+!!! example
+
+``` markdown
+[My Page](my-page)
+```
+
 # Admonitions
 
 Admonition support is provided by a Flexmark-Java extension called [flexmark-ext-admonition](https://github.com/vsch/flexmark-java/tree/master/flexmark-ext-admonition).
 
-``` md
+``` markdown
 !!! note
     a note...
 ```

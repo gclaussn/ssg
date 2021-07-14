@@ -9,6 +9,7 @@ node:
     - bootstrap/dist/css/bootstrap.min.css
     - jquery/dist/jquery.min.js
     - prismjs/prism.js
+    - prismjs/components/prism-markdown.min.js
     - prismjs/components/prism-pug.min.js
     - prismjs/components/prism-yaml.min.js
     - prismjs/themes/prism-tomorrow.css
